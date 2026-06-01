@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: starluck-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: starluck
+      MYSQL_USER: starluck
+      MYSQL_PASSWORD: starluck123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./starluck-server/src/main/resources/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  redis:
+    image: redis:7-alpine
+    container_name: starluck-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  server:
+    build:
+      context: ./starluck-server
+      dockerfile: Dockerfile
+    container_name: starluck-server
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      MYSQL_PASSWORD: starluck123
+      REDIS_PASSWORD: ""
+      JWT_SECRET: Starluck-YiQingYouRen-2026-SecretKey-ForJWT-Prod
+    volumes:
+      - upload-data:/data/uploads
+
+volumes:
+  mysql-data:
+  redis-data:
+  upload-data:
