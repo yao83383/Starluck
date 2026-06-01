@@ -36,6 +36,6 @@ public class VipController {
     public Result<Void> subscribe(@RequestParam String planType, @RequestParam String payMethod) {
         Long userId = SecurityUtil.getCurrentUserId();
         vipService.subscribe(userId, planType, payMethod);
-        return Result.ok("VIP开通成功");
+        return Result.okMsg("VIP开通成功");
     }
 }

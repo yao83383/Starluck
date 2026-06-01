@@ -29,7 +29,7 @@ public class AuthController {
     @PostMapping("/send-code")
     public Result<Void> sendCode(@Valid @RequestBody SendCodeRequest request) {
         authService.sendCode(request.getPhone());
-        return Result.ok("验证码已发送");
+        return Result.okMsg("验证码已发送");
     }
 
     /**

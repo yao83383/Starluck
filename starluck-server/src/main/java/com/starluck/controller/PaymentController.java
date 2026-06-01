@@ -49,6 +49,6 @@ public class PaymentController {
     public Result<Void> withdraw(@Valid @RequestBody WithdrawRequest request) {
         Long userId = SecurityUtil.getCurrentUserId();
         paymentService.applyWithdraw(userId, request.getAmount(), request.getMethod(), request.getAccount());
-        return Result.ok("提现申请已提交");
+        return Result.okMsg("提现申请已提交");
     }
 }

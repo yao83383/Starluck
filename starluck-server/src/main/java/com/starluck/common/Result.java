@@ -35,6 +35,13 @@ public class Result<T> {
         return new Result<>(200, message, data);
     }
 
+    /**
+     * 返回成功，仅带消息体（data=null）
+     */
+    public static Result<Void> okMsg(String message) {
+        return new Result<>(200, message, null);
+    }
+
     public static <T> Result<T> fail(String message) {
         return new Result<>(500, message, null);
     }

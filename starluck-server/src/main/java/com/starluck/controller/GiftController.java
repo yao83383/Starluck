@@ -39,6 +39,6 @@ public class GiftController {
     public Result<Void> sendGift(@Valid @RequestBody GiftSendRequest request) {
         Long userId = SecurityUtil.getCurrentUserId();
         giftService.sendGift(userId, request);
-        return Result.ok("礼物已送出");
+        return Result.okMsg("礼物已送出");
     }
 }

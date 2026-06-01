@@ -152,7 +152,7 @@ public class AuthServiceImpl implements AuthService {
         UserBalance balance = new UserBalance();
         balance.setUserId(user.getId());
         balance.setDiamonds(666);
-        balance.setCash(0.00);
+        balance.setCash(java.math.BigDecimal.ZERO);
         balance.setDailyFreeChat(5);
         userBalanceMapper.insert(balance);
 

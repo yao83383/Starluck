@@ -37,7 +37,7 @@ public class UserController {
     public Result<Void> updateProfile(@RequestBody UserProfile profile) {
         Long userId = SecurityUtil.getCurrentUserId();
         userService.updateProfile(userId, profile);
-        return Result.ok("资料更新成功");
+        return Result.okMsg("资料更新成功");
     }
 
     /**

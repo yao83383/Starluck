@@ -79,7 +79,7 @@ public class AdminServiceImpl implements AdminService {
             f.setAvatarNo(RandomUtil.randomInt(1, 9));
             f.setAge(20 + RandomUtil.randomInt(10));
             f.setCity(CITY_POOL[RandomUtil.randomInt(CITY_POOL.length)]);
-            f.setDist((0.5 + RandomUtil.randomDouble(5)).formatted("%.1f") + "km");
+            f.setDist(String.format("%.1f", 0.5 + RandomUtil.randomDouble(5)) + "km");
             f.setOnline(RandomUtil.randomInt(10) > 3);
             f.setVip(RandomUtil.randomInt(10) > 6);
             f.setHeight(158 + RandomUtil.randomInt(15));

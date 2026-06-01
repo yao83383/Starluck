@@ -51,7 +51,7 @@ public class AdminController {
     @PostMapping("/push/manual")
     public Result<Void> manualPush(@RequestParam Long fakeUserId, @RequestParam Long targetUserId) {
         adminService.manualPush(fakeUserId, targetUserId);
-        return Result.ok("推送成功");
+        return Result.okMsg("推送成功");
     }
 
     /** 获取推送规则 */
