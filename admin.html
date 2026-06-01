@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1280" />
+<title>一青友人 · 运营后台</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#f5f6fa;color:#2d2d3a;font-size:13px;line-height:1.5;height:100vh;overflow:hidden;}
+button{border:none;outline:none;background:none;font-family:inherit;cursor:pointer;}
+input,textarea,select{border:none;outline:none;font-family:inherit;background:none;}
+a{text-decoration:none;color:inherit;}
+
+/* === 整体布局 === */
+.layout{display:grid;grid-template-columns:200px 1fr;height:100vh;}
+.sidebar{background:linear-gradient(180deg,#1e1a3a,#2a1f4a);color:#fff;overflow-y:auto;display:flex;flex-direction:column;}
+.sidebar .logo{padding:18px 20px;font-size:18px;font-weight:700;background:linear-gradient(135deg,#ff5a8a,#b66dff);-webkit-background-clip:text;background-clip:text;color:transparent;display:flex;align-items:center;gap:8px;}
+.sidebar .logo .ic{font-size:24px;background:none;-webkit-text-fill-color:initial;}
+.sidebar .nav{flex:1;padding:8px 0;}
+.sidebar .nav-item{padding:10px 20px;display:flex;align-items:center;gap:10px;color:rgba(255,255,255,.75);font-size:14px;cursor:pointer;border-left:3px solid transparent;}
+.sidebar .nav-item:hover{background:rgba(255,255,255,.05);}
+.sidebar .nav-item.active{background:rgba(255,90,138,.15);color:#ff5a8a;border-left-color:#ff5a8a;font-weight:600;}
+.sidebar .nav-item .ic{font-size:16px;}
+.sidebar .nav-item .bd{margin-left:auto;background:#ff3b5c;color:#fff;font-size:10px;padding:1px 6px;border-radius:8px;}
+.sidebar .footer{padding:14px 20px;font-size:11px;color:rgba(255,255,255,.4);border-top:1px solid rgba(255,255,255,.06);}
+
+.main{overflow:hidden;display:flex;flex-direction:column;}
+.header{height:54px;background:#fff;border-bottom:1px solid #eee;display:flex;align-items:center;padding:0 24px;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,.02);flex-shrink:0;}
+.header .title{font-size:17px;font-weight:700;}
+.header .right{display:flex;align-items:center;gap:14px;font-size:12px;color:#666;}
+.header .right .dot{display:inline-flex;align-items:center;gap:5px;}
+.header .right .dot::before{content:"";width:7px;height:7px;background:#22c55e;border-radius:50%;display:inline-block;}
+.header .right .dot.off::before{background:#ccc;}
+.content{flex:1;overflow-y:auto;padding:18px 24px;background:#f5f6fa;}
+
+/* === 通用控件 === */
+.btn{display:inline-flex;align-items:center;justify-content:center;height:32px;padding:0 14px;border-radius:6px;font-size:13px;font-weight:500;background:linear-gradient(135deg,#ff5a8a,#b66dff);color:#fff;transition:opacity .15s;gap:4px;}
+.btn:hover{opacity:.9;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.btn.ghost{background:#fff;color:#666;border:1px solid #ddd;}
+.btn.ghost:hover{border-color:#ff5a8a;color:#ff5a8a;background:#fff;}
+.btn.danger{background:#ff3b5c;}
+.btn.gold{background:linear-gradient(135deg,#ffd75e,#ff9a3c);color:#5a3a00;}
+.btn.small{height:26px;padding:0 10px;font-size:12px;}
+.btn.tiny{height:22px;padding:0 8px;font-size:11px;border-radius:4px;}
+
+.input{display:block;width:100%;height:32px;padding:0 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;color:#2d2d3a;background:#fff;}
+.input:focus{border-color:#ff5a8a;}
+textarea.input{height:auto;padding:8px 10px;resize:vertical;font-family:inherit;line-height:1.5;}
+
+.card{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.04);padding:16px;}
+.card-title{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+
+.tag{display:inline-flex;align-items:center;padding:2px 8px;font-size:11px;border-radius:4px;background:#f0f0f5;color:#666;}
+.tag.green{background:#dcfce7;color:#15803d;}
+.tag.red{background:#fee2e2;color:#dc2626;}
+.tag.gold{background:#fef3c7;color:#b45309;}
+.tag.purple{background:#ede9fe;color:#7c3aed;}
+.tag.pink{background:#fce7f3;color:#be185d;}
+
+.av{width:36px;height:36px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;flex-shrink:0;font-size:14px;}
+.av-1{background:linear-gradient(135deg,#ff5a8a,#b66dff);}
+.av-2{background:linear-gradient(135deg,#7c5aff,#4ade80);}
+.av-3{background:linear-gradient(135deg,#ffd75e,#ff9a3c);}
+.av-4{background:linear-gradient(135deg,#ff3b5c,#ffd75e);}
+.av-5{background:linear-gradient(135deg,#4ade80,#7c5aff);}
+.av-6{background:linear-gradient(135deg,#b66dff,#ff5a8a);}
+.av-7{background:linear-gradient(135deg,#ff9a3c,#ff3b5c);}
+.av-8{background:linear-gradient(135deg,#7c5aff,#ff5a8a);}
+
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;padding:10px 12px;background:#fafafd;font-weight:600;color:#666;font-size:12px;border-bottom:1px solid #eee;}
+td{padding:10px 12px;border-bottom:1px solid #f5f5f8;vertical-align:middle;}
+tr:hover td{background:#fafafd;}
+
+/* === 数据看板 === */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;}
+.kpi-card{background:#fff;border-radius:8px;padding:16px;position:relative;overflow:hidden;}
+.kpi-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#ff5a8a,#b66dff);}
+.kpi-card .l{font-size:12px;color:#888;display:flex;align-items:center;gap:6px;}
+.kpi-card .v{font-size:28px;font-weight:800;color:#2d2d3a;margin-top:6px;}
+.kpi-card .d{font-size:11px;color:#888;margin-top:4px;}
+.kpi-card .d .up{color:#22c55e;}
+.kpi-card .d .down{color:#ef4444;}
+
+.funnel{display:flex;align-items:flex-end;gap:0;height:160px;padding:14px 0;}
+.funnel .fn{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;}
+.funnel .fn .bar{width:80%;background:linear-gradient(180deg,#ff5a8a,#b66dff);border-radius:6px 6px 0 0;display:flex;align-items:flex-start;justify-content:center;color:#fff;font-weight:700;padding-top:8px;}
+.funnel .fn .nm{font-size:12px;color:#666;}
+.funnel .fn .v{font-size:11px;color:#888;}
+.funnel .fn::after{content:"›";position:absolute;right:-10px;top:50%;transform:translateY(-50%);font-size:24px;color:#ccc;}
+.funnel .fn:last-child::after{display:none;}
+
+/* === 假用户管理 === */
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;}
+.toolbar .left{display:flex;align-items:center;gap:8px;}
+.toolbar .left .input{width:240px;}
+.toolbar .right{display:flex;gap:8px;}
+
+/* === 客服工作台 === */
+.cs-layout{display:grid;grid-template-columns:280px 1fr 320px;gap:14px;height:calc(100vh - 54px - 36px);}
+.cs-col{background:#fff;border-radius:8px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.cs-col-head{padding:12px 14px;border-bottom:1px solid #eee;font-size:13px;font-weight:700;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.cs-col-body{flex:1;overflow-y:auto;}
+
+.conv-item{padding:12px 14px;display:flex;gap:10px;cursor:pointer;border-bottom:1px solid #f5f5f8;}
+.conv-item:hover{background:#fafafd;}
+.conv-item.active{background:#fef0f5;border-left:3px solid #ff5a8a;padding-left:11px;}
+.conv-item .iv{flex:1;min-width:0;}
+.conv-item .iv .nm{display:flex;justify-content:space-between;align-items:center;}
+.conv-item .iv .nm .n{font-size:13px;font-weight:600;}
+.conv-item .iv .nm .t{font-size:10px;color:#999;}
+.conv-item .iv .ln{font-size:11px;color:#888;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.conv-item .iv .as{font-size:10px;color:#7c3aed;margin-top:3px;}
+.conv-item .bd{background:#ff3b5c;color:#fff;font-size:10px;padding:1px 5px;border-radius:8px;min-width:16px;text-align:center;}
+
+.cs-chat{display:flex;flex-direction:column;}
+.cs-chat-head{padding:12px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.cs-chat-head .iv{flex:1;}
+.cs-chat-head .iv .n{font-size:14px;font-weight:700;}
+.cs-chat-head .iv .m{font-size:11px;color:#888;}
+.cs-msg-flow{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:#fafafd;}
+.cs-sys{font-size:11px;color:#999;text-align:center;padding:6px;}
+.cs-bubble-row{display:flex;gap:8px;max-width:75%;align-items:flex-end;}
+.cs-bubble-row.fake{align-self:flex-end;flex-direction:row-reverse;}
+.cs-bubble-row .av{width:30px;height:30px;font-size:12px;}
+.cs-bubble{padding:8px 12px;border-radius:12px;background:#fff;font-size:13px;line-height:1.4;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+.cs-bubble-row.fake .cs-bubble{background:linear-gradient(135deg,#ff5a8a,#b66dff);color:#fff;}
+.cs-bubble-row .meta{font-size:9px;color:#bbb;margin-top:3px;}
+.cs-input-bar{padding:12px 14px;border-top:1px solid #eee;background:#fff;flex-shrink:0;}
+.cs-input-row{display:flex;gap:8px;}
+.cs-input-row textarea{flex:1;border:1px solid #ddd;border-radius:6px;padding:8px 10px;font-size:13px;height:60px;resize:none;font-family:inherit;}
+.cs-input-row textarea:focus{border-color:#ff5a8a;}
+.cs-quick-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.cs-quick-row .q{padding:3px 10px;background:#f5f5f8;border-radius:12px;font-size:11px;color:#666;cursor:pointer;}
+.cs-quick-row .q:hover{background:#fef0f5;color:#ff5a8a;}
+
+.cs-side-section{padding:12px 14px;border-bottom:1px solid #eee;}
+.cs-side-section h4{font-size:12px;color:#888;font-weight:600;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.cs-profile{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.cs-profile .iv{flex:1;}
+.cs-profile .iv .n{font-size:14px;font-weight:700;}
+.cs-profile .iv .m{font-size:11px;color:#888;}
+.profile-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;}
+.profile-stats .ps{background:#fafafd;padding:6px 8px;border-radius:6px;}
+.profile-stats .ps .l{color:#888;}
+.profile-stats .ps .v{font-weight:700;color:#2d2d3a;margin-top:2px;}
+
+.ai-suggest{background:linear-gradient(135deg,rgba(255,215,94,.15),rgba(255,154,60,.05));border:1px solid rgba(255,154,60,.3);border-radius:8px;padding:10px;font-size:12px;}
+.ai-suggest .hd{font-size:11px;color:#ff9a3c;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:4px;}
+.ai-suggest .tx{font-size:13px;color:#2d2d3a;margin:6px 0;min-height:36px;line-height:1.5;}
+.ai-suggest .act{display:flex;gap:6px;}
+
+/* === 推送规则 === */
+.slot-row{display:grid;grid-template-columns:auto 1fr 1fr 1fr auto;gap:10px;align-items:center;padding:10px;border-radius:6px;background:#fafafd;margin-bottom:8px;}
+.slot-row label{font-size:11px;color:#888;}
+.slot-row .input{height:28px;font-size:12px;}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center;}
+.modal-card{background:#fff;border-radius:8px;width:520px;max-width:90vw;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;}
+.modal-head{padding:14px 18px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;}
+.modal-head .t{font-size:15px;font-weight:700;}
+.modal-head .x{font-size:20px;color:#999;cursor:pointer;}
+.modal-body{padding:18px;overflow-y:auto;flex:1;}
+.modal-foot{padding:12px 18px;border-top:1px solid #eee;display:flex;justify-content:flex-end;gap:8px;}
+
+.form-row{margin-bottom:12px;}
+.form-row label{display:block;font-size:12px;color:#666;margin-bottom:4px;font-weight:500;}
+
+.toast{position:fixed;top:24px;right:24px;background:#1e293b;color:#fff;padding:10px 16px;border-radius:6px;font-size:13px;z-index:9999;animation:slideIn .25s;}
+@keyframes slideIn{from{transform:translateX(120%);}to{transform:translateX(0);}}
+
+.empty{padding:60px 20px;text-align:center;color:#bbb;font-size:13px;}
+.empty .ei{font-size:48px;opacity:.5;margin-bottom:14px;}
+
+.sw{width:38px;height:22px;background:#e5e5ec;border-radius:11px;position:relative;transition:background .2s;display:inline-block;cursor:pointer;vertical-align:middle;}
+.sw.on{background:#ff5a8a;}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 2px 4px rgba(0,0,0,.2);}
+.sw.on::after{transform:translateX(16px);}
+
+.log-row{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f8;font-size:12px;align-items:center;}
+.log-row .t{color:#888;font-family:monospace;}
+.log-row .av{width:24px;height:24px;font-size:10px;}
+.log-row .a{flex:1;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://unpkg.com/vue@3.4.27/dist/vue.global.prod.js"></script>
+<script>
+const { createApp, reactive, ref, computed, watch, onMounted, nextTick } = Vue
+
+/* ===================== 共享 Store（与 app.html 同源 localStorage） ===================== */
+const DEFAULT_STORE = {
+  loggedIn:false, onboarded:false,
+  fakeUsers:[],
+  pushRules:{enabled:true, timeSlots:[
+    {start:'09:00',end:'11:00',maxPer:1},
+    {start:'12:00',end:'14:00',maxPer:1},
+    {start:'19:00',end:'22:30',maxPer:2},
+  ], strategy:'active', cooldownMin:30},
+  pushLog:[],
+  csConfig:{aiKey:'', systemPrompt:'你是一个温柔、有趣、积极的年轻女性，正在和一位男性聊天交友。回复要：1) 简短自然（30字内）2) 偶尔反问引导对方说更多 3) 不主动提钱、礼物、转账 4) 不暴露你是AI。', templates:['哈哈是的呢～','你说的对','在做什么呢？','想见你了','晚点聊好吗？','谢谢你的礼物～'], autoReplyEnabled:false},
+  adminAnalytics:{pushed:0,opened:0,replied:0,paidAfter:0},
+  user:{id:'me',name:'我',av:1,city:'上海',vip:false,vipExpire:'',followers:128,fans:256,friends:42,likes:1280},
+  diamonds:666, cash:88.50, isAuthed:false, chatFreeRemain:5,
+  chats:[], transactions:[],
+  invitedCount:12, invitedPaid:5, invitedReward:686.50, myRank:28, inviteCode:'YQ8888',
+  settings:{invisible:false,hideLoc:false,vipOnly:true,sound:true,vibrate:true},
+  firstRechargeShown:false,
+}
+
+const store = reactive(JSON.parse(JSON.stringify(DEFAULT_STORE)))
+try{
+  const saved = JSON.parse(localStorage.getItem('yqyr_store')||'null')
+  if(saved){
+    // 兼容旧版数据：缺字段补默认
+    for(const k of Object.keys(DEFAULT_STORE)){
+      if(saved[k] === undefined) saved[k] = DEFAULT_STORE[k]
+    }
+    Object.assign(store, saved)
+  }
+}catch(e){ console.warn('load store err', e) }
+
+let _saveT
+watch(store, ()=>{
+  clearTimeout(_saveT)
+  _saveT = setTimeout(()=>{
+    try{ localStorage.setItem('yqyr_store', JSON.stringify(store)) }catch(e){}
+  }, 150)
+}, {deep:true})
+
+window.addEventListener('storage', e=>{
+  if(e.key !== 'yqyr_store' || !e.newValue) return
+  try{
+    const incoming = JSON.parse(e.newValue)
+    for(const k of Object.keys(incoming)){
+      if(typeof incoming[k]==='object' && incoming[k]!==null && !Array.isArray(incoming[k])){
+        Object.assign(store[k], incoming[k])
+      }else{
+        store[k] = incoming[k]
+      }
+    }
+  }catch(_){}
+})
+
+/* ===================== Toast ===================== */
+const toastState = ref('')
+let toastTimer
+const toast = (msg)=>{
+  toastState.value = msg
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(()=>{ toastState.value = '' }, 2000)
+}
+
+/* ===================== 智谱 GLM-4-Flash 客户端 ===================== */
+const glm = {
+  async chat(messages, opts={}){
+    const key = opts.key || store.csConfig.aiKey
+    if(!key) throw new Error('未配置 API Key')
+    const res = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body: JSON.stringify({
+        model: opts.model||'glm-4-flash',
+        messages,
+        temperature: opts.temperature ?? 0.85,
+        max_tokens: opts.max_tokens || 200,
+      })
+    })
+    if(!res.ok){
+      const err = await res.text().catch(()=>'')
+      throw new Error('GLM '+res.status+': '+err.slice(0,140))
+    }
+    const data = await res.json()
+    return data?.choices?.[0]?.message?.content?.trim()||''
+  }
+}
+
+/* ===================== 假用户工具 ===================== */
+const FAKE_NAME_POOL = ['小诗','糖糖','梨花','若兮','茉莉','柚柚','安琪','可可','小鹿','月亮','晓雯','子萱','婉清','雨晴','南风','沐妍','栀子','清欢','一一','阿月']
+const CITY_POOL = ['上海','北京','深圳','广州','杭州','成都','南京','武汉','重庆','西安']
+const SIGN_POOL = ['寻找一个温暖的人','生活不止眼前的苟且','喜欢摄影、咖啡和旅行','期待一场认真的恋爱','喜欢看星星和电影','愿和你共度春秋','一个人也要好好生活','努力做有趣的女生']
+const TAG_POOL = ['旅行','咖啡','摄影','美食','音乐','电影','健身','读书','宠物','瑜伽','汉服','烹饪','逛街','插画','烘焙']
+
+const randomFakeUser = ()=>{
+  const id = 'f'+Date.now()+Math.floor(Math.random()*1000)
+  const name = FAKE_NAME_POOL[Math.floor(Math.random()*FAKE_NAME_POOL.length)]
+  const tags = []
+  while(tags.length<3){
+    const t = TAG_POOL[Math.floor(Math.random()*TAG_POOL.length)]
+    if(!tags.includes(t)) tags.push(t)
+  }
+  return {
+    id, name, av:Math.floor(Math.random()*8)+1,
+    age:20+Math.floor(Math.random()*10),
+    city:CITY_POOL[Math.floor(Math.random()*CITY_POOL.length)],
+    dist:(0.5+Math.random()*5).toFixed(1)+'km',
+    tags,
+    sign:SIGN_POOL[Math.floor(Math.random()*SIGN_POOL.length)],
+    online:Math.random()>0.3, vip:Math.random()>0.6,
+    height:158+Math.floor(Math.random()*15), weight:42+Math.floor(Math.random()*15),
+    job:'设计师', edu:'本科', home:'广东深圳', love:'单身',
+    persona:'温柔、爱笑、喜欢分享日常',
+    csOwner:'', // 客服认领人
+    createdAt:Date.now(),
+  }
+}
+
+const findUser = id => {
+  return store.fakeUsers.find(u=>u.id===id)
+}
+
+/* ===================== 视图状态 ===================== */
+const view = ref('dashboard')
+const ui = reactive({
+  showFakeModal:false, editingFake:null,
+  showBatchModal:false, batchCount:5,
+  activeConvId:'',
+  aiSuggest:'', aiLoading:false,
+  reply:'',
+})
+
+/* ===================== 计算属性 ===================== */
+// 与假用户的对话（运营关心的）
+const fakeConvs = computed(()=>{
+  return store.chats.filter(c=>store.fakeUsers.find(f=>f.id===c.uid))
+})
+const totalUnread = computed(()=>fakeConvs.value.reduce((s,c)=>s+(c.unread||0),0))
+
+const activeConv = computed(()=>store.chats.find(c=>c.id===ui.activeConvId))
+const activeFake = computed(()=>activeConv.value ? findUser(activeConv.value.uid) : null)
+
+/* ===================== 业务方法 ===================== */
+const ops = {
+  addFake(data){
+    const fake = data.id ? data : {...randomFakeUser(), ...data}
+    if(data.id){
+      const i = store.fakeUsers.findIndex(f=>f.id===data.id)
+      if(i>=0) store.fakeUsers[i] = fake
+    }else{
+      store.fakeUsers.push(fake)
+    }
+  },
+  delFake(id){
+    if(!confirm('确认删除此假用户？相关会话将保留但不再被推送命中')) return
+    store.fakeUsers = store.fakeUsers.filter(f=>f.id!==id)
+    toast('已删除')
+  },
+  batchGen(n){
+    for(let i=0;i<n;i++) store.fakeUsers.push(randomFakeUser())
+    toast('已生成 '+n+' 个假用户')
+  },
+  sendReply(text){
+    if(!activeConv.value || !text.trim()) return
+    activeConv.value.msgs.push({type:'in', text:text.trim(), time:'刚刚', cs:true})
+    activeConv.value.lastMsg = text.trim()
+    activeConv.value.time = '刚刚'
+    activeConv.value.unread = (activeConv.value.unread||0) + 1
+    store.adminAnalytics.replied = (store.adminAnalytics.replied||0) + 1
+    ui.reply = ''
+    ui.aiSuggest = ''
+    toast('已发送')
+  },
+  async askAI(){
+    if(!activeConv.value) return
+    if(!store.csConfig.aiKey){ toast('请先在 AI 设置 中配置 API Key'); return }
+    ui.aiLoading = true
+    ui.aiSuggest = ''
+    try{
+      const last6 = activeConv.value.msgs.slice(-6).filter(m=>m.type==='in'||m.type==='out')
+      const dialog = last6.map(m=>({
+        // 站在假女用户的视角：男用户(out)是 user 角色，假女(in/cs)是 assistant 角色
+        role: m.type==='out' ? 'user' : 'assistant',
+        content: m.text
+      }))
+      const fk = activeFake.value
+      const sys = store.csConfig.systemPrompt + `\n你的角色资料：昵称${fk.name}，${fk.age}岁，${fk.city}，性格：${fk.persona||'温柔'}。`
+      const out = await glm.chat([
+        {role:'system', content:sys},
+        ...dialog,
+        ...(dialog.length===0 ? [{role:'user', content:'(对方刚刚向你打招呼，请友好回复)'}] : [])
+      ])
+      ui.aiSuggest = out
+    }catch(e){ toast('AI出错: '+e.message) }
+    ui.aiLoading = false
+  },
+  manualPush(fakeId){
+    if(!store.loggedIn){ toast('男用户端未登录，无法推送'); return }
+    const fu = store.fakeUsers.find(f=>f.id===fakeId)
+    if(!fu){ toast('假用户不存在'); return }
+    const greetings = ['你好呀～看你头像感觉好亲切','嗨～在干嘛呢','在吗？刚刷到你～','哈喽～感觉我们好像挺投缘的','突然好想找人聊聊天']
+    const greet = greetings[Math.floor(Math.random()*greetings.length)]
+    let chat = store.chats.find(c=>c.uid===fu.id)
+    if(!chat){
+      chat = {id:'c'+Date.now(), uid:fu.id, lastMsg:'', time:'刚刚', unread:0, msgs:[
+        {type:'sys', text:'TA向你发起了打招呼'}
+      ]}
+      store.chats.unshift(chat)
+    }
+    chat.msgs.push({type:'in', text:greet, time:'刚刚'})
+    chat.lastMsg = greet
+    chat.time = '刚刚'
+    chat.unread = (chat.unread||0) + 1
+    store.pushLog.push({ts:Date.now(), fakeUid:fu.id, toUid:store.user.id, slot:'manual', opened:false, replied:false})
+    store.adminAnalytics.pushed = (store.adminAnalytics.pushed||0) + 1
+    toast('已手动推送：'+fu.name+' → 男用户')
+  },
+  resetAll(){
+    if(!confirm('确认重置所有数据？localStorage 会被清空')) return
+    localStorage.removeItem('yqyr_store')
+    location.reload()
+  }
+}
+
+/* ===================== 视图组件 ===================== */
+
+/* 数据看板 */
+const ViewDashboard = {
+  setup(){
+    const onlineFake = computed(()=>store.fakeUsers.filter(f=>f.online).length)
+    const todayPush = computed(()=>{
+      const today = new Date().toDateString()
+      return store.pushLog.filter(p=>new Date(p.ts).toDateString()===today).length
+    })
+    const fakeConvCount = computed(()=>fakeConvs.value.length)
+    const conversionRate = computed(()=>{
+      const p = store.adminAnalytics.pushed||0
+      const r = store.adminAnalytics.replied||0
+      return p>0 ? ((r/p)*100).toFixed(1) : '0'
+    })
+    return {store, onlineFake, todayPush, fakeConvCount, conversionRate, view, ops}
+  },
+  template:`<div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="l">👥 假用户总数</div>
+        <div class="v">{{store.fakeUsers.length}}</div>
+        <div class="d">在线 <span class="up">{{onlineFake}}</span> 人</div>
+      </div>
+      <div class="kpi-card">
+        <div class="l">💌 今日推送</div>
+        <div class="v">{{todayPush}}</div>
+        <div class="d">累计 {{store.adminAnalytics.pushed||0}}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="l">💬 进行中会话</div>
+        <div class="v">{{fakeConvCount}}</div>
+        <div class="d">未读 <span class="up">{{totalUnread}}</span></div>
+      </div>
+      <div class="kpi-card">
+        <div class="l">📈 推送→回复转化</div>
+        <div class="v">{{conversionRate}}%</div>
+        <div class="d">已回复 {{store.adminAnalytics.replied||0}}</div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-title">
+        <span>转化漏斗</span>
+        <span style="font-size:11px;color:#999;font-weight:400;">推送 → 打开 → 回复 → 充值</span>
+      </div>
+      <div class="funnel">
+        <div class="fn">
+          <div class="bar" :style="{height:'140px'}">{{store.adminAnalytics.pushed||0}}</div>
+          <div class="nm">推送</div>
+          <div class="v">100%</div>
+        </div>
+        <div class="fn">
+          <div class="bar" :style="{height:(store.adminAnalytics.pushed?Math.max(20,(store.adminAnalytics.opened||0)/store.adminAnalytics.pushed*140):20)+'px'}">{{store.adminAnalytics.opened||0}}</div>
+          <div class="nm">打开</div>
+          <div class="v">{{store.adminAnalytics.pushed?Math.round((store.adminAnalytics.opened||0)/store.adminAnalytics.pushed*100):0}}%</div>
+        </div>
+        <div class="fn">
+          <div class="bar" :style="{height:(store.adminAnalytics.pushed?Math.max(20,(store.adminAnalytics.replied||0)/store.adminAnalytics.pushed*140):20)+'px'}">{{store.adminAnalytics.replied||0}}</div>
+          <div class="nm">回复</div>
+          <div class="v">{{store.adminAnalytics.pushed?Math.round((store.adminAnalytics.replied||0)/store.adminAnalytics.pushed*100):0}}%</div>
+        </div>
+        <div class="fn">
+          <div class="bar" :style="{height:(store.adminAnalytics.pushed?Math.max(20,(store.adminAnalytics.paidAfter||0)/store.adminAnalytics.pushed*140):20)+'px'}">{{store.adminAnalytics.paidAfter||0}}</div>
+          <div class="nm">充值</div>
+          <div class="v">{{store.adminAnalytics.pushed?Math.round((store.adminAnalytics.paidAfter||0)/store.adminAnalytics.pushed*100):0}}%</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">
+        <span>快速操作</span>
+        <button class="btn small ghost danger" @click="ops.resetAll" style="color:#ff3b5c;border-color:#ff3b5c;">⚠️ 重置所有数据</button>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn" @click="view='fakes'">👤 管理假用户</button>
+        <button class="btn ghost" @click="view='workbench'">💬 进入客服工作台 <span v-if="totalUnread" class="tag red" style="margin-left:6px;">{{totalUnread}} 待回复</span></button>
+        <button class="btn ghost" @click="view='push'">📡 推送规则</button>
+        <button class="btn ghost" @click="view='ai'">🤖 AI 设置</button>
+      </div>
+    </div>
+  </div>`
+}
+
+/* 假用户管理 */
+const ViewFakes = {
+  setup(){
+    const search = ref('')
+    const list = computed(()=>{
+      const q = search.value.trim().toLowerCase()
+      if(!q) return store.fakeUsers
+      return store.fakeUsers.filter(f=>f.name.toLowerCase().includes(q)||f.city.includes(q))
+    })
+    const openNew = ()=>{
+      ui.editingFake = randomFakeUser()
+      ui.editingFake.id = ''
+      ui.showFakeModal = true
+    }
+    const openEdit = (f)=>{
+      ui.editingFake = JSON.parse(JSON.stringify(f))
+      ui.showFakeModal = true
+    }
+    return {store, search, list, openNew, openEdit, ops, ui}
+  },
+  template:`<div>
+    <div class="toolbar">
+      <div class="left">
+        <input class="input" v-model="search" placeholder="搜索昵称或城市..." />
+        <span class="tag">共 {{store.fakeUsers.length}} 个</span>
+      </div>
+      <div class="right">
+        <button class="btn ghost" @click="ui.showBatchModal=true">📦 批量生成</button>
+        <button class="btn" @click="openNew">➕ 新增假用户</button>
+      </div>
+    </div>
+    <div class="card" style="padding:0;">
+      <table v-if="list.length">
+        <thead><tr>
+          <th style="width:60px;">头像</th>
+          <th>昵称</th>
+          <th>年龄</th>
+          <th>城市</th>
+          <th>兴趣</th>
+          <th>状态</th>
+          <th>人设</th>
+          <th>会话</th>
+          <th style="width:140px;">操作</th>
+        </tr></thead>
+        <tbody>
+          <tr v-for="f in list" :key="f.id">
+            <td><div class="av" :class="'av-'+f.av">{{f.name[0]}}</div></td>
+            <td><b>{{f.name}}</b> <span v-if="f.vip" class="tag gold" style="margin-left:4px;">VIP</span></td>
+            <td>{{f.age}}</td>
+            <td>{{f.city}}</td>
+            <td><span v-for="t in f.tags" :key="t" class="tag pink" style="margin-right:3px;">{{t}}</span></td>
+            <td><span class="tag" :class="f.online?'green':''">{{f.online?'● 在线':'○ 离线'}}</span></td>
+            <td style="font-size:11px;color:#888;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{f.persona}}</td>
+            <td>
+              <span class="tag">{{store.chats.filter(c=>c.uid===f.id).length}}</span>
+            </td>
+            <td>
+              <button class="btn tiny ghost" @click="ops.manualPush(f.id)" title="向当前登录的男用户发起打招呼">📨 推送</button>
+              <button class="btn tiny ghost" @click="openEdit(f)">编辑</button>
+              <button class="btn tiny ghost" @click="ops.delFake(f.id)" style="color:#ff3b5c;">删除</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div v-else class="empty">
+        <div class="ei">👤</div>
+        <div>还没有假用户。点击右上角 <b>批量生成</b> 或 <b>新增</b> 开始</div>
+      </div>
+    </div>
+
+    <!-- 编辑弹窗 -->
+    <div v-if="ui.showFakeModal" class="modal" @click.self="ui.showFakeModal=false">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div class="t">{{ui.editingFake.id?'编辑':'新增'}}假用户</div>
+          <div class="x" @click="ui.showFakeModal=false">×</div>
+        </div>
+        <div class="modal-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-row"><label>昵称</label><input class="input" v-model="ui.editingFake.name" /></div>
+            <div class="form-row"><label>头像编号 (1-8)</label><input class="input" type="number" min="1" max="8" v-model.number="ui.editingFake.av" /></div>
+            <div class="form-row"><label>年龄</label><input class="input" type="number" v-model.number="ui.editingFake.age" /></div>
+            <div class="form-row"><label>城市</label><input class="input" v-model="ui.editingFake.city" /></div>
+            <div class="form-row"><label>身高 (cm)</label><input class="input" type="number" v-model.number="ui.editingFake.height" /></div>
+            <div class="form-row"><label>职业</label><input class="input" v-model="ui.editingFake.job" /></div>
+          </div>
+          <div class="form-row"><label>签名</label><input class="input" v-model="ui.editingFake.sign" /></div>
+          <div class="form-row"><label>兴趣标签（逗号分隔）</label>
+            <input class="input" :value="ui.editingFake.tags.join(',')" @input="ui.editingFake.tags=$event.target.value.split(',').map(s=>s.trim()).filter(Boolean)" />
+          </div>
+          <div class="form-row"><label>人设描述（给 AI 的角色背景）</label>
+            <textarea class="input" rows="3" v-model="ui.editingFake.persona"></textarea>
+          </div>
+          <div style="display:flex;gap:18px;align-items:center;font-size:12px;color:#666;">
+            <label><input type="checkbox" v-model="ui.editingFake.online" /> 在线</label>
+            <label><input type="checkbox" v-model="ui.editingFake.vip" /> VIP</label>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn ghost" @click="ui.showFakeModal=false">取消</button>
+          <button class="btn" @click="ops.addFake(ui.editingFake); ui.showFakeModal=false; toast('已保存')">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 批量生成弹窗 -->
+    <div v-if="ui.showBatchModal" class="modal" @click.self="ui.showBatchModal=false">
+      <div class="modal-card" style="width:380px;">
+        <div class="modal-head"><div class="t">批量生成假用户</div><div class="x" @click="ui.showBatchModal=false">×</div></div>
+        <div class="modal-body">
+          <div class="form-row">
+            <label>生成数量</label>
+            <input class="input" type="number" min="1" max="50" v-model.number="ui.batchCount" />
+          </div>
+          <div style="font-size:12px;color:#888;background:#fafafd;padding:10px;border-radius:6px;">
+            从昵称池、城市池、签名池中随机组合，头像随机 1-8 号，可在生成后手动编辑。
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn ghost" @click="ui.showBatchModal=false">取消</button>
+          <button class="btn" @click="ops.batchGen(ui.batchCount); ui.showBatchModal=false">生成 {{ui.batchCount}} 个</button>
+        </div>
+      </div>
+    </div>
+  </div>`
+}
+
+/* 客服工作台 */
+const ViewWorkbench = {
+  setup(){
+    const msgFlowRef = ref(null)
+    watch(()=>activeConv.value?.msgs?.length, async ()=>{
+      await nextTick()
+      if(msgFlowRef.value) msgFlowRef.value.scrollTop = msgFlowRef.value.scrollHeight
+    })
+    const pickConv = (c)=>{
+      ui.activeConvId = c.id
+      c.unread = 0
+      ui.aiSuggest = ''
+      nextTick(()=>{
+        if(msgFlowRef.value) msgFlowRef.value.scrollTop = msgFlowRef.value.scrollHeight
+      })
+    }
+    const useAI = ()=>{
+      ui.reply = ui.aiSuggest
+      ui.aiSuggest = ''
+    }
+    const send = ()=>ops.sendReply(ui.reply)
+    const pickTemplate = (t)=>{ ui.reply = t }
+    const meInfo = computed(()=>({
+      diamonds: store.diamonds,
+      cash: store.cash,
+      vip: store.user.vip,
+      authed: store.isAuthed,
+    }))
+    return {store, ui, ops, fakeConvs, activeConv, activeFake, pickConv, useAI, send, pickTemplate, meInfo, msgFlowRef}
+  },
+  template:`<div class="cs-layout">
+    <!-- 左：会话列表 -->
+    <div class="cs-col">
+      <div class="cs-col-head">
+        <span>待回复会话 <span v-if="totalUnread" class="tag red">{{totalUnread}}</span></span>
+        <span class="tag">{{fakeConvs.length}}</span>
+      </div>
+      <div class="cs-col-body">
+        <div v-if="!fakeConvs.length" class="empty"><div class="ei">📭</div><div>暂无会话<br><small>男用户和假用户开始聊天后会出现在此</small></div></div>
+        <div v-for="c in fakeConvs" :key="c.id" class="conv-item" :class="{active:ui.activeConvId===c.id}" @click="pickConv(c)">
+          <div class="av" :class="'av-'+(findUser(c.uid)?.av||1)">{{findUser(c.uid)?.name?.[0]||'?'}}</div>
+          <div class="iv">
+            <div class="nm">
+              <span class="n">{{findUser(c.uid)?.name}}</span>
+              <span class="t">{{c.time}}</span>
+            </div>
+            <div class="ln">{{c.lastMsg||'(无消息)'}}</div>
+            <div class="as">扮演 → 男用户 #{{store.user.id}}</div>
+          </div>
+          <div v-if="c.unread" class="bd">{{c.unread}}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 中：聊天上下文 -->
+    <div class="cs-col cs-chat">
+      <template v-if="activeConv">
+        <div class="cs-chat-head">
+          <div class="av" :class="'av-'+activeFake.av">{{activeFake.name[0]}}</div>
+          <div class="iv">
+            <div class="n">扮演 {{activeFake.name}}（假身份）</div>
+            <div class="m">对话男用户：{{store.user.name}} · 钻石 {{store.diamonds}} · {{store.user.vip?'VIP':'普通'}}</div>
+          </div>
+          <span class="tag green" v-if="activeFake.online">● 在线</span>
+        </div>
+        <div class="cs-msg-flow" ref="msgFlowRef">
+          <template v-for="(m,i) in activeConv.msgs" :key="i">
+            <div v-if="m.type==='sys'" class="cs-sys">{{m.text}}</div>
+            <div v-else-if="m.type==='out'" class="cs-bubble-row">
+              <div class="av" :class="'av-'+store.user.av">{{store.user.name[0]}}</div>
+              <div>
+                <div class="cs-bubble">{{m.text}}</div>
+                <div class="meta">男用户 · {{m.time}}{{m.cost?' · -'+m.cost+'💎':''}}</div>
+              </div>
+            </div>
+            <div v-else-if="m.type==='in'" class="cs-bubble-row fake">
+              <div class="av" :class="'av-'+activeFake.av">{{activeFake.name[0]}}</div>
+              <div>
+                <div class="cs-bubble">{{m.text}}</div>
+                <div class="meta" style="text-align:right;">{{m.cs?'客服回复':'系统推送'}} · {{m.time}}</div>
+              </div>
+            </div>
+            <div v-else-if="m.type==='gift'" class="cs-bubble-row">
+              <div class="av" :class="'av-'+store.user.av">{{store.user.name[0]}}</div>
+              <div>
+                <div class="cs-bubble" style="background:linear-gradient(135deg,#fff5d6,#ffe8b3);color:#5a3a00;">{{m.from==='me'?'对方送出 ':'我送出 '}}{{m.em}} {{m.text}} <small>({{m.price}}💎)</small></div>
+              </div>
+            </div>
+          </template>
+        </div>
+        <div class="cs-input-bar">
+          <div class="cs-input-row">
+            <textarea v-model="ui.reply" placeholder="作为 {{activeFake.name}} 回复对方..." @keydown.ctrl.enter="send"></textarea>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <button class="btn" @click="send" :disabled="!ui.reply.trim()">发送</button>
+              <button class="btn ghost small" @click="ops.askAI" :disabled="ui.aiLoading">{{ui.aiLoading?'AI思考中...':'💡 AI 建议'}}</button>
+            </div>
+          </div>
+          <div class="cs-quick-row">
+            <span v-for="t in store.csConfig.templates" :key="t" class="q" @click="pickTemplate(t)">{{t}}</span>
+          </div>
+          <div style="margin-top:6px;font-size:10px;color:#aaa;">Ctrl+Enter 快速发送</div>
+        </div>
+      </template>
+      <div v-else class="empty" style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <div class="ei">👈</div>
+        <div>从左侧选择一个会话开始</div>
+      </div>
+    </div>
+
+    <!-- 右：男用户画像 + AI建议 -->
+    <div class="cs-col">
+      <div class="cs-col-head">对话信息</div>
+      <div class="cs-col-body">
+        <template v-if="activeConv">
+          <div class="cs-side-section">
+            <h4>男用户画像</h4>
+            <div class="cs-profile">
+              <div class="av" :class="'av-'+store.user.av">{{store.user.name[0]}}</div>
+              <div class="iv">
+                <div class="n">{{store.user.name}} <span v-if="meInfo.vip" class="tag gold">VIP</span></div>
+                <div class="m">ID: {{store.user.id}} · {{store.user.city}}</div>
+              </div>
+            </div>
+            <div class="profile-stats">
+              <div class="ps"><div class="l">钻石</div><div class="v">💎 {{meInfo.diamonds}}</div></div>
+              <div class="ps"><div class="l">余额</div><div class="v">¥{{meInfo.cash.toFixed(2)}}</div></div>
+              <div class="ps"><div class="l">VIP</div><div class="v">{{meInfo.vip?'已开通':'未开通'}}</div></div>
+              <div class="ps"><div class="l">实名</div><div class="v">{{meInfo.authed?'已认证':'未认证'}}</div></div>
+            </div>
+          </div>
+
+          <div class="cs-side-section">
+            <h4>💡 AI 建议回复</h4>
+            <div class="ai-suggest">
+              <div class="hd">🤖 GLM-4-Flash</div>
+              <div class="tx" v-if="ui.aiLoading">思考中...</div>
+              <div class="tx" v-else-if="ui.aiSuggest">{{ui.aiSuggest}}</div>
+              <div class="tx" v-else style="color:#bbb;">点击下方按钮获取建议</div>
+              <div class="act">
+                <button class="btn tiny ghost" @click="ops.askAI" :disabled="ui.aiLoading">{{ui.aiSuggest?'重新生成':'生成建议'}}</button>
+                <button class="btn tiny gold" v-if="ui.aiSuggest" @click="useAI">采用</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="cs-side-section">
+            <h4>扮演角色信息</h4>
+            <div style="font-size:12px;line-height:1.7;">
+              <div><b>{{activeFake.name}}</b>，{{activeFake.age}}岁，{{activeFake.city}}</div>
+              <div style="color:#888;">{{activeFake.sign}}</div>
+              <div style="margin-top:6px;">
+                <span v-for="t in activeFake.tags" :key="t" class="tag pink" style="margin-right:3px;">{{t}}</span>
+              </div>
+              <div style="margin-top:8px;color:#888;font-style:italic;">人设：{{activeFake.persona}}</div>
+            </div>
+          </div>
+        </template>
+        <div v-else class="empty" style="padding:30px 20px;">
+          <div>未选中会话</div>
+        </div>
+      </div>
+    </div>
+  </div>`
+}
+
+/* 推送规则 */
+const ViewPush = {
+  setup(){
+    const addSlot = ()=>{
+      store.pushRules.timeSlots.push({start:'08:00',end:'10:00',maxPer:1})
+    }
+    const delSlot = (i)=>{
+      store.pushRules.timeSlots.splice(i,1)
+    }
+    const save = ()=>toast('已保存（自动持久化）')
+    const testNow = ()=>{
+      if(!store.fakeUsers.length){ toast('请先创建假用户'); return }
+      if(!store.loggedIn){ toast('男用户端未登录'); return }
+      const fu = store.fakeUsers[Math.floor(Math.random()*store.fakeUsers.length)]
+      ops.manualPush(fu.id)
+    }
+    return {store, addSlot, delSlot, save, testNow}
+  },
+  template:`<div>
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-title">
+        <span>自动推送总开关</span>
+        <div style="display:flex;align-items:center;gap:10px;font-size:12px;">
+          <span :style="{color:store.pushRules.enabled?'#22c55e':'#999'}">{{store.pushRules.enabled?'● 运行中':'○ 已暂停'}}</span>
+          <div class="sw" :class="{on:store.pushRules.enabled}" @click="store.pushRules.enabled=!store.pushRules.enabled"></div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:#888;line-height:1.7;">
+        开启后：app.html 端的 Worker 会按下方时段策略，从假用户池随机选人，向当前登录的男用户主动发起打招呼。<br>
+        Worker 每 1-3 分钟检查一次时段，命中时段且未达上限即推送。
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-title">
+        <span>时段策略</span>
+        <button class="btn small ghost" @click="addSlot">➕ 添加时段</button>
+      </div>
+      <div v-for="(s,i) in store.pushRules.timeSlots" :key="i" class="slot-row">
+        <span style="font-weight:600;color:#666;">时段 {{i+1}}</span>
+        <div><label>开始</label><input class="input" type="time" v-model="s.start" /></div>
+        <div><label>结束</label><input class="input" type="time" v-model="s.end" /></div>
+        <div><label>该时段最多推送</label><input class="input" type="number" min="1" v-model.number="s.maxPer" /></div>
+        <button class="btn tiny ghost" style="color:#ff3b5c;" @click="delSlot(i)">删除</button>
+      </div>
+      <div v-if="!store.pushRules.timeSlots.length" style="text-align:center;padding:20px;color:#bbb;font-size:12px;">无时段，自动推送将不触发</div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-title"><span>选人策略</span></div>
+      <div style="display:flex;gap:14px;font-size:13px;">
+        <label><input type="radio" value="random" v-model="store.pushRules.strategy" /> 随机抽取</label>
+        <label><input type="radio" value="active" v-model="store.pushRules.strategy" /> 优先在线/活跃</label>
+        <label><input type="radio" value="vip" v-model="store.pushRules.strategy" /> 优先 VIP 假用户</label>
+      </div>
+      <div style="margin-top:14px;font-size:12px;color:#888;">
+        <label>同一假用户冷却时间（分钟）<input class="input" type="number" v-model.number="store.pushRules.cooldownMin" style="width:100px;display:inline-block;margin-left:8px;" /></label>
+        <div style="margin-top:6px;">同一假用户对同一男用户在冷却内不会重复推送</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>调试 & 测试</span></div>
+      <button class="btn gold" @click="testNow">🧪 立即测试推送一条</button>
+      <span style="margin-left:14px;font-size:12px;color:#888;">忽略时段，随机挑一个假用户立刻推送到男用户端</span>
+    </div>
+  </div>`
+}
+
+/* AI 设置 */
+const ViewAI = {
+  setup(){
+    const testing = ref(false)
+    const testOut = ref('')
+    const testKey = async ()=>{
+      if(!store.csConfig.aiKey){ toast('请填入 API Key'); return }
+      testing.value = true
+      testOut.value = ''
+      try{
+        const out = await glm.chat([
+          {role:'system', content:store.csConfig.systemPrompt},
+          {role:'user', content:'你好呀，第一次见你～'}
+        ])
+        testOut.value = out
+        toast('API Key 有效')
+      }catch(e){
+        testOut.value = '❌ '+e.message
+      }
+      testing.value = false
+    }
+    const addTpl = ()=>{
+      const v = prompt('输入新的快捷话术：')
+      if(v && v.trim()) store.csConfig.templates.push(v.trim())
+    }
+    const delTpl = (i)=>store.csConfig.templates.splice(i,1)
+    return {store, testing, testOut, testKey, addTpl, delTpl}
+  },
+  template:`<div>
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-title"><span>智谱 GLM-4-Flash 配置</span><a href="https://open.bigmodel.cn/usercenter/apikeys" target="_blank" style="font-size:12px;color:#7c3aed;">→ 获取 API Key</a></div>
+      <div class="form-row">
+        <label>API Key</label>
+        <input class="input" v-model="store.csConfig.aiKey" placeholder="粘贴你的 GLM API Key（仅本地存储，不会上传）" type="password" />
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button class="btn ghost" @click="testKey" :disabled="testing">{{testing?'测试中...':'🧪 测试连接'}}</button>
+        <span v-if="testOut" style="font-size:12px;color:#666;flex:1;">{{testOut}}</span>
+      </div>
+      <div style="margin-top:12px;font-size:11px;color:#888;background:#fef3c7;padding:10px;border-radius:6px;">
+        ⚠️ 注意：当前架构为纯前端调用，API Key 会进入前端 localStorage 与浏览器请求头。<strong>仅适合内部演示</strong>。正式上线必须改为后端代理，避免 Key 泄露。
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-title"><span>System Prompt（女性角色设定）</span></div>
+      <textarea class="input" v-model="store.csConfig.systemPrompt" rows="6"></textarea>
+      <div style="margin-top:8px;font-size:11px;color:#888;">客服端调 AI 时，会以本 prompt + 假用户具体资料 + 最近 6 轮对话 作为上下文，让 AI 扮演该假女用户回复。</div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-title">
+        <span>快捷话术模板</span>
+        <button class="btn small ghost" @click="addTpl">➕ 添加</button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        <span v-for="(t,i) in store.csConfig.templates" :key="i" class="tag" style="padding:6px 10px;font-size:12px;background:#fafafd;">
+          {{t}} <span @click="delTpl(i)" style="margin-left:6px;color:#ff3b5c;cursor:pointer;">×</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>关于"AI 给男用户提示"</span></div>
+      <div style="font-size:12px;color:#666;line-height:1.7;">
+        男用户端 app.html 的 PageChat 已加入"💡 AI 建议"按钮：用户在和任何对象（包括真假用户）聊天时，点击该按钮，AI 会以"恋爱沟通教练"视角根据最近 6 轮对话，给出一条 30 字内回复建议。<br>
+        男用户端 AI 调用使用同一份 csConfig.aiKey（按需可拆分）。
+      </div>
+    </div>
+  </div>`
+}
+
+/* 推送日志 */
+const ViewLogs = {
+  setup(){
+    const logs = computed(()=>store.pushLog.slice().reverse())
+    const fmt = (ts)=>{
+      const d = new Date(ts)
+      return d.toLocaleDateString()+' '+d.toLocaleTimeString()
+    }
+    const clearLog = ()=>{
+      if(!confirm('清空所有推送日志？')) return
+      store.pushLog = []
+      toast('已清空')
+    }
+    return {store, logs, fmt, clearLog, findUser}
+  },
+  template:`<div>
+    <div class="card">
+      <div class="card-title">
+        <span>推送日志（共 {{logs.length}} 条）</span>
+        <button class="btn small ghost" @click="clearLog" style="color:#ff3b5c;">清空日志</button>
+      </div>
+      <div v-if="!logs.length" class="empty"><div class="ei">📋</div>暂无推送记录</div>
+      <div v-else>
+        <div v-for="(l,i) in logs" :key="i" class="log-row">
+          <span class="t">{{fmt(l.ts)}}</span>
+          <div class="av" :class="'av-'+(findUser(l.fakeUid)?.av||1)">{{findUser(l.fakeUid)?.name?.[0]||'?'}}</div>
+          <div class="a">
+            <b>{{findUser(l.fakeUid)?.name||'(已删除)'}}</b> → 男用户 <b>{{l.toUid}}</b>
+            <span class="tag" style="margin-left:6px;">{{l.slot==='manual'?'手动':'时段 '+l.slot}}</span>
+          </div>
+          <span class="tag" :class="l.replied?'green':l.opened?'gold':''">
+            {{l.replied?'✓ 已回复':l.opened?'已查看':'未查看'}}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>`
+}
+
+/* 根 App */
+const App = {
+  components:{ViewDashboard,ViewFakes,ViewWorkbench,ViewPush,ViewAI,ViewLogs},
+  setup(){
+    const NAVS = [
+      {k:'dashboard',ic:'📊',n:'数据看板'},
+      {k:'fakes',ic:'👤',n:'假用户管理'},
+      {k:'workbench',ic:'💬',n:'客服工作台'},
+      {k:'push',ic:'📡',n:'推送规则'},
+      {k:'ai',ic:'🤖',n:'AI 设置'},
+      {k:'logs',ic:'📋',n:'推送日志'},
+    ]
+    const titles = {dashboard:'数据看板',fakes:'假用户管理',workbench:'客服工作台',push:'推送规则',ai:'AI 设置',logs:'推送日志'}
+    const currentView = computed(()=>{
+      const map = {dashboard:'view-dashboard',fakes:'view-fakes',workbench:'view-workbench',push:'view-push',ai:'view-ai',logs:'view-logs'}
+      return map[view.value]||'view-dashboard'
+    })
+    const appOnline = computed(()=>store.loggedIn)
+    return {view, NAVS, titles, currentView, store, toastState, totalUnread, appOnline}
+  },
+  template:`<div class="layout">
+    <div class="sidebar">
+      <div class="logo"><span class="ic">💕</span>一青友人 后台</div>
+      <div class="nav">
+        <div v-for="n in NAVS" :key="n.k" class="nav-item" :class="{active:view===n.k}" @click="view=n.k">
+          <span class="ic">{{n.ic}}</span>
+          <span>{{n.n}}</span>
+          <span v-if="n.k==='workbench'&&totalUnread" class="bd">{{totalUnread}}</span>
+        </div>
+      </div>
+      <div class="footer">
+        v1.0 · 演示版本<br>
+        <span style="opacity:.6;">localStorage 共享于 app.html</span>
+      </div>
+    </div>
+    <div class="main">
+      <div class="header">
+        <div class="title">{{titles[view]||''}}</div>
+        <div class="right">
+          <span class="dot" :class="{off:!appOnline}">{{appOnline?'男用户端已登录':'男用户端未登录'}}</span>
+          <span>钻石 💎 {{store.diamonds}}</span>
+          <span>余额 ¥{{store.cash.toFixed(2)}}</span>
+          <a href="app.html" target="_blank" class="btn small ghost" style="text-decoration:none;">↗ 打开 app.html</a>
+        </div>
+      </div>
+      <div class="content">
+        <component :is="currentView" />
+      </div>
+    </div>
+    <div v-if="toastState" class="toast">{{toastState}}</div>
+  </div>`
+}
+
+createApp(App).mount('#app')
+
+// 调试入口
+window.admin = { store, ops, view, ui, glm, toast }
+</script>
+</body>
+</html>
