@@ -5,19 +5,29 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.starluck.common.BusinessException;
 import com.starluck.config.ChatWebSocketHandler;
 import com.starluck.dto.ChatSendRequest;
-import com.starluck.entity.*;
-import com.starluck.mapper.*;
+import com.starluck.entity.ChatMessage;
+import com.starluck.entity.ChatSession;
+import com.starluck.entity.DiamondRecord;
+import com.starluck.entity.FakeUser;
+import com.starluck.entity.UserBalance;
+import com.starluck.entity.UserProfile;
+import com.starluck.mapper.ChatMessageMapper;
+import com.starluck.mapper.ChatSessionMapper;
+import com.starluck.mapper.DiamondRecordMapper;
+import com.starluck.mapper.FakeUserMapper;
+import com.starluck.mapper.UserBalanceMapper;
+import com.starluck.mapper.UserProfileMapper;
 import com.starluck.service.ChatService;
 import com.starluck.vo.ChatMessageVO;
 import com.starluck.vo.ChatSessionVO;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -26,10 +36,10 @@ import java.util.stream.Collectors;
  * @author AI
  * @date 2026-06-01
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class ChatServiceImpl implements ChatService {
+
+    private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HH:mm");
 
     private final ChatSessionMapper sessionMapper;
     private final ChatMessageMapper messageMapper;
@@ -38,7 +48,16 @@ public class ChatServiceImpl implements ChatService {
     private final FakeUserMapper fakeUserMapper;
     private final UserProfileMapper userProfileMapper;
 
-    private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HH:mm");
+    public ChatServiceImpl(ChatSessionMapper sessionMapper, ChatMessageMapper messageMapper,
+                           UserBalanceMapper balanceMapper, DiamondRecordMapper diamondRecordMapper,
+                           FakeUserMapper fakeUserMapper, UserProfileMapper userProfileMapper) {
+        this.sessionMapper = sessionMapper;
+        this.messageMapper = messageMapper;
+        this.balanceMapper = balanceMapper;
+        this.diamondRecordMapper = diamondRecordMapper;
+        this.fakeUserMapper = fakeUserMapper;
+        this.userProfileMapper = userProfileMapper;
+    }
 
     @Override
     public List<ChatSessionVO> getSessionList(Long userId) {
@@ -51,7 +70,8 @@ public class ChatServiceImpl implements ChatService {
         return sessions.stream().map(s -> {
             boolean isMale = s.getMaleUserId().equals(userId);
             Long peerId = isMale ? s.getFemaleUserId() : s.getMaleUserId();
-            int unread = isMale ? s.getMaleUnread() : s.getFemaleUnread();
+            int unread = isMale ? (s.getMaleUnread() == null ? 0 : s.getMaleUnread())
+                                : (s.getFemaleUnread() == null ? 0 : s.getFemaleUnread());
 
             String peerName = "未知";
             Integer peerAv = 1;
@@ -102,7 +122,6 @@ public class ChatServiceImpl implements ChatService {
             throw new BusinessException("会话不存在");
         }
 
-        // 清除该用户的未读数
         if (session.getMaleUserId().equals(userId)) {
             session.setMaleUnread(0);
         } else {
@@ -137,7 +156,6 @@ public class ChatServiceImpl implements ChatService {
             throw new BusinessException("会话不存在");
         }
 
-        // 判断发送者是男用户还是女用户
         boolean isMale = session.getMaleUserId().equals(senderId);
         Long receiverId = isMale ? session.getFemaleUserId() : session.getMaleUserId();
         String senderRole = isMale ? "male" : "female";
@@ -145,22 +163,20 @@ public class ChatServiceImpl implements ChatService {
         String now = LocalDateTime.now().format(TIME_FMT);
         int costDiamond = 0;
 
-        // 男用户发送文字消息扣费
-        if (isMale && !session.getIsFake()) {
+        if (isMale && !Boolean.TRUE.equals(session.getIsFake())) {
             UserBalance balance = balanceMapper.selectOne(
                     new LambdaQueryWrapper<UserBalance>().eq(UserBalance::getUserId, senderId));
             if (balance == null || balance.getDiamonds() < 1) {
                 throw new BusinessException("钻石余额不足，请充值");
             }
 
-            // VIP用户每日有免费额度
-            if (balance.getIsVip() == 1 && balance.getDailyFreeChat() > 0) {
+            if (balance.getIsVip() != null && balance.getIsVip() == 1
+                    && balance.getDailyFreeChat() != null && balance.getDailyFreeChat() > 0) {
                 balance.setDailyFreeChat(balance.getDailyFreeChat() - 1);
             } else {
                 costDiamond = 1;
                 balance.setDiamonds(balance.getDiamonds() - 1);
 
-                // 记录钻石流水
                 DiamondRecord dr = new DiamondRecord();
                 dr.setUserId(senderId);
                 dr.setType("out");
@@ -173,7 +189,6 @@ public class ChatServiceImpl implements ChatService {
             balanceMapper.updateById(balance);
         }
 
-        // 保存消息
         ChatMessage msg = new ChatMessage();
         msg.setSessionId(session.getId());
         msg.setSenderId(senderId);
@@ -184,30 +199,20 @@ public class ChatServiceImpl implements ChatService {
         msg.setMsgTime(now);
         messageMapper.insert(msg);
 
-        // 更新会话
         session.setLastMsg(request.getContent());
         session.setLastTime(now);
         if (isMale) {
-            session.setFemaleUnread(session.getFemaleUnread() + 1);
+            session.setFemaleUnread((session.getFemaleUnread() == null ? 0 : session.getFemaleUnread()) + 1);
         } else {
-            session.setMaleUnread(session.getMaleUnread() + 1);
+            session.setMaleUnread((session.getMaleUnread() == null ? 0 : session.getMaleUnread()) + 1);
         }
         sessionMapper.updateById(session);
 
-        // 通过WebSocket推送给对方
         Map<String, Object> pushData = new HashMap<>();
         pushData.put("type", "new_message");
         pushData.put("sessionId", session.getId());
-        pushData.put("message", ChatMessageVO.builder()
-                .id(msg.getId())
-                .sessionId(msg.getSessionId())
-                .senderId(msg.getSenderId())
-                .senderRole(msg.getSenderRole())
-                .msgType(msg.getMsgType())
-                .content(msg.getContent())
-                .costDiamond(msg.getCostDiamond())
-                .msgTime(msg.getMsgTime())
-                .build());
+        pushData.put("content", msg.getContent());
+        pushData.put("senderId", senderId);
         ChatWebSocketHandler.sendToUser(receiverId, JSONUtil.toJsonStr(pushData));
 
         return ChatMessageVO.builder()
@@ -236,6 +241,8 @@ public class ChatServiceImpl implements ChatService {
             session.setFemaleUserId(femaleUserId);
             session.setIsFake(isFake);
             session.setType("chat");
+            session.setMaleUnread(0);
+            session.setFemaleUnread(0);
             sessionMapper.insert(session);
         }
 

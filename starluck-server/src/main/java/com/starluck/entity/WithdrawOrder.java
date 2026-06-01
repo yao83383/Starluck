@@ -1,52 +1,23 @@
 package com.starluck.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import lombok.Data;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * 提现订单表
- *
- * @author AI
- * @date 2026-06-01
- */
-@Data
 @TableName("withdraw_order")
 public class WithdrawOrder {
 
     @TableId(type = IdType.AUTO)
     private Long id;
-
-    /** 订单号 */
     private String orderNo;
-
-    /** 用户ID */
     private Long userId;
-
-    /** 提现金额（元） */
     private BigDecimal amount;
-
-    /** 手续费（元） */
     private BigDecimal fee;
-
-    /** 实际到账（元） */
     private BigDecimal actualAmount;
-
-    /** 提现方式：wechat微信 alipay支付宝 bank银行卡 */
     private String method;
-
-    /** 收款账号 */
     private String account;
-
-    /** 状态：pending待审核 approved已通过 rejected已拒绝 paid已打款 */
     private String status;
-
-    /** 审核备注 */
     private String auditRemark;
-
-    /** 打款时间 */
     private LocalDateTime paidAt;
 
     @TableField(fill = FieldFill.INSERT)
@@ -54,4 +25,31 @@ public class WithdrawOrder {
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updatedAt;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getOrderNo() { return orderNo; }
+    public void setOrderNo(String orderNo) { this.orderNo = orderNo; }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+    public BigDecimal getAmount() { return amount; }
+    public void setAmount(BigDecimal amount) { this.amount = amount; }
+    public BigDecimal getFee() { return fee; }
+    public void setFee(BigDecimal fee) { this.fee = fee; }
+    public BigDecimal getActualAmount() { return actualAmount; }
+    public void setActualAmount(BigDecimal actualAmount) { this.actualAmount = actualAmount; }
+    public String getMethod() { return method; }
+    public void setMethod(String method) { this.method = method; }
+    public String getAccount() { return account; }
+    public void setAccount(String account) { this.account = account; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public String getAuditRemark() { return auditRemark; }
+    public void setAuditRemark(String auditRemark) { this.auditRemark = auditRemark; }
+    public LocalDateTime getPaidAt() { return paidAt; }
+    public void setPaidAt(LocalDateTime paidAt) { this.paidAt = paidAt; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

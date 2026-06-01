@@ -1,8 +1,6 @@
 package com.starluck.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import lombok.Data;
-
 import java.time.LocalDateTime;
 
 /**
@@ -11,40 +9,44 @@ import java.time.LocalDateTime;
  * @author AI
  * @date 2026-06-01
  */
-@Data
 @TableName("chat_message")
 public class ChatMessage {
 
     @TableId(type = IdType.AUTO)
     private Long id;
-
-    /** 会话ID */
     private Long sessionId;
-
-    /** 发送者ID */
     private Long senderId;
-
-    /** 发送者角色：male男用户 female女用户 system系统 */
     private String senderRole;
-
-    /** 消息类型：text文字 gift礼物 sys系统提示 image图片 */
     private String msgType;
-
-    /** 消息内容 */
     private String content;
-
-    /** 礼物emoji */
     private String giftEmoji;
-
-    /** 礼物名称 */
     private String giftName;
-
-    /** 消费钻石数 */
     private Integer costDiamond;
-
-    /** 消息时间 */
     private String msgTime;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getSessionId() { return sessionId; }
+    public void setSessionId(Long sessionId) { this.sessionId = sessionId; }
+    public Long getSenderId() { return senderId; }
+    public void setSenderId(Long senderId) { this.senderId = senderId; }
+    public String getSenderRole() { return senderRole; }
+    public void setSenderRole(String senderRole) { this.senderRole = senderRole; }
+    public String getMsgType() { return msgType; }
+    public void setMsgType(String msgType) { this.msgType = msgType; }
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
+    public String getGiftEmoji() { return giftEmoji; }
+    public void setGiftEmoji(String giftEmoji) { this.giftEmoji = giftEmoji; }
+    public String getGiftName() { return giftName; }
+    public void setGiftName(String giftName) { this.giftName = giftName; }
+    public Integer getCostDiamond() { return costDiamond; }
+    public void setCostDiamond(Integer costDiamond) { this.costDiamond = costDiamond; }
+    public String getMsgTime() { return msgTime; }
+    public void setMsgTime(String msgTime) { this.msgTime = msgTime; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

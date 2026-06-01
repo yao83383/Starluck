@@ -1,37 +1,18 @@
 package com.starluck.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import lombok.Data;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * 邀请记录表
- *
- * @author AI
- * @date 2026-06-01
- */
-@Data
 @TableName("invite_record")
 public class InviteRecord {
 
     @TableId(type = IdType.AUTO)
     private Long id;
-
-    /** 邀请人ID */
     private Long inviterId;
-
-    /** 被邀请人ID */
     private Long inviteeId;
-
-    /** 被邀请人状态：registered已注册 authed已实名 recharged已充值 */
     private String status;
-
-    /** 奖励钻石数 */
     private Integer rewardDiamond;
-
-    /** 现金返佣（元） */
     private BigDecimal rewardCash;
 
     @TableField(fill = FieldFill.INSERT)
@@ -39,4 +20,21 @@ public class InviteRecord {
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updatedAt;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getInviterId() { return inviterId; }
+    public void setInviterId(Long inviterId) { this.inviterId = inviterId; }
+    public Long getInviteeId() { return inviteeId; }
+    public void setInviteeId(Long inviteeId) { this.inviteeId = inviteeId; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public Integer getRewardDiamond() { return rewardDiamond; }
+    public void setRewardDiamond(Integer rewardDiamond) { this.rewardDiamond = rewardDiamond; }
+    public BigDecimal getRewardCash() { return rewardCash; }
+    public void setRewardCash(BigDecimal rewardCash) { this.rewardCash = rewardCash; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

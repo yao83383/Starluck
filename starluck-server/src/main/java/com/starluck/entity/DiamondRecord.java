@@ -1,44 +1,40 @@
 package com.starluck.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import lombok.Data;
-
 import java.time.LocalDateTime;
 
-/**
- * 钻石流水表
- *
- * @author AI
- * @date 2026-06-01
- */
-@Data
 @TableName("diamond_record")
 public class DiamondRecord {
 
     @TableId(type = IdType.AUTO)
     private Long id;
-
-    /** 用户ID */
     private Long userId;
-
-    /** 类型：in收入 out支出 */
     private String type;
-
-    /** 钻石数量变化（正为收入，负为支出） */
     private Integer amount;
-
-    /** 变动后余额 */
     private Integer balanceAfter;
-
-    /** 业务类型：recharge充值 chat聊天 gift送礼 withdraw提现 invite邀请 vip赠送 */
     private String bizType;
-
-    /** 关联业务ID */
     private Long refId;
-
-    /** 备注 */
     private String remark;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
+    public Integer getAmount() { return amount; }
+    public void setAmount(Integer amount) { this.amount = amount; }
+    public Integer getBalanceAfter() { return balanceAfter; }
+    public void setBalanceAfter(Integer balanceAfter) { this.balanceAfter = balanceAfter; }
+    public String getBizType() { return bizType; }
+    public void setBizType(String bizType) { this.bizType = bizType; }
+    public Long getRefId() { return refId; }
+    public void setRefId(Long refId) { this.refId = refId; }
+    public String getRemark() { return remark; }
+    public void setRemark(String remark) { this.remark = remark; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

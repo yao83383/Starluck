@@ -1,14 +1,11 @@
 package com.starluck.common;
 
-import lombok.Data;
-
 /**
  * 当前登录用户上下文
  *
  * @author AI
  * @date 2026-06-01
  */
-@Data
 public class LoginUser {
 
     private Long userId;
@@ -20,4 +17,9 @@ public class LoginUser {
         user.phone = phone;
         return user;
     }
+
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 }

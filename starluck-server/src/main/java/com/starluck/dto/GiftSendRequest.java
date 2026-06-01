@@ -2,15 +2,7 @@ package com.starluck.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.Data;
 
-/**
- * 赠送礼物请求
- *
- * @author AI
- * @date 2026-06-01
- */
-@Data
 public class GiftSendRequest {
     @NotNull(message = "接收者ID不能为空")
     private Long receiverId;
@@ -21,6 +13,14 @@ public class GiftSendRequest {
     @Positive(message = "数量必须大于0")
     private Integer quantity;
 
-    /** 关联会话ID（可选） */
     private Long sessionId;
+
+    public Long getReceiverId() { return receiverId; }
+    public void setReceiverId(Long receiverId) { this.receiverId = receiverId; }
+    public Long getGiftId() { return giftId; }
+    public void setGiftId(Long giftId) { this.giftId = giftId; }
+    public Integer getQuantity() { return quantity; }
+    public void setQuantity(Integer quantity) { this.quantity = quantity; }
+    public Long getSessionId() { return sessionId; }
+    public void setSessionId(Long sessionId) { this.sessionId = sessionId; }
 }

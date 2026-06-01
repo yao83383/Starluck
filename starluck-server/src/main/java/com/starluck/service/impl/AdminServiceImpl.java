@@ -1,15 +1,20 @@
 package com.starluck.service.impl;
 
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.starluck.common.BusinessException;
-import com.starluck.config.ChatWebSocketHandler;
-import com.starluck.entity.*;
-import com.starluck.mapper.*;
+import com.starluck.entity.ChatMessage;
+import com.starluck.entity.ChatSession;
+import com.starluck.entity.FakeUser;
+import com.starluck.entity.PushLog;
+import com.starluck.entity.PushRule;
+import com.starluck.mapper.ChatMessageMapper;
+import com.starluck.mapper.ChatSessionMapper;
+import com.starluck.mapper.FakeUserMapper;
+import com.starluck.mapper.PushLogMapper;
+import com.starluck.mapper.PushRuleMapper;
+import com.starluck.mapper.UserMapper;
 import com.starluck.service.AdminService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 后台管理服务实现
@@ -24,10 +30,15 @@ import java.util.List;
  * @author AI
  * @date 2026-06-01
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
+
+    private static final String[] NAME_POOL = {"小诗","糖糖","梨花","若兮","茉莉","柚柚","安琪","可可","小鹿","月亮","晓雯","子萱","婉清","雨晴","南风","沐妍","栀子","清欢","一一","阿月"};
+    private static final String[] CITY_POOL = {"上海","北京","深圳","广州","杭州","成都","南京","武汉","重庆","西安"};
+    private static final String[] SIGN_POOL = {"寻找一个温暖的人","生活不止眼前的苟且","喜欢摄影、咖啡和旅行","期待一场认真的恋爱","喜欢看星星和电影","愿和你共度春秋","一个人也要好好生活","努力做有趣的女生"};
+    private static final String[] TAG_POOL = {"旅行","咖啡","摄影","美食","音乐","电影","健身","读书","宠物","瑜伽","汉服","烹饪","逛街","插画","烘焙"};
+    private static final String[] GREETINGS = {"你好呀～看你头像感觉好亲切","嗨～在干嘛呢","在吗？刚刷到你～","哈喽～感觉我们好像挺投缘的","突然好想找人聊聊天"};
+    private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HH:mm");
 
     private final FakeUserMapper fakeUserMapper;
     private final PushRuleMapper pushRuleMapper;
@@ -36,12 +47,16 @@ public class AdminServiceImpl implements AdminService {
     private final ChatMessageMapper messageMapper;
     private final UserMapper userMapper;
 
-    private static final String[] NAME_POOL = {"小诗","糖糖","梨花","若兮","茉莉","柚柚","安琪","可可","小鹿","月亮","晓雯","子萱","婉清","雨晴","南风","沐妍","栀子","清欢","一一","阿月"};
-    private static final String[] CITY_POOL = {"上海","北京","深圳","广州","杭州","成都","南京","武汉","重庆","西安"};
-    private static final String[] SIGN_POOL = {"寻找一个温暖的人","生活不止眼前的苟且","喜欢摄影、咖啡和旅行","期待一场认真的恋爱","喜欢看星星和电影","愿和你共度春秋","一个人也要好好生活","努力做有趣的女生"};
-    private static final String[] TAG_POOL = {"旅行","咖啡","摄影","美食","音乐","电影","健身","读书","宠物","瑜伽","汉服","烹饪","逛街","插画","烘焙"};
-    private static final String[] GREETINGS = {"你好呀～看你头像感觉好亲切","嗨～在干嘛呢","在吗？刚刷到你～","哈喽～感觉我们好像挺投缘的","突然好想找人聊聊天"};
-    private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HH:mm");
+    public AdminServiceImpl(FakeUserMapper fakeUserMapper, PushRuleMapper pushRuleMapper,
+                            PushLogMapper pushLogMapper, ChatSessionMapper sessionMapper,
+                            ChatMessageMapper messageMapper, UserMapper userMapper) {
+        this.fakeUserMapper = fakeUserMapper;
+        this.pushRuleMapper = pushRuleMapper;
+        this.pushLogMapper = pushLogMapper;
+        this.sessionMapper = sessionMapper;
+        this.messageMapper = messageMapper;
+        this.userMapper = userMapper;
+    }
 
     @Override
     public List<FakeUser> getFakeUsers(String keyword) {
@@ -72,30 +87,30 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<FakeUser> batchGenerate(int count) {
+        ThreadLocalRandom rnd = ThreadLocalRandom.current();
         List<FakeUser> list = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             FakeUser f = new FakeUser();
-            f.setName(NAME_POOL[RandomUtil.randomInt(NAME_POOL.length)]);
-            f.setAvatarNo(RandomUtil.randomInt(1, 9));
-            f.setAge(20 + RandomUtil.randomInt(10));
-            f.setCity(CITY_POOL[RandomUtil.randomInt(CITY_POOL.length)]);
-            f.setDist(String.format("%.1f", 0.5 + RandomUtil.randomDouble(5)) + "km");
-            f.setOnline(RandomUtil.randomInt(10) > 3);
-            f.setVip(RandomUtil.randomInt(10) > 6);
-            f.setHeight(158 + RandomUtil.randomInt(15));
-            f.setWeight(42 + RandomUtil.randomInt(15));
+            f.setName(NAME_POOL[rnd.nextInt(NAME_POOL.length)]);
+            f.setAvatarNo(rnd.nextInt(1, 9));
+            f.setAge(20 + rnd.nextInt(10));
+            f.setCity(CITY_POOL[rnd.nextInt(CITY_POOL.length)]);
+            f.setDist(String.format("%.1f", 0.5 + rnd.nextDouble() * 5) + "km");
+            f.setOnline(rnd.nextInt(10) > 3);
+            f.setVip(rnd.nextInt(10) > 6);
+            f.setHeight(158 + rnd.nextInt(15));
+            f.setWeight(42 + rnd.nextInt(15));
             f.setJob("设计师");
             f.setEdu("本科");
             f.setHometown("广东深圳");
             f.setLoveStatus("单身");
-            f.setSign(SIGN_POOL[RandomUtil.randomInt(SIGN_POOL.length)]);
+            f.setSign(SIGN_POOL[rnd.nextInt(SIGN_POOL.length)]);
             f.setPersona("温柔、爱笑、喜欢分享日常");
             f.setStatus(1);
 
-            // 随机3个标签
             List<String> tags = new ArrayList<>();
             while (tags.size() < 3) {
-                String t = TAG_POOL[RandomUtil.randomInt(TAG_POOL.length)];
+                String t = TAG_POOL[rnd.nextInt(TAG_POOL.length)];
                 if (!tags.contains(t)) tags.add(t);
             }
             f.setTags(JSONUtil.toJsonStr(tags));
@@ -115,10 +130,9 @@ public class AdminServiceImpl implements AdminService {
             throw new BusinessException("假用户不存在");
         }
 
-        String greet = GREETINGS[RandomUtil.randomInt(GREETINGS.length)];
+        String greet = GREETINGS[ThreadLocalRandom.current().nextInt(GREETINGS.length)];
         String now = LocalDateTime.now().format(TIME_FMT);
 
-        // 查找或创建会话
         ChatSession session = sessionMapper.selectOne(
                 new LambdaQueryWrapper<ChatSession>()
                         .eq(ChatSession::getMaleUserId, targetUserId)
@@ -129,10 +143,11 @@ public class AdminServiceImpl implements AdminService {
             session.setFemaleUserId(fakeUserId);
             session.setIsFake(true);
             session.setType("chat");
+            session.setMaleUnread(0);
+            session.setFemaleUnread(0);
             sessionMapper.insert(session);
         }
 
-        // 系统提示消息
         ChatMessage sysMsg = new ChatMessage();
         sysMsg.setSessionId(session.getId());
         sysMsg.setSenderId(0L);
@@ -142,7 +157,6 @@ public class AdminServiceImpl implements AdminService {
         sysMsg.setMsgTime(now);
         messageMapper.insert(sysMsg);
 
-        // 打招呼消息
         ChatMessage msg = new ChatMessage();
         msg.setSessionId(session.getId());
         msg.setSenderId(fakeUserId);
@@ -152,13 +166,11 @@ public class AdminServiceImpl implements AdminService {
         msg.setMsgTime(now);
         messageMapper.insert(msg);
 
-        // 更新会话
         session.setLastMsg(greet);
         session.setLastTime(now);
-        session.setMaleUnread(session.getMaleUnread() + 1);
+        session.setMaleUnread((session.getMaleUnread() == null ? 0 : session.getMaleUnread()) + 1);
         sessionMapper.updateById(session);
 
-        // 推送日志
         PushLog log = new PushLog();
         log.setFakeUserId(fakeUserId);
         log.setTargetUserId(targetUserId);
@@ -185,7 +197,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public String getAiSuggestion(Long sessionId) {
-        // TODO: 对接GLM-4-Flash API（后端代理，Key存储在配置中）
+        // TODO: 对接GLM-4-Flash API
         return "（AI建议功能需配置GLM API Key）";
     }
 }

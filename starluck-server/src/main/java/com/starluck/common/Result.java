@@ -1,21 +1,18 @@
 package com.starluck.common;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 /**
  * 统一响应结果
  *
  * @author AI
  * @date 2026-06-01
  */
-@Data
-@NoArgsConstructor
 public class Result<T> {
 
     private int code;
     private String message;
     private T data;
+
+    public Result() {}
 
     private Result(int code, String message, T data) {
         this.code = code;
@@ -57,4 +54,11 @@ public class Result<T> {
     public static <T> Result<T> forbidden(String message) {
         return new Result<>(403, message, null);
     }
+
+    public int getCode() { return code; }
+    public void setCode(int code) { this.code = code; }
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
+    public T getData() { return data; }
+    public void setData(T data) { this.data = data; }
 }

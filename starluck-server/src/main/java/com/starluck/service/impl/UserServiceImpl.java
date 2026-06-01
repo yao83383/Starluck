@@ -12,9 +12,9 @@ import com.starluck.mapper.UserMapper;
 import com.starluck.mapper.UserProfileMapper;
 import com.starluck.service.UserService;
 import com.starluck.vo.UserProfileVO;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,12 +25,18 @@ import java.util.List;
  * @date 2026-06-01
  */
 @Service
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
     private final UserProfileMapper userProfileMapper;
     private final UserBalanceMapper userBalanceMapper;
+
+    public UserServiceImpl(UserMapper userMapper, UserProfileMapper userProfileMapper,
+                           UserBalanceMapper userBalanceMapper) {
+        this.userMapper = userMapper;
+        this.userProfileMapper = userProfileMapper;
+        this.userBalanceMapper = userBalanceMapper;
+    }
 
     @Override
     public UserProfileVO getUserProfile(Long userId) {
@@ -72,11 +78,11 @@ public class UserServiceImpl implements UserService {
                 .tags(tags)
                 .inviteCode(user.getInviteCode())
                 .diamonds(balance != null ? balance.getDiamonds() : 0)
-                .cash(balance != null ? balance.getCash() : java.math.BigDecimal.ZERO)
-                .isVip(balance != null && balance.getIsVip() == 1)
+                .cash(balance != null ? balance.getCash() : BigDecimal.ZERO)
+                .isVip(balance != null && balance.getIsVip() != null && balance.getIsVip() == 1)
                 .vipExpireTime(balance != null && balance.getVipExpireTime() != null
                         ? balance.getVipExpireTime().toString() : null)
-                .isAuthed(balance != null && balance.getIsAuthed() == 1)
+                .isAuthed(balance != null && balance.getIsAuthed() != null && balance.getIsAuthed() == 1)
                 .fansCount(profile.getFansCount())
                 .followCount(profile.getFollowCount())
                 .friendsCount(profile.getFriendsCount())

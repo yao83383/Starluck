@@ -3,13 +3,19 @@ package com.starluck.service.impl;
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.starluck.common.BusinessException;
-import com.starluck.entity.*;
-import com.starluck.mapper.*;
+import com.starluck.entity.DiamondRecord;
+import com.starluck.entity.RechargeOrder;
+import com.starluck.entity.Transaction;
+import com.starluck.entity.UserBalance;
+import com.starluck.entity.WithdrawOrder;
+import com.starluck.mapper.DiamondRecordMapper;
+import com.starluck.mapper.RechargeOrderMapper;
+import com.starluck.mapper.TransactionMapper;
+import com.starluck.mapper.UserBalanceMapper;
+import com.starluck.mapper.WithdrawOrderMapper;
 import com.starluck.service.PaymentService;
 import com.starluck.vo.TransactionVO;
 import com.starluck.vo.WalletVO;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,10 +32,10 @@ import java.util.stream.Collectors;
  * @author AI
  * @date 2026-06-01
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
+
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("MM/dd HH:mm");
 
     private final UserBalanceMapper balanceMapper;
     private final RechargeOrderMapper rechargeOrderMapper;
@@ -37,7 +43,15 @@ public class PaymentServiceImpl implements PaymentService {
     private final DiamondRecordMapper diamondRecordMapper;
     private final TransactionMapper transactionMapper;
 
-    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("MM/dd HH:mm");
+    public PaymentServiceImpl(UserBalanceMapper balanceMapper, RechargeOrderMapper rechargeOrderMapper,
+                              WithdrawOrderMapper withdrawOrderMapper, DiamondRecordMapper diamondRecordMapper,
+                              TransactionMapper transactionMapper) {
+        this.balanceMapper = balanceMapper;
+        this.rechargeOrderMapper = rechargeOrderMapper;
+        this.withdrawOrderMapper = withdrawOrderMapper;
+        this.diamondRecordMapper = diamondRecordMapper;
+        this.transactionMapper = transactionMapper;
+    }
 
     @Override
     public WalletVO getWallet(Long userId) {
@@ -47,7 +61,6 @@ public class PaymentServiceImpl implements PaymentService {
             throw new BusinessException("用户余额不存在");
         }
 
-        // 本月交易记录
         List<Transaction> txs = transactionMapper.selectList(
                 new LambdaQueryWrapper<Transaction>()
                         .eq(Transaction::getUserId, userId)
@@ -76,7 +89,6 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String createRechargeOrder(Long userId, Long packageId, String payMethod) {
-        // 充值套餐定义（前端目前也有一套，为简化这里硬编码）
         int[][] packages = {
             {60, 600}, {300, 3000}, {680, 6800}, {1280, 12800}, {3280, 32800}, {6480, 64800}
         };
@@ -100,7 +112,6 @@ public class PaymentServiceImpl implements PaymentService {
         order.setStatus("pending");
         rechargeOrderMapper.insert(order);
 
-        // TODO: 正式环境调用微信/支付宝下单接口，返回支付参数
         // 演示环境直接完成支付
         handlePayCallback(orderNo, "DEMO_" + IdUtil.fastSimpleUUID().substring(0, 16));
         return orderNo;
@@ -123,14 +134,15 @@ public class PaymentServiceImpl implements PaymentService {
         order.setPaidAt(LocalDateTime.now());
         rechargeOrderMapper.updateById(order);
 
-        // 增加钻石
         UserBalance balance = balanceMapper.selectOne(
                 new LambdaQueryWrapper<UserBalance>().eq(UserBalance::getUserId, order.getUserId()));
-        balance.setDiamonds(balance.getDiamonds() + order.getDiamonds() + order.getBonusDiamonds());
-        balance.setTotalRecharged(balance.getTotalRecharged().add(order.getAmount()));
+        balance.setDiamonds(balance.getDiamonds() + order.getDiamonds()
+                + (order.getBonusDiamonds() == null ? 0 : order.getBonusDiamonds()));
+        BigDecimal totalRecharged = balance.getTotalRecharged() == null
+                ? BigDecimal.ZERO : balance.getTotalRecharged();
+        balance.setTotalRecharged(totalRecharged.add(order.getAmount()));
         balanceMapper.updateById(balance);
 
-        // 钻石流水
         DiamondRecord dr = new DiamondRecord();
         dr.setUserId(order.getUserId());
         dr.setType("in");
@@ -141,7 +153,6 @@ public class PaymentServiceImpl implements PaymentService {
         dr.setRemark("充值" + order.getAmount() + "元，获得" + order.getDiamonds() + "钻石");
         diamondRecordMapper.insert(dr);
 
-        // 交易流水
         Transaction tx = new Transaction();
         tx.setUserId(order.getUserId());
         tx.setType("expense");
@@ -156,10 +167,9 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void applyWithdraw(Long userId, BigDecimal amount, String method, String account) {
-        // 校验实名
         UserBalance balance = balanceMapper.selectOne(
                 new LambdaQueryWrapper<UserBalance>().eq(UserBalance::getUserId, userId));
-        if (balance.getIsAuthed() != 1) {
+        if (balance.getIsAuthed() == null || balance.getIsAuthed() != 1) {
             throw new BusinessException("请先完成实名认证");
         }
 
@@ -170,7 +180,6 @@ public class PaymentServiceImpl implements PaymentService {
             throw new BusinessException("可提现余额不足");
         }
 
-        // 手续费
         BigDecimal fee = amount.multiply(BigDecimal.valueOf(0.006)).setScale(2, RoundingMode.HALF_UP);
         if (fee.compareTo(BigDecimal.ONE) < 0) {
             fee = BigDecimal.ONE;
@@ -189,12 +198,12 @@ public class PaymentServiceImpl implements PaymentService {
         order.setStatus("pending");
         withdrawOrderMapper.insert(order);
 
-        // 冻结提现余额
         balance.setCash(balance.getCash().subtract(amount));
-        balance.setTotalWithdrawn(balance.getTotalWithdrawn().add(amount));
+        BigDecimal totalWithdrawn = balance.getTotalWithdrawn() == null
+                ? BigDecimal.ZERO : balance.getTotalWithdrawn();
+        balance.setTotalWithdrawn(totalWithdrawn.add(amount));
         balanceMapper.updateById(balance);
 
-        // 交易流水
         Transaction tx = new Transaction();
         tx.setUserId(userId);
         tx.setType("expense");

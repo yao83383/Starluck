@@ -8,7 +8,6 @@ import com.starluck.entity.VipOrder;
 import com.starluck.mapper.UserBalanceMapper;
 import com.starluck.mapper.VipOrderMapper;
 import com.starluck.service.VipService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,11 +23,15 @@ import java.util.Map;
  * @date 2026-06-01
  */
 @Service
-@RequiredArgsConstructor
 public class VipServiceImpl implements VipService {
 
     private final VipOrderMapper vipOrderMapper;
     private final UserBalanceMapper balanceMapper;
+
+    public VipServiceImpl(VipOrderMapper vipOrderMapper, UserBalanceMapper balanceMapper) {
+        this.vipOrderMapper = vipOrderMapper;
+        this.balanceMapper = balanceMapper;
+    }
 
     @Override
     public Map<String, Object> getPlans() {
@@ -68,8 +71,8 @@ public class VipServiceImpl implements VipService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expireTime = now.plusMonths(months);
 
-        // 如果已有VIP，叠加时间
-        if (balance.getIsVip() == 1 && balance.getVipExpireTime() != null
+        if (balance.getIsVip() != null && balance.getIsVip() == 1
+                && balance.getVipExpireTime() != null
                 && balance.getVipExpireTime().isAfter(now)) {
             expireTime = balance.getVipExpireTime().plusMonths(months);
         }
@@ -80,14 +83,13 @@ public class VipServiceImpl implements VipService {
         order.setPlanType(planType);
         order.setAmount(amount);
         order.setPayMethod(payMethod);
-        order.setStatus("paid"); // 演示环境直接完成支付
+        order.setStatus("paid");
         order.setTradeNo("DEMO_" + IdUtil.fastSimpleUUID().substring(0, 16));
         order.setStartTime(now);
         order.setExpireTime(expireTime);
         order.setPaidAt(now);
         vipOrderMapper.insert(order);
 
-        // 更新用户VIP状态
         balance.setIsVip(1);
         balance.setVipExpireTime(expireTime);
         balance.setDailyFreeChat(100);

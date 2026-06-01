@@ -4,14 +4,22 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.starluck.common.BusinessException;
 import com.starluck.config.ChatWebSocketHandler;
-import com.starluck.entity.*;
-import com.starluck.mapper.*;
 import com.starluck.dto.GiftSendRequest;
+import com.starluck.entity.DiamondRecord;
+import com.starluck.entity.Gift;
+import com.starluck.entity.GiftRecord;
+import com.starluck.entity.Transaction;
+import com.starluck.entity.UserBalance;
+import com.starluck.mapper.DiamondRecordMapper;
+import com.starluck.mapper.GiftMapper;
+import com.starluck.mapper.GiftRecordMapper;
+import com.starluck.mapper.TransactionMapper;
+import com.starluck.mapper.UserBalanceMapper;
 import com.starluck.service.GiftService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +31,6 @@ import java.util.Map;
  * @date 2026-06-01
  */
 @Service
-@RequiredArgsConstructor
 public class GiftServiceImpl implements GiftService {
 
     private final GiftMapper giftMapper;
@@ -31,6 +38,16 @@ public class GiftServiceImpl implements GiftService {
     private final UserBalanceMapper balanceMapper;
     private final DiamondRecordMapper diamondRecordMapper;
     private final TransactionMapper transactionMapper;
+
+    public GiftServiceImpl(GiftMapper giftMapper, GiftRecordMapper giftRecordMapper,
+                           UserBalanceMapper balanceMapper, DiamondRecordMapper diamondRecordMapper,
+                           TransactionMapper transactionMapper) {
+        this.giftMapper = giftMapper;
+        this.giftRecordMapper = giftRecordMapper;
+        this.balanceMapper = balanceMapper;
+        this.diamondRecordMapper = diamondRecordMapper;
+        this.transactionMapper = transactionMapper;
+    }
 
     @Override
     public List<Gift> getGiftList(String category) {
@@ -54,7 +71,6 @@ public class GiftServiceImpl implements GiftService {
         int quantity = request.getQuantity() != null ? request.getQuantity() : 1;
         int totalCost = gift.getPrice() * quantity;
 
-        // 扣钻石
         UserBalance balance = balanceMapper.selectOne(
                 new LambdaQueryWrapper<UserBalance>().eq(UserBalance::getUserId, senderId));
         if (balance == null || balance.getDiamonds() < totalCost) {
@@ -63,7 +79,6 @@ public class GiftServiceImpl implements GiftService {
         balance.setDiamonds(balance.getDiamonds() - totalCost);
         balanceMapper.updateById(balance);
 
-        // 钻石流水
         DiamondRecord dr = new DiamondRecord();
         dr.setUserId(senderId);
         dr.setType("out");
@@ -74,7 +89,6 @@ public class GiftServiceImpl implements GiftService {
         dr.setRemark("赠送礼物：" + gift.getName() + " x" + quantity);
         diamondRecordMapper.insert(dr);
 
-        // 赠送记录
         GiftRecord record = new GiftRecord();
         record.setSenderId(senderId);
         record.setReceiverId(request.getReceiverId());
@@ -87,29 +101,25 @@ public class GiftServiceImpl implements GiftService {
         record.setSessionId(request.getSessionId());
         giftRecordMapper.insert(record);
 
-        // 接收者收益（假用户不收真实收益）
-        // 真用户收益：10钻石 = 0.6元
         UserBalance receiverBalance = balanceMapper.selectOne(
                 new LambdaQueryWrapper<UserBalance>().eq(UserBalance::getUserId, request.getReceiverId()));
         if (receiverBalance != null) {
-            // 平台分成70%，主播分成30%
             double cashReward = totalCost * 0.03;
-            receiverBalance.setCash(receiverBalance.getCash().add(
-                    java.math.BigDecimal.valueOf(cashReward)));
+            BigDecimal newCash = receiverBalance.getCash().add(BigDecimal.valueOf(cashReward));
+            receiverBalance.setCash(newCash);
             balanceMapper.updateById(receiverBalance);
 
             Transaction tx = new Transaction();
             tx.setUserId(request.getReceiverId());
             tx.setType("income");
-            tx.setAmount(java.math.BigDecimal.valueOf(cashReward));
+            tx.setAmount(BigDecimal.valueOf(cashReward));
             tx.setBizType("gift");
             tx.setRefId(record.getId());
             tx.setDescription("收到礼物：" + gift.getName() + " x" + quantity);
-            tx.setBalanceAfter(receiverBalance.getCash());
+            tx.setBalanceAfter(newCash);
             transactionMapper.insert(tx);
         }
 
-        // 推送礼物通知
         Map<String, Object> pushData = new HashMap<>();
         pushData.put("type", "new_gift");
         pushData.put("giftName", gift.getName());

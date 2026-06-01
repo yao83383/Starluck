@@ -1,7 +1,6 @@
 package com.starluck.service.impl;
 
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.starluck.common.BusinessException;
 import com.starluck.dto.LoginRequest;
@@ -14,15 +13,19 @@ import com.starluck.mapper.UserProfileMapper;
 import com.starluck.security.JwtUtil;
 import com.starluck.service.AuthService;
 import com.starluck.vo.LoginVO;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 认证服务实现
@@ -30,27 +33,43 @@ import java.time.LocalDateTime;
  * @author AI
  * @date 2026-06-01
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
+    private static final String SMS_CODE_PREFIX = "sms:code:";
 
     private final UserMapper userMapper;
     private final UserProfileMapper userProfileMapper;
     private final UserBalanceMapper userBalanceMapper;
-    private final RedisTemplate<String, Object> redisTemplate;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    private static final String SMS_CODE_PREFIX = "sms:code:";
+    @Autowired(required = false)
+    private RedisTemplate<String, Object> redisTemplate;
+
+    @Autowired(required = false)
+    private Map<String, String> codeStore;
+
+    public AuthServiceImpl(UserMapper userMapper, UserProfileMapper userProfileMapper,
+                           UserBalanceMapper userBalanceMapper, PasswordEncoder passwordEncoder,
+                           JwtUtil jwtUtil) {
+        this.userMapper = userMapper;
+        this.userProfileMapper = userProfileMapper;
+        this.userBalanceMapper = userBalanceMapper;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
+    }
 
     @Override
     public void sendCode(String phone) {
         String code = "123456";
-        // TODO: 正式环境接入短信服务（阿里云/腾讯云短信）
-        // String code = RandomUtil.randomNumbers(6);
         String key = SMS_CODE_PREFIX + phone;
-        redisTemplate.opsForValue().set(key, code, Duration.ofMinutes(5));
+        if (redisTemplate != null) {
+            redisTemplate.opsForValue().set(key, code, Duration.ofMinutes(5));
+        } else if (codeStore != null) {
+            codeStore.put(key, code);
+        }
         log.info("验证码发送成功 - phone: {}, code: {}", phone, code);
     }
 
@@ -60,33 +79,37 @@ public class AuthServiceImpl implements AuthService {
         String phone = request.getPhone();
         String code = request.getCode();
 
-        // 校验验证码
         String key = SMS_CODE_PREFIX + phone;
-        String cachedCode = (String) redisTemplate.opsForValue().get(key);
+        String cachedCode;
+        if (redisTemplate != null) {
+            cachedCode = (String) redisTemplate.opsForValue().get(key);
+        } else if (codeStore != null) {
+            cachedCode = codeStore.get(key);
+        } else {
+            cachedCode = null;
+        }
         if (cachedCode == null) {
             throw new BusinessException("验证码已过期，请重新获取");
         }
         if (!cachedCode.equals(code)) {
             throw new BusinessException("验证码错误");
         }
-        // 验证通过后删除验证码
-        redisTemplate.delete(key);
+        if (redisTemplate != null) {
+            redisTemplate.delete(key);
+        } else if (codeStore != null) {
+            codeStore.remove(key);
+        }
 
-        // 查询或创建用户
         User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getPhone, phone));
-        boolean isNewUser = (user == null);
-        if (isNewUser) {
+        if (user == null) {
             user = createNewUser(phone);
         }
 
-        // 更新登录信息
         user.setLastLoginTime(LocalDateTime.now());
         userMapper.updateById(user);
 
-        // 生成Token
         String token = jwtUtil.generateToken(user.getId(), user.getPhone());
 
-        // 查询用户资料
         UserProfile profile = userProfileMapper.selectOne(
                 new LambdaQueryWrapper<UserProfile>().eq(UserProfile::getUserId, user.getId()));
         UserBalance balance = userBalanceMapper.selectOne(
@@ -100,7 +123,7 @@ public class AuthServiceImpl implements AuthService {
                 .avatar(profile != null ? profile.getAvatar() : null)
                 .onboarded(profile != null && profile.getNickname() != null)
                 .diamonds(balance != null ? balance.getDiamonds() : 666)
-                .isVip(balance != null && balance.getIsVip() == 1)
+                .isVip(balance != null && balance.getIsVip() != null && balance.getIsVip() == 1)
                 .vipExpireTime(balance != null && balance.getVipExpireTime() != null
                         ? balance.getVipExpireTime().toString() : null)
                 .build();
@@ -124,15 +147,12 @@ public class AuthServiceImpl implements AuthService {
                 .avatar(profile != null ? profile.getAvatar() : null)
                 .onboarded(profile != null && profile.getNickname() != null)
                 .diamonds(balance != null ? balance.getDiamonds() : 666)
-                .isVip(balance != null && balance.getIsVip() == 1)
+                .isVip(balance != null && balance.getIsVip() != null && balance.getIsVip() == 1)
                 .vipExpireTime(balance != null && balance.getVipExpireTime() != null
                         ? balance.getVipExpireTime().toString() : null)
                 .build();
     }
 
-    /**
-     * 创建新用户
-     */
     private User createNewUser(String phone) {
         User user = new User();
         user.setPhone(phone);
@@ -142,26 +162,25 @@ public class AuthServiceImpl implements AuthService {
         user.setRole("USER");
         userMapper.insert(user);
 
-        // 创建资料记录
         UserProfile profile = new UserProfile();
         profile.setUserId(user.getId());
-        profile.setAvatarNo(RandomUtil.randomInt(1, 9));
+        profile.setAvatarNo(ThreadLocalRandom.current().nextInt(1, 9));
         userProfileMapper.insert(profile);
 
-        // 创建余额记录（新用户赠送666钻石）
         UserBalance balance = new UserBalance();
         balance.setUserId(user.getId());
         balance.setDiamonds(666);
-        balance.setCash(java.math.BigDecimal.ZERO);
+        balance.setCash(BigDecimal.ZERO);
+        balance.setTotalRecharged(BigDecimal.ZERO);
+        balance.setTotalWithdrawn(BigDecimal.ZERO);
+        balance.setIsVip(0);
+        balance.setIsAuthed(0);
         balance.setDailyFreeChat(5);
         userBalanceMapper.insert(balance);
 
         return user;
     }
 
-    /**
-     * 生成唯一邀请码
-     */
     private String generateInviteCode() {
         String code;
         do {
