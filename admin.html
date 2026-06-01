@@ -187,8 +187,18 @@ tr:hover td{background:#fafafd;}
 <body>
 <div id="app"></div>
 <script src="https://unpkg.com/vue@3.4.27/dist/vue.global.prod.js"></script>
+<script src="api.js"></script>
 <script>
 const { createApp, reactive, ref, computed, watch, onMounted, nextTick } = Vue
+
+/* ===================== 后端API开关 =====================
+ * true  => 假用户管理、批量生成、推送等优先走后端API
+ * false => 仅本地 localStorage Mock
+ * 调用失败时降级到本地，保证后台仍可用。
+ */
+const USE_BACKEND = true
+const API = (typeof window !== 'undefined' && window.starluckApi) ? window.starluckApi : null
+const apiOn = ()=> USE_BACKEND && API
 
 /* ===================== 共享 Store（与 app.html 同源 localStorage） ===================== */
 const DEFAULT_STORE = {
@@ -308,7 +318,9 @@ const randomFakeUser = ()=>{
 }
 
 const findUser = id => {
-  return store.fakeUsers.find(u=>u.id===id)
+  if(id == null) return null
+  // 兼容字符串/数字 id（后端返回数字、前端旧mock可能是字符串）
+  return store.fakeUsers.find(u => u.id === id || String(u.id) === String(id)) || null
 }
 
 /* ===================== 视图状态 ===================== */
@@ -324,7 +336,7 @@ const ui = reactive({
 /* ===================== 计算属性 ===================== */
 // 与假用户的对话（运营关心的）
 const fakeConvs = computed(()=>{
-  return store.chats.filter(c=>store.fakeUsers.find(f=>f.id===c.uid))
+  return store.chats.filter(c=>store.fakeUsers.find(f=>f.id===c.uid || String(f.id)===String(c.uid)))
 })
 const totalUnread = computed(()=>fakeConvs.value.reduce((s,c)=>s+(c.unread||0),0))
 
@@ -341,15 +353,59 @@ const ops = {
     }else{
       store.fakeUsers.push(fake)
     }
+    // 同步到后端
+    if(apiOn()){
+      const payload = {
+        id: typeof fake.id === 'number' ? fake.id : undefined,
+        name: fake.name, avatarNo: fake.av, age: fake.age, city: fake.city,
+        sign: fake.sign, online: !!fake.online, vip: !!fake.vip,
+        height: fake.height, weight: fake.weight, job: fake.job, edu: fake.edu,
+        hometown: fake.home, loveStatus: fake.love, persona: fake.persona,
+        tags: fake.tags ? JSON.stringify(fake.tags) : null, status: 1
+      }
+      API.admin.saveFakeUser(payload).catch(err=>{
+        console.warn('[api] saveFakeUser failed:', err.message)
+      })
+    }
   },
   delFake(id){
     if(!confirm('确认删除此假用户？相关会话将保留但不再被推送命中')) return
     store.fakeUsers = store.fakeUsers.filter(f=>f.id!==id)
     toast('已删除')
+    if(apiOn() && typeof id === 'number'){
+      API.admin.deleteFakeUser(id).catch(err=>{
+        console.warn('[api] deleteFakeUser failed:', err.message)
+      })
+    }
   },
   batchGen(n){
-    for(let i=0;i<n;i++) store.fakeUsers.push(randomFakeUser())
-    toast('已生成 '+n+' 个假用户')
+    // 优先走后端：可生成持久化记录
+    if(apiOn()){
+      API.admin.batchGenerate(n).then(list=>{
+        // 将后端返回的假用户合并到本地store
+        if(Array.isArray(list)){
+          list.forEach(f=>{
+            store.fakeUsers.push({
+              id: f.id, name: f.name, av: f.avatarNo || 1,
+              age: f.age, city: f.city, dist: f.dist,
+              tags: (typeof f.tags === 'string' ? safeParseJson(f.tags) : f.tags) || [],
+              sign: f.sign, online: !!f.online, vip: !!f.vip,
+              height: f.height, weight: f.weight, job: f.job, edu: f.edu,
+              home: f.hometown, love: f.loveStatus, persona: f.persona,
+              csOwner: f.csOwner || '', createdAt: Date.now()
+            })
+          })
+          toast('后端已生成 '+list.length+' 个假用户')
+        }
+      }).catch(err=>{
+        console.warn('[api] batchGenerate failed, fallback local:', err.message)
+        for(let i=0;i<n;i++) store.fakeUsers.push(randomFakeUser())
+        toast('本地生成 '+n+' 个假用户（后端失败）')
+      })
+    }else{
+      for(let i=0;i<n;i++) store.fakeUsers.push(randomFakeUser())
+      toast('已生成 '+n+' 个假用户')
+    }
   },
   sendReply(text){
     if(!activeConv.value || !text.trim()) return
@@ -358,6 +414,12 @@ const ops = {
     activeConv.value.time = '刚刚'
     activeConv.value.unread = (activeConv.value.unread||0) + 1
     store.adminAnalytics.replied = (store.adminAnalytics.replied||0) + 1
+    // 客服回复同步到后端（站在女用户视角发送消息）
+    if(apiOn() && activeConv.value.sessionId){
+      API.chat.sendMessage(activeConv.value.sessionId, text.trim()).catch(err=>{
+        console.warn('[api] cs sendMessage failed:', err.message)
+      })
+    }
     ui.reply = ''
     ui.aiSuggest = ''
     toast('已发送')
@@ -405,12 +467,51 @@ const ops = {
     store.pushLog.push({ts:Date.now(), fakeUid:fu.id, toUid:store.user.id, slot:'manual', opened:false, replied:false})
     store.adminAnalytics.pushed = (store.adminAnalytics.pushed||0) + 1
     toast('已手动推送：'+fu.name+' → 男用户')
+
+    // 同步到后端（需要 fakeId 和 targetUserId 都是后端数字ID）
+    if(apiOn() && typeof fu.id === 'number' && typeof store.user.id === 'number'){
+      API.admin.manualPush(fu.id, store.user.id).catch(err=>{
+        console.warn('[api] manualPush failed:', err.message)
+      })
+    }
+  },
+  // 从后端拉取假用户列表覆盖本地
+  syncFakesFromBackend(){
+    if(!apiOn()) return Promise.resolve()
+    return API.admin.getFakeUsers().then(list=>{
+      if(!Array.isArray(list)) return
+      store.fakeUsers = list.map(f=>({
+        id: f.id, name: f.name, av: f.avatarNo || 1,
+        age: f.age, city: f.city, dist: f.dist,
+        tags: (typeof f.tags === 'string' ? safeParseJson(f.tags) : f.tags) || [],
+        sign: f.sign, online: !!f.online, vip: !!f.vip,
+        height: f.height, weight: f.weight, job: f.job, edu: f.edu,
+        home: f.hometown, love: f.loveStatus, persona: f.persona,
+        csOwner: f.csOwner || '', createdAt: f.createdAt ? new Date(f.createdAt).getTime() : Date.now()
+      }))
+      toast('已从后端同步 '+list.length+' 个假用户')
+    }).catch(err=>{
+      console.warn('[api] syncFakes failed:', err.message)
+    })
   },
   resetAll(){
     if(!confirm('确认重置所有数据？localStorage 会被清空')) return
     localStorage.removeItem('yqyr_store')
+    if(apiOn()) API.auth.logout()
     location.reload()
   }
+}
+
+// JSON 解析工具
+function safeParseJson(str){
+  try { return JSON.parse(str) } catch(e){ return null }
+}
+
+// 启动时尝试从后端同步假用户列表
+if(apiOn()){
+  setTimeout(()=>{
+    ops.syncFakesFromBackend()
+  }, 500)
 }
 
 /* ===================== 视图组件 ===================== */
@@ -647,12 +748,12 @@ const ViewWorkbench = {
     const send = ()=>ops.sendReply(ui.reply)
     const pickTemplate = (t)=>{ ui.reply = t }
     const meInfo = computed(()=>({
-      diamonds: store.diamonds,
-      cash: store.cash,
-      vip: store.user.vip,
-      authed: store.isAuthed,
+      diamonds: store.diamonds || 0,
+      cash: typeof store.cash === 'number' ? store.cash : 0,
+      vip: !!store.user?.vip,
+      authed: !!store.isAuthed,
     }))
-    return {store, ui, ops, fakeConvs, activeConv, activeFake, pickConv, useAI, send, pickTemplate, meInfo, msgFlowRef}
+    return {store, ui, ops, fakeConvs, activeConv, activeFake, pickConv, useAI, send, pickTemplate, meInfo, msgFlowRef, findUser, totalUnread}
   },
   template:`<div class="cs-layout">
     <!-- 左：会话列表 -->
@@ -680,9 +781,9 @@ const ViewWorkbench = {
 
     <!-- 中：聊天上下文 -->
     <div class="cs-col cs-chat">
-      <template v-if="activeConv">
+      <template v-if="activeConv && activeFake">
         <div class="cs-chat-head">
-          <div class="av" :class="'av-'+activeFake.av">{{activeFake.name[0]}}</div>
+          <div class="av" :class="'av-'+(activeFake.av||1)">{{activeFake.name?.[0]||'?'}}</div>
           <div class="iv">
             <div class="n">扮演 {{activeFake.name}}（假身份）</div>
             <div class="m">对话男用户：{{store.user.name}} · 钻石 {{store.diamonds}} · {{store.user.vip?'VIP':'普通'}}</div>
@@ -693,21 +794,21 @@ const ViewWorkbench = {
           <template v-for="(m,i) in activeConv.msgs" :key="i">
             <div v-if="m.type==='sys'" class="cs-sys">{{m.text}}</div>
             <div v-else-if="m.type==='out'" class="cs-bubble-row">
-              <div class="av" :class="'av-'+store.user.av">{{store.user.name[0]}}</div>
+              <div class="av" :class="'av-'+store.user.av">{{store.user.name?.[0]||'?'}}</div>
               <div>
                 <div class="cs-bubble">{{m.text}}</div>
                 <div class="meta">男用户 · {{m.time}}{{m.cost?' · -'+m.cost+'💎':''}}</div>
               </div>
             </div>
             <div v-else-if="m.type==='in'" class="cs-bubble-row fake">
-              <div class="av" :class="'av-'+activeFake.av">{{activeFake.name[0]}}</div>
+              <div class="av" :class="'av-'+(activeFake.av||1)">{{activeFake.name?.[0]||'?'}}</div>
               <div>
                 <div class="cs-bubble">{{m.text}}</div>
                 <div class="meta" style="text-align:right;">{{m.cs?'客服回复':'系统推送'}} · {{m.time}}</div>
               </div>
             </div>
             <div v-else-if="m.type==='gift'" class="cs-bubble-row">
-              <div class="av" :class="'av-'+store.user.av">{{store.user.name[0]}}</div>
+              <div class="av" :class="'av-'+store.user.av">{{store.user.name?.[0]||'?'}}</div>
               <div>
                 <div class="cs-bubble" style="background:linear-gradient(135deg,#fff5d6,#ffe8b3);color:#5a3a00;">{{m.from==='me'?'对方送出 ':'我送出 '}}{{m.em}} {{m.text}} <small>({{m.price}}💎)</small></div>
               </div>
@@ -716,7 +817,7 @@ const ViewWorkbench = {
         </div>
         <div class="cs-input-bar">
           <div class="cs-input-row">
-            <textarea v-model="ui.reply" placeholder="作为 {{activeFake.name}} 回复对方..." @keydown.ctrl.enter="send"></textarea>
+            <textarea v-model="ui.reply" :placeholder="'作为 '+activeFake.name+' 回复对方...'" @keydown.ctrl.enter="send"></textarea>
             <div style="display:flex;flex-direction:column;gap:6px;">
               <button class="btn" @click="send" :disabled="!ui.reply.trim()">发送</button>
               <button class="btn ghost small" @click="ops.askAI" :disabled="ui.aiLoading">{{ui.aiLoading?'AI思考中...':'💡 AI 建议'}}</button>
@@ -730,7 +831,8 @@ const ViewWorkbench = {
       </template>
       <div v-else class="empty" style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;">
         <div class="ei">👈</div>
-        <div>从左侧选择一个会话开始</div>
+        <div v-if="!activeConv">从左侧选择一个会话开始</div>
+        <div v-else>选中的会话假用户已被删除，请选择其他会话</div>
       </div>
     </div>
 
@@ -742,7 +844,7 @@ const ViewWorkbench = {
           <div class="cs-side-section">
             <h4>男用户画像</h4>
             <div class="cs-profile">
-              <div class="av" :class="'av-'+store.user.av">{{store.user.name[0]}}</div>
+              <div class="av" :class="'av-'+(store.user.av||1)">{{store.user.name?.[0]||'?'}}</div>
               <div class="iv">
                 <div class="n">{{store.user.name}} <span v-if="meInfo.vip" class="tag gold">VIP</span></div>
                 <div class="m">ID: {{store.user.id}} · {{store.user.city}}</div>
@@ -772,14 +874,15 @@ const ViewWorkbench = {
 
           <div class="cs-side-section">
             <h4>扮演角色信息</h4>
-            <div style="font-size:12px;line-height:1.7;">
+            <div style="font-size:12px;line-height:1.7;" v-if="activeFake">
               <div><b>{{activeFake.name}}</b>，{{activeFake.age}}岁，{{activeFake.city}}</div>
               <div style="color:#888;">{{activeFake.sign}}</div>
               <div style="margin-top:6px;">
-                <span v-for="t in activeFake.tags" :key="t" class="tag pink" style="margin-right:3px;">{{t}}</span>
+                <span v-for="t in (activeFake.tags||[])" :key="t" class="tag pink" style="margin-right:3px;">{{t}}</span>
               </div>
               <div style="margin-top:8px;color:#888;font-style:italic;">人设：{{activeFake.persona}}</div>
             </div>
+            <div v-else style="font-size:12px;color:#bbb;">该会话假用户已被删除</div>
           </div>
         </template>
         <div v-else class="empty" style="padding:30px 20px;">

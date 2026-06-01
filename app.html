@@ -709,8 +709,18 @@ a{text-decoration:none;color:inherit;}
 <body>
 <div id="app"></div>
 <script src="https://unpkg.com/vue@3.4.27/dist/vue.global.prod.js"></script>
+<script src="api.js"></script>
 <script>
 const { createApp, reactive, ref, computed, watch, onMounted, h } = Vue
+
+/* ===================== 后端API开关 =====================
+ * 设为 true  => 优先调用真实后端API (api.js)
+ * 设为 false => 完全本地 Mock + localStorage（旧行为）
+ * 调用失败时自动降级回本地逻辑，保证体验可用。
+ */
+const USE_BACKEND = true
+const API = (typeof window !== 'undefined' && window.starluckApi) ? window.starluckApi : null
+const apiOn = ()=> USE_BACKEND && API
 
 /* ===================== Mock 数据 ===================== */
 const MOCK_USERS = [
@@ -723,7 +733,46 @@ const MOCK_USERS = [
   {id:'u7', name:'柚柚', av:7, age:21, city:'武汉', dist:'2.0km', tags:['二次元','游戏','奶茶'], sign:'寻找搭档一起开黑～', online:true, vip:false, height:160, weight:46, job:'学生', edu:'在读', home:'湖北襄阳', love:'单身'},
   {id:'u8', name:'若兮', av:8, age:27, city:'南京', dist:'4.5km', tags:['瑜伽','烹饪','旅行'], sign:'用心去爱，温暖如初', online:true, vip:true, height:170, weight:52, job:'教师', edu:'硕士', home:'江苏苏州', love:'单身'},
 ]
-const findUser = id => MOCK_USERS.find(u=>u.id===id) || MOCK_USERS[0]
+// 查找用户：先查 MOCK_USERS（内置真实用户），再查 store.fakeUsers（后台/admin推送的假用户）
+// 修复：admin 推送过来的假用户 id 可能是数字或 'f' 开头字符串，findUser 必须能查到对应人，
+// 否则会一律回退到 MOCK_USERS[0]（小诗），导致所有会话都显示成"小诗"。
+const findUser = id => {
+  if(id == null) return MOCK_USERS[0]
+  // eq 比较，兼容字符串/数字
+  const eq = (a,b)=> a === b || String(a) === String(b)
+  let u = MOCK_USERS.find(u=>eq(u.id, id))
+  if(u) return u
+  // 查 store.fakeUsers（store 可能在脚本前期尚未初始化，用 try 兜底）
+  let storeRef = null
+  try { storeRef = store } catch(e) {}
+  if(storeRef && Array.isArray(storeRef.fakeUsers)){
+    const f = storeRef.fakeUsers.find(f=>eq(f.id, id))
+    if(f){
+      // 把假用户转换成 MOCK_USERS 形状并缓存进 MOCK_USERS，避免重复查询
+      const conv = {
+        id: f.id,
+        name: f.name || '神秘嘉宾',
+        av: f.av || f.avatarNo || 1,
+        age: f.age || 22,
+        city: f.city || '',
+        dist: f.dist || '',
+        tags: Array.isArray(f.tags) ? f.tags : [],
+        sign: f.sign || '',
+        online: !!f.online,
+        vip: !!f.vip,
+        height: f.height || 165,
+        weight: f.weight || 50,
+        job: f.job || '',
+        edu: f.edu || '',
+        home: f.home || f.hometown || '',
+        love: f.love || f.loveStatus || '单身'
+      }
+      MOCK_USERS.push(conv)
+      return conv
+    }
+  }
+  return MOCK_USERS[0]
+}
 
 const MOCK_GIFTS = [
   {id:'g1', cat:'hot', name:'玫瑰', em:'🌹', price:66},
@@ -841,6 +890,47 @@ try{
   if(saved) Object.assign(store, saved)
 }catch(e){}
 
+// 启动时把 localStorage 中已存在的 fakeUsers 注入 MOCK_USERS，
+// 保证刷新页面后会话列表/聊天页能正确显示对应假用户的头像和昵称
+if(Array.isArray(store.fakeUsers)){
+  store.fakeUsers.forEach(fu=>{
+    if(!MOCK_USERS.find(u=>String(u.id)===String(fu.id))){
+      MOCK_USERS.push({
+        id: fu.id,
+        name: fu.name || '神秘嘉宾',
+        av: fu.av || fu.avatarNo || 1,
+        age: fu.age || 22,
+        city: fu.city || '',
+        dist: fu.dist || '',
+        tags: Array.isArray(fu.tags) ? fu.tags : (typeof fu.tags==='string' ? (function(s){try{return JSON.parse(s)}catch(e){return []}})(fu.tags) : []),
+        sign: fu.sign || '',
+        online: !!fu.online,
+        vip: !!fu.vip,
+        height: fu.height || 165,
+        weight: fu.weight || 50,
+        job: fu.job || '',
+        edu: fu.edu || '',
+        home: fu.home || fu.hometown || '',
+        love: fu.love || fu.loveStatus || '单身'
+      })
+    }
+  })
+}
+
+// 启动时：若本地存在后端token，自动标记为已登录并拉一次用户信息
+if(typeof window !== 'undefined' && window.starluckApi && window.starluckApi.auth.isLoggedIn()){
+  store.loggedIn = true
+  // 异步同步后端用户信息（失败不影响）
+  window.starluckApi.auth.getUserInfo().then(info=>{
+    if(info){
+      if(info.diamonds !== undefined) store.diamonds = info.diamonds
+      if(info.nickname) store.user.name = info.nickname
+      if(info.isVip) store.user.vip = true
+      if(info.onboarded) store.onboarded = true
+    }
+  }).catch(()=>{})
+}
+
 let _saveTimer
 watch(store, ()=>{
   clearTimeout(_saveTimer)
@@ -862,7 +952,32 @@ window.addEventListener('storage', e=>{
         store[k] = incoming[k]
       }
     }
-  }catch(_){}
+    // admin.html / 后台推送过来的 fakeUsers 注入到 MOCK_USERS，修复会话中名字/头像错乱
+    if(Array.isArray(incoming.fakeUsers)){
+      incoming.fakeUsers.forEach(fu=>{
+        if(!MOCK_USERS.find(u=>String(u.id)===String(fu.id))){
+          MOCK_USERS.push({
+            id: fu.id,
+            name: fu.name || '神秘嘉宾',
+            av: fu.av || fu.avatarNo || 1,
+            age: fu.age || 22,
+            city: fu.city || '',
+            dist: fu.dist || '',
+            tags: Array.isArray(fu.tags) ? fu.tags : (typeof fu.tags==='string' ? (function(s){try{return JSON.parse(s)}catch(e){return []}})(fu.tags) : []),
+            sign: fu.sign || '',
+            online: !!fu.online,
+            vip: !!fu.vip,
+            height: fu.height || 165,
+            weight: fu.weight || 50,
+            job: fu.job || '',
+            edu: fu.edu || '',
+            home: fu.home || fu.hometown || '',
+            love: fu.love || fu.loveStatus || '单身'
+          })
+        }
+      })
+    }
+  }catch(_){ }
 })
 
 /* === 智谱 GLM-4-Flash 客户端 === */
@@ -929,14 +1044,33 @@ const toast = (msg)=>{
   toastTimer = setTimeout(()=>{ uiState.toast = '' }, 1800)
 }
 
-/* ===================== 业务方法 ===================== */
+/* ===================== 业务方法 =====================
+ * 所有方法均同步返回 boolean（与旧 UI 兼容），
+ * 内部触发的 API 调用是异步的：成功后通过 toast/Store 反向更新 UI。
+ * 调用失败 / 后端不可达 时降级到原本地 Mock 逻辑。
+ */
 const biz = {
+  // ---------- 充值 ----------
   recharge(rmb, diamond){
+    // 本地立即扣加，保证体验
     store.diamonds += diamond
     store.transactions.unshift({id:'t'+Date.now(), type:'out', cat:'recharge', t1:`充值 ${diamond}💎`, t2:'刚刚', amt:rmb})
     toast(`充值成功 +${diamond}💎`)
     if(!store.firstRechargeShown){ store.firstRechargeShown = true }
+
+    // 异步同步到后端：根据金额匹配套餐ID（60/300/680/1280/3280/6480 -> 1/2/3/4/5/6）
+    if(apiOn()){
+      const packageMap = {60:1, 300:2, 680:3, 1280:4, 3280:5, 6480:6}
+      const pkgId = packageMap[rmb]
+      if(pkgId){
+        API.payment.recharge(pkgId, 'wechat').catch(err=>{
+          console.warn('[api] recharge failed, kept local:', err.message)
+        })
+      }
+    }
   },
+
+  // ---------- 聊天消息 ----------
   sendChatMsg(chatId, text){
     const chat = store.chats.find(c=>c.id===chatId)
     if(!chat) return false
@@ -954,15 +1088,27 @@ const biz = {
     chat.msgs.push({type:'out', text, time:'刚刚', cost})
     chat.lastMsg = text
     chat.time = '刚刚'
-    // 模拟回复
-    setTimeout(()=>{
-      const replies = ['嗯嗯～','你说的对','哈哈～','是这样吗？','听你的','想见你了']
-      const r = replies[Math.floor(Math.random()*replies.length)]
-      chat.msgs.push({type:'in', text:r, time:'刚刚'})
-      chat.lastMsg = r
-    }, 1200)
+
+    // 异步同步到后端（仅当 chat.sessionId 已绑定后端会话时）
+    if(apiOn() && chat.sessionId){
+      API.chat.sendMessage(chat.sessionId, text).catch(err=>{
+        console.warn('[api] sendMessage failed, kept local:', err.message)
+      })
+    }
+
+    // 本地模拟回复（无后端时维持原体验）
+    if(!apiOn() || !chat.sessionId){
+      setTimeout(()=>{
+        const replies = ['嗯嗯～','你说的对','哈哈～','是这样吗？','听你的','想见你了']
+        const r = replies[Math.floor(Math.random()*replies.length)]
+        chat.msgs.push({type:'in', text:r, time:'刚刚'})
+        chat.lastMsg = r
+      }, 1200)
+    }
     return true
   },
+
+  // ---------- 赠送礼物 ----------
   sendGift(chatId, gift, num){
     const total = gift.price * num
     if(store.diamonds < total){
@@ -977,8 +1123,17 @@ const biz = {
       chat.time = '刚刚'
     }
     toast(`已送出 ${gift.name} ×${num}`)
+
+    // 异步同步：将本地 gift.id 映射为后端 giftId（1-12按顺序对应）
+    if(apiOn() && chat && chat.peerUserId && gift.backendId){
+      API.gift.send(chat.peerUserId, gift.backendId, num, chat.sessionId).catch(err=>{
+        console.warn('[api] sendGift failed, kept local:', err.message)
+      })
+    }
     return true
   },
+
+  // ---------- 提现 ----------
   withdraw(amt){
     if(amt < 10){ toast('单笔最低 ¥10'); return false }
     if(amt > store.cash){ toast('余额不足'); return false }
@@ -987,45 +1142,133 @@ const biz = {
     store.cash = +(store.cash - amt).toFixed(2)
     store.transactions.unshift({id:'t'+Date.now(), type:'out', cat:'withdraw', t1:`提现 ¥${amt}（手续费 ¥${fee}）`, t2:'刚刚', amt})
     toast(`提现成功 ¥${(amt-fee).toFixed(2)} 已到账`)
+
+    if(apiOn()){
+      API.payment.withdraw(amt, 'wechat', '').catch(err=>{
+        console.warn('[api] withdraw failed, kept local:', err.message)
+      })
+    }
     return true
   },
+
+  // ---------- VIP 开通 ----------
   openVip(plan){
-    const prices = {month:30, season:68, year:198}
     const days = {month:30, season:90, year:365}
-    if(store.diamonds < prices[plan]*10){
-      // 这里仅模拟现金支付
-    }
     store.user.vip = true
     store.user.vipExpire = `${days[plan]}天后`
     toast(`已开通 ${plan==='month'?'月':plan==='season'?'季':'年'}卡 VIP！`)
+
+    if(apiOn()){
+      const planTypeMap = {month:'month', season:'quarter', year:'year'}
+      API.vip.subscribe(planTypeMap[plan]||'month', 'wechat').catch(err=>{
+        console.warn('[api] openVip failed, kept local:', err.message)
+      })
+    }
     return true
   },
+
+  // ---------- 视频通话扣费 ----------
   callMinute(uid){
     let rate = 6
     if(store.user.vip) rate = Math.ceil(rate*0.8)
     if(store.diamonds < rate) return false
     store.diamonds -= rate
+    // 视频通话扣费暂未提供独立后端接口，仅本地扣
     return rate
   },
+
+  // ---------- 实名认证 ----------
   finishAuth(){
     store.isAuthed = true
     store.diamonds += 100
     toast('实名认证成功 +100💎')
+    // 后端实名认证接口待补充（TODO）
   },
+
+  // ---------- 新人资料 ----------
   finishOnboard(data){
     Object.assign(store.user, data)
     store.onboarded = true
     store.diamonds += 88
     toast('资料完善 +88💎')
+
+    if(apiOn()){
+      API.user.updateProfile({
+        nickname: data.name,
+        avatarNo: data.av,
+        gender: data.gender === '男' ? 'M' : 'F',
+        age: data.age,
+        city: data.city,
+        height: data.height,
+        job: data.job,
+        sign: data.sign,
+        tags: data.tags ? JSON.stringify(data.tags) : null
+      }).catch(err=>{
+        console.warn('[api] updateProfile failed:', err.message)
+      })
+    }
   },
+
+  // ---------- 登录 ----------
   login(){
     store.loggedIn = true
     toast('登录成功')
   },
+
+  // ---------- 真实后端登录（手机+验证码） ----------
+  loginByApi(phone, code){
+    if(!apiOn()) return Promise.reject(new Error('后端未启用'))
+    return API.auth.login(phone, code).then(data=>{
+      store.loggedIn = true
+      if(data){
+        if(data.nickname) store.user.name = data.nickname
+        if(data.diamonds !== undefined) store.diamonds = data.diamonds
+        if(data.isVip) store.user.vip = true
+        if(data.onboarded) store.onboarded = true
+      }
+      toast('登录成功')
+      // 登录后建立 WebSocket
+      try { API.ws.connect() } catch(e) {}
+      return data
+    })
+  },
+
+  // ---------- 发送验证码 ----------
+  sendCode(phone){
+    if(!apiOn()) { toast('验证码已发送（演示）'); return Promise.resolve() }
+    return API.auth.sendCode(phone).then(()=>{
+      toast('验证码已发送（演示验证码：123456）')
+    }).catch(err=>{
+      toast('发送失败：'+err.message+'，演示验证码：123456')
+    })
+  },
+
+  // ---------- 退出登录 ----------
   logout(){
+    if(apiOn()) { try { API.auth.logout() } catch(e){} try { API.ws.disconnect() } catch(e){} }
     Object.assign(store, JSON.parse(JSON.stringify(DEFAULT_STORE)))
     toast('已退出登录')
   }
+}
+
+// ===== WebSocket 推送：收到新消息时插入到对应会话 =====
+if(apiOn()){
+  API.ws.on(function(msg){
+    if(!msg) return
+    if(msg.type === 'new_message' && msg.sessionId){
+      const chat = store.chats.find(c=>c.sessionId === msg.sessionId)
+      if(chat){
+        chat.msgs.push({type:'in', text:msg.content || '', time:'刚刚'})
+        chat.lastMsg = msg.content || ''
+        chat.time = '刚刚'
+        chat.unread = (chat.unread||0) + 1
+      }
+    }else if(msg.type === 'new_gift'){
+      toast(`收到 ${msg.giftIcon||'🎁'} ${msg.giftName||'礼物'} ×${msg.quantity||1}`)
+    }
+  })
+  // 若已登录则立即连接
+  if(API.auth.isLoggedIn()) { try { API.ws.connect() } catch(e){} }
 }
 
 /* ===================== 公共组件 ===================== */
@@ -1074,21 +1317,47 @@ const PageLogin = {
     const code = ref('')
     const agreed = ref(true)
     const cd = ref(0)
+    const loading = ref(false)
     const sendCode = ()=>{
       if(!/^1\d{10}$/.test(phone.value)){ toast('请输入正确手机号'); return }
       cd.value = 60
-      toast('验证码已发送（演示：1234）')
       const t = setInterval(()=>{ cd.value--; if(cd.value<=0) clearInterval(t) },1000)
+      // 调后端，失败回落本地提示
+      if(apiOn()){
+        biz.sendCode(phone.value)
+      }else{
+        toast('验证码已发送（演示：123456）')
+      }
     }
     const doLogin = ()=>{
       if(!agreed.value){ toast('请同意用户协议'); return }
       if(!/^1\d{10}$/.test(phone.value)){ toast('请输入正确手机号'); return }
       if(!code.value){ toast('请输入验证码'); return }
-      biz.login()
-      if(!store.onboarded) go('/onboard')
-      else go('/discover')
+
+      const afterLogin = ()=>{
+        if(!store.onboarded) go('/onboard')
+        else go('/discover')
+      }
+
+      if(apiOn()){
+        loading.value = true
+        biz.loginByApi(phone.value, code.value).then(()=>{
+          loading.value = false
+          afterLogin()
+        }).catch(err=>{
+          loading.value = false
+          // 后端失败 => 回落本地登录
+          console.warn('[api] login failed, fallback local:', err.message)
+          toast('后端登录失败：'+err.message+'，已使用本地模式')
+          biz.login()
+          afterLogin()
+        })
+      }else{
+        biz.login()
+        afterLogin()
+      }
     }
-    return {phone,code,agreed,cd,sendCode,doLogin}
+    return {phone,code,agreed,cd,loading,sendCode,doLogin}
   },
   template:`<div class="screen">
     <status-bar />
@@ -1456,8 +1725,8 @@ const PageChat = {
   components:{StatusBar,NavBar},
   setup(){
     const route = computed(()=>parseRoute(currentRoute.value))
-    const chat = computed(()=>store.chats.find(c=>c.id===route.value.param) || store.chats[0])
-    const user = computed(()=>findUser(chat.value.uid))
+    const chat = computed(()=>store.chats.find(c=>c.id===route.value.param) || store.chats[0] || {id:'',uid:'',msgs:[],lastMsg:'',time:''})
+    const user = computed(()=>findUser(chat.value && chat.value.uid))
     const txt = ref('')
     const aiLoading = ref(false)
     const aiSuggest = ref('')
@@ -1495,7 +1764,7 @@ const PageChat = {
       aiLoading.value = false
     }
     const useAI = ()=>{ txt.value = aiSuggest.value; aiSuggest.value='' }
-    return {chat,user,txt,tools,send,store,goToRecharge,askAI,useAI,aiLoading,aiSuggest}
+    return {chat,user,txt,tools,send,store,goToRecharge,askAI,useAI,aiLoading,aiSuggest,back}
   },
   template:`<div class="screen chat-screen">
     <status-bar />
