@@ -1,0 +1,86 @@
+<view class="page page-bg-radial" style="{{themeStyle}}">
+  <starfield density="light"></starfield>
+
+  <view class="status-bar" style="height:{{statusBarHeight}}px;"></view>
+
+  <view class="page-top">
+    <text class="brand-name fs-xl">动态</text>
+    <text class="sub text-3">📷 记录你的星光时刻</text>
+  </view>
+
+  <!-- Feed Tab -->
+  <scroll-view class="tabs" scroll-x="true" enhanced="true" show-scrollbar="false">
+    <view
+      class="tab {{tabKey===item.key?'on':''}}"
+      wx:for="{{tabs}}"
+      wx:key="key"
+      data-key="{{item.key}}"
+      bindtap="switchTab"
+    >{{item.label}}</view>
+  </scroll-view>
+
+  <!-- 热门话题 -->
+  <scroll-view class="topics" scroll-x="true" enhanced="true" show-scrollbar="false">
+    <view
+      class="tp"
+      wx:for="{{topics}}"
+      wx:key="*this"
+      bindtap="goTopic"
+    >{{item}}</view>
+  </scroll-view>
+
+  <!-- Feed 列表 -->
+  <scroll-view class="feed-list" scroll-y="true" enhanced="true" show-scrollbar="false">
+    <view class="feed-card" wx:for="{{feeds}}" wx:key="id">
+      <!-- 顶部：头像 + 昵称 + 关注 -->
+      <view class="fc-top">
+        <view class="av av-{{item.av}}" data-uid="{{item.uid}}" bindtap="goProfile">{{item.name[0]}}</view>
+        <view class="fcb flex-1" data-uid="{{item.uid}}" bindtap="goProfile">
+          <view class="row">
+            <text class="n">{{item.name}}</text>
+            <text wx:if="{{item.vip}}" class="sl-tag vip" style="margin-left:6rpx;font-size:16rpx">VIP</text>
+          </view>
+          <view class="m text-3">{{item.time}}</view>
+        </view>
+        <view class="fb">+ 关注</view>
+      </view>
+
+      <!-- 正文 -->
+      <view class="fc-text">{{item.text}}</view>
+
+      <!-- 图片 -->
+      <view wx:if="{{item.imgs.length>0}}" class="fc-imgs {{item.imgs.length===1?'one':(item.imgs.length===2?'two':'three')}}">
+        <view class="img {{img}}" wx:for="{{item.imgs}}" wx:for-item="img" wx:key="*this"></view>
+      </view>
+
+      <!-- 话题标签 -->
+      <view class="fc-tags" wx:if="{{item.tags.length>0}}">
+        <view class="sl-tag" wx:for="{{item.tags}}" wx:key="*this" style="margin-right:10rpx;">{{item}}</view>
+      </view>
+
+      <!-- 底部工具栏 -->
+      <view class="fc-tools">
+        <view class="ft" data-id="{{item.id}}" catchtap="like">
+          <text>❤️</text>
+          <text>{{item.likes}}</text>
+        </view>
+        <view class="ft">
+          <text>💬</text>
+          <text>{{item.comments}}</text>
+        </view>
+        <view class="ft">
+          <text>🎁</text>
+          <text>送礼</text>
+        </view>
+        <view class="ft">
+          <text>↗️</text>
+          <text>分享</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="tabbar-placeholder"></view>
+  </scroll-view>
+
+  <sl-tabbar active="feed"></sl-tabbar>
+</view>

@@ -1,0 +1,73 @@
+<view class="page page-bg-radial" style="{{themeStyle}}">
+  <starfield density="normal"></starfield>
+
+  <view class="status-bar" style="height:{{statusBarHeight}}px;"></view>
+
+  <view class="nav-bar">
+    <view class="back" bindtap="back">‹</view>
+    <view class="title">主题中心</view>
+    <view class="right"></view>
+  </view>
+
+  <view class="hero">
+    <view class="hero-emoji">🌌</view>
+    <view class="hero-title brand-name fs-xl">为你的星空换一种颜色</view>
+    <view class="hero-sub text-2">所有变化即时生效 · 随时切换</view>
+  </view>
+
+  <scroll-view class="cards-wrap" scroll-y="true" enhanced="true" show-scrollbar="false">
+
+    <view
+      class="theme-card {{store.themeId===item.id?'current':''}}"
+      wx:for="{{themes}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="selectTheme"
+      hover-class="hover"
+    >
+      <view class="preview" style="background:{{item.bgRadial}}">
+        <view class="preview-star"></view>
+        <view class="badge" wx:if="{{store.themeId===item.id}}">✓ 当前</view>
+        <view class="mini-phone">
+          <view class="mini-screen" style="background:{{item.bgGradient}};color:{{item.text1}};">
+            <view class="mini-logo">✨</view>
+            <view class="mini-brand" style="background:{{item.brandGrad}};-webkit-background-clip:text;background-clip:text;color:transparent;">Starluck</view>
+            <view class="mini-slogan" style="color:{{item.text3}}">每颗星，都在等另一颗</view>
+            <view class="mini-btn" style="background:{{item.brandGrad}};">发出星语</view>
+            <view class="mini-row">
+              <view class="mini-dot" style="background:{{item.overlayCard}};border:1rpx solid {{item.border1}}"></view>
+              <view class="mini-dot" style="background:{{item.overlayCard}};border:1rpx solid {{item.border1}}"></view>
+              <view class="mini-dot" style="background:{{item.overlayCard}};border:1rpx solid {{item.border1}}"></view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="info">
+        <view class="info-row">
+          <view class="name">{{item.name}}</view>
+          <view class="en text-3">{{item.en}}</view>
+        </view>
+        <view class="desc text-2">{{item.desc}}</view>
+        <view class="swatches">
+          <view class="sw" style="background:{{item.bgDeep}};"></view>
+          <view class="sw" style="background:{{item.bgCard}};"></view>
+          <view class="sw" style="background:{{item.brandGrad}};"></view>
+          <view class="sw" style="background:{{item.brandCool}};"></view>
+          <view class="sw" style="background:{{item.vipGold}};"></view>
+        </view>
+        <view class="footer">
+          <view wx:if="{{store.themeId===item.id}}" class="btn-current">✓ 当前主题</view>
+          <view wx:else class="btn-apply">点击应用</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="tip text-3">
+      💡 不变量：版式 · 组件 · 文案 · Slogan · 业务规则
+      可变量：色彩 · 阴影 · 渐变方向
+    </view>
+
+    <view style="height:60rpx;"></view>
+  </scroll-view>
+</view>

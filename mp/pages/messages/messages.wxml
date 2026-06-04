@@ -1,0 +1,59 @@
+<view class="page page-bg-radial" style="{{themeStyle}}">
+  <starfield density="light"></starfield>
+
+  <view class="status-bar" style="height:{{statusBarHeight}}px;"></view>
+
+  <view class="page-top">
+    <text class="brand-name fs-xl">消息</text>
+    <text class="sub text-3">还没有星向你发出信号？发起一次星语 ✨</text>
+  </view>
+
+  <view class="quick">
+    <view
+      class="qi"
+      wx:for="{{quick}}"
+      wx:key="key"
+      data-key="{{item.key}}"
+      bindtap="onQuick"
+    >
+      <view class="ico {{item.color}}">
+        <text>{{item.icon}}</text>
+        <view wx:if="{{item.badge>0}}" class="badge">{{item.badge}}</view>
+      </view>
+      <text class="lbl">{{item.label}}</text>
+    </view>
+  </view>
+
+  <scroll-view class="chat-list" scroll-y="true" enhanced="true" show-scrollbar="false">
+    <view
+      class="chat-item"
+      wx:for="{{chats}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="goChat"
+      hover-class="hover"
+    >
+      <view class="av-wrap">
+        <view class="av av-{{item.av}}">{{item.name[0]}}</view>
+        <view wx:if="{{item.online}}" class="online-dot"></view>
+      </view>
+      <view class="ci-info flex-1">
+        <view class="row1">
+          <text class="name">{{item.name}}</text>
+          <text wx:if="{{item.vip}}" class="sl-tag vip" style="margin-left:6rpx;font-size:18rpx">VIP</text>
+          <text class="time text-3">{{item.time}}</text>
+        </view>
+        <view class="last text-2">{{item.last}}</view>
+      </view>
+      <view wx:if="{{item.unread>0}}" class="badge unread">{{item.unread}}</view>
+    </view>
+    <view wx:if="{{chats.length===0}}" class="empty-msg">
+      <view class="ei">💬</view>
+      <view class="em">还没有星语</view>
+      <view class="es text-3">去发现页找到一颗星，发出你的第一句星语吧</view>
+    </view>
+    <view class="tabbar-placeholder"></view>
+  </scroll-view>
+
+  <sl-tabbar active="messages"></sl-tabbar>
+</view>

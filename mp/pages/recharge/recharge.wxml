@@ -1,0 +1,63 @@
+<view class="page page-bg-radial" style="{{themeStyle}}">
+  <starfield density="normal"></starfield>
+
+  <view class="status-bar" style="height:{{statusBarHeight}}px;"></view>
+
+  <view class="nav-bar">
+    <view class="back" bindtap="back">‹</view>
+    <view class="title">星屑充值</view>
+    <view class="right text-2">明细</view>
+  </view>
+
+  <scroll-view class="body" scroll-y="true" enhanced="true" show-scrollbar="false">
+
+    <view class="balance">
+      <view class="lbl text-3">我的星屑</view>
+      <view class="num text-gold">✨ {{store.diamonds}}</view>
+    </view>
+
+    <view class="bonus-banner">🎉 首充翻倍！首次充值赠送双倍星屑</view>
+
+    <view class="pkg-grid">
+      <view
+        class="pkg-card {{selected===item.id?'on':''}} {{item.hot?'hot':''}}"
+        wx:for="{{packages}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="pickPkg"
+      >
+        <view wx:if="{{item.hot}}" class="hot-tag">超值热销</view>
+        <view class="d">✨ {{item.diamond}}</view>
+        <view wx:if="{{item.bonus}}" class="bn text-success">{{item.bonus}}</view>
+        <view class="p">¥{{item.price}}</view>
+      </view>
+    </view>
+
+    <view class="pay-section">
+      <view class="pay-title">支付方式</view>
+      <view
+        class="pay-method {{payMethod===item.id?'on':''}}"
+        wx:for="{{methods}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="pickPay"
+      >
+        <text class="pi">{{item.emoji}}</text>
+        <text class="pn flex-1">{{item.label}}</text>
+        <view class="pr"></view>
+      </view>
+    </view>
+
+    <view class="tip text-3">
+      * 1元 = 10星屑 · 星屑不支持提现和转赠 · 充值成功后即时到账
+    </view>
+
+    <view style="height:200rpx;"></view>
+  </scroll-view>
+
+  <view class="bottom-bar">
+    <sl-button type="gold" block bindtap="doPay">
+      ¥{{selectedPkg.price}} 立即充值
+    </sl-button>
+  </view>
+</view>

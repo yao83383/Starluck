@@ -9,6 +9,8 @@ import com.starluck.vo.LoginVO;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 /**
  * 认证控制器
  *
@@ -26,14 +28,28 @@ public class AuthController {
     }
 
     @PostMapping("/send-code")
-    public Result<Void> sendCode(@Valid @RequestBody SendCodeRequest request) {
-        authService.sendCode(request.getPhone());
-        return Result.okMsg("验证码已发送");
+    public Result<String> sendCode(@Valid @RequestBody SendCodeRequest request) {
+        String code = authService.sendCode(request.getPhone());
+        return Result.ok("验证码已发送", code);
     }
 
     @PostMapping("/login")
     public Result<LoginVO> login(@Valid @RequestBody LoginRequest request) {
         LoginVO vo = authService.loginByPhone(request);
+        return Result.ok("登录成功", vo);
+    }
+
+    @PostMapping("/login-by-password")
+    public Result<LoginVO> loginByPassword(@RequestBody Map<String, String> body) {
+        String phone = body.get("phone");
+        String password = body.get("password");
+        if (phone == null || phone.isEmpty()) {
+            return Result.fail("手机号不能为空");
+        }
+        if (password == null || password.isEmpty()) {
+            return Result.fail("密码不能为空");
+        }
+        LoginVO vo = authService.loginByPassword(phone, password);
         return Result.ok("登录成功", vo);
     }
 

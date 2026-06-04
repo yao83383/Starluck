@@ -1,0 +1,97 @@
+.login {
+  position: relative;
+  z-index: 2;
+  padding: 120rpx 56rpx 56rpx;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.logo {
+  font-size: 100rpx;
+  text-align: center;
+  line-height: 1;
+  margin-top: 60rpx;
+}
+.brand-name { text-align: center; margin-top: 24rpx; }
+.slogan { text-align: center; margin-top: 12rpx; font-size: 28rpx; }
+.slogan-en { text-align: center; margin-top: 6rpx; font-size: 20rpx; font-style: italic; letter-spacing: 0.5rpx; }
+
+.form { margin-top: 80rpx; }
+
+.input-row {
+  background: var(--sl-overlayCard, rgba(255,138,176,0.1));
+  border: 1rpx solid var(--sl-border1, rgba(255,138,176,0.25));
+  border-radius: 24rpx;
+  padding: 24rpx 32rpx;
+  margin-bottom: 24rpx;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+.prefix { color: var(--sl-brand1); font-weight: 600; font-size: 28rpx; }
+.ipt { flex: 1; font-size: 30rpx; color: var(--sl-text1, #fff); }
+.ph { color: var(--sl-text3, rgba(255,255,255,0.4)); }
+.send-code { color: var(--sl-brand2); font-weight: 600; font-size: 26rpx; }
+.send-code.disabled { color: var(--sl-text3); }
+
+.agree {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 22rpx;
+  margin-top: 24rpx;
+  flex-wrap: wrap;
+}
+.agree .cb {
+  width: 28rpx; height: 28rpx;
+  border-radius: 50%;
+  border: 2rpx solid var(--sl-text3);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: #fff; font-size: 18rpx;
+}
+.agree .cb.on {
+  background: var(--sl-brand1);
+  border-color: var(--sl-brand1);
+}
+.agree .link { color: var(--sl-brand1); }
+
+.third { margin-top: 80rpx; text-align: center; }
+.third .label { font-size: 22rpx; margin-bottom: 32rpx; }
+.third .ico-row { display: flex; justify-content: center; gap: 48rpx; }
+.third .ico {
+  width: 88rpx; height: 88rpx;
+  border-radius: 50%;
+  background: var(--sl-overlayCard);
+  border: 1rpx solid var(--sl-border1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44rpx;
+}
+
+/* 登录方式切换 */
+.mode-tabs {
+  display: flex;
+  justify-content: center;
+  margin-top: 60rpx;
+  background: var(--sl-overlayCard);
+  border-radius: 32rpx;
+  padding: 4rpx;
+}
+.mode-tab {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  font-size: 26rpx;
+  color: var(--sl-text3);
+  border-radius: 28rpx;
+  transition: all 0.2s;
+}
+.mode-tab.on {
+  background: var(--sl-brandGrad);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: var(--sl-shadowBtn);
+}

@@ -1,0 +1,18 @@
+<view class="sl-tabbar" style="{{themeStyle}}">
+  <view class="ti {{active==='discover'?'on':''}}" bindtap="toDiscover">
+    <text class="ico">👥</text>
+    <text class="lbl">发现</text>
+  </view>
+  <view class="ti {{active==='feed'?'on':''}}" bindtap="toFeed">
+    <text class="ico">📷</text>
+    <text class="lbl">动态</text>
+  </view>
+  <view class="ti {{active==='messages'?'on':''}}" bindtap="toMessages">
+    <text class="ico">💬</text>
+    <text class="lbl">消息</text>
+  </view>
+  <view class="ti {{active==='me'?'on':''}}" bindtap="toMe">
+    <text class="ico">👤</text>
+    <text class="lbl">我的</text>
+  </view>
+</view>

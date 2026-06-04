@@ -2,18 +2,16 @@ server:
   port: 8080
 
 spring:
-  application:
-    name: starluck-server
-  profiles:
-    active: prod
-
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
-      url: jdbc:mysql://mysql:3306/starluck?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+      url: jdbc:mysql://mysql:3306/starluck?useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&useServerPrepStmts=false&cachePrepStmts=false
       username: starluck
       password: ${MYSQL_PASSWORD:starluck123}
       driver-class-name: com.mysql.cj.jdbc.Driver
+      # 强制每条连接 SET NAMES utf8mb4
+      connection-init-sqls:
+        - SET NAMES utf8mb4
 
   data:
     redis:

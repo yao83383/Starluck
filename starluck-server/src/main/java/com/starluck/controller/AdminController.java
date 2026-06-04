@@ -5,8 +5,13 @@ import com.starluck.entity.FakeUser;
 import com.starluck.entity.PushRule;
 import com.starluck.service.AdminService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -37,6 +42,34 @@ public class AdminController {
     @PostMapping("/fake-users/batch")
     public Result<List<FakeUser>> batchGenerate(@RequestParam(defaultValue = "5") int count) {
         return Result.ok(adminService.batchGenerate(count));
+    }
+
+    /**
+     * 为假用户上传头像
+     */
+    @PostMapping("/fake-users/{id}/avatar")
+    public Result<Map<String, String>> uploadFakeAvatar(@PathVariable Long id,
+                                                         @RequestParam("file") MultipartFile file) {
+        try {
+            String ext = file.getOriginalFilename() != null
+                    && file.getOriginalFilename().contains(".")
+                    ? file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."))
+                    : ".png";
+            String fileName = "fake_avatar_" + id + "_" + UUID.randomUUID().toString().substring(0, 8) + ext;
+            File dir = new File("/data/uploads/avatars");
+            if (!dir.exists()) dir.mkdirs();
+            File dest = new File(dir, fileName);
+            file.transferTo(dest);
+
+            // 更新假用户头像（cosmetic avatar_url 可以忽略，但后端留痕）
+            FakeUser fu = new FakeUser();
+            fu.setId(id);
+            fu.setAvatarNo(id.intValue() % 8 + 1);
+            adminService.saveFakeUser(fu);
+            return Result.ok(Map.of("url", "/uploads/avatars/" + fileName));
+        } catch (IOException e) {
+            return Result.fail("头像上传失败：" + e.getMessage());
+        }
     }
 
     @PostMapping("/push/manual")

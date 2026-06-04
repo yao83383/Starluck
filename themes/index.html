@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Starluck · 主题中心</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#050714;
+  --card:rgba(255,255,255,0.04);
+  --border:rgba(255,255,255,0.1);
+  --text:#fff;--text2:rgba(255,255,255,.7);--text3:rgba(255,255,255,.4);
+}
+html,body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.5;font-size:14px;min-height:100vh;position:relative;overflow-x:hidden;}
+
+/* 全局星光层 */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse at 15% 10%,rgba(161,140,255,.18),transparent 50%),
+    radial-gradient(ellipse at 50% 50%,rgba(255,138,176,.12),transparent 60%),
+    radial-gradient(ellipse at 85% 80%,rgba(122,158,255,.15),transparent 50%);}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 18%,#fff,transparent),
+    radial-gradient(1px 1px at 28% 42%,#e0c8ff,transparent),
+    radial-gradient(2px 2px at 47% 76%,#fff,transparent),
+    radial-gradient(1px 1px at 63% 23%,#ffd6f5,transparent),
+    radial-gradient(1.5px 1.5px at 78% 57%,#fff,transparent),
+    radial-gradient(1px 1px at 88% 88%,#e0c8ff,transparent),
+    radial-gradient(1px 1px at 92% 14%,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 35% 64%,#ffd6f5,transparent),
+    radial-gradient(1px 1px at 56% 91%,#fff,transparent);
+  background-size:520px 520px;opacity:.65;animation:tw 6s ease-in-out infinite;}
+@keyframes tw{0%,100%{opacity:.35;}50%{opacity:.8;}}
+.container{position:relative;z-index:1;max-width:1300px;margin:0 auto;padding:48px 24px;}
+
+/* 页头 */
+.hero{text-align:center;padding:40px 0 20px;}
+.hero .logo{font-size:48px;line-height:1;margin-bottom:14px;}
+.hero h1{font-size:36px;font-weight:800;letter-spacing:1px;
+  background:linear-gradient(135deg,#a18cff,#ff8ad4,#ffd966);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  margin-bottom:8px;}
+.hero .sub{font-size:14px;color:var(--text2);font-style:italic;letter-spacing:.5px;}
+.hero .cn-sub{font-size:13px;color:var(--text3);margin-top:6px;}
+
+/* 主题卡片网格 */
+.themes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:24px;margin-top:48px;}
+.theme-card{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;backdrop-filter:blur(20px);transition:transform .3s ease,box-shadow .3s ease;cursor:pointer;}
+.theme-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.5);}
+.theme-card.current{outline:2px solid #ffd966;outline-offset:-2px;}
+
+/* 卡片预览图 */
+.preview{height:240px;position:relative;overflow:hidden;}
+.preview::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:
+    radial-gradient(1.5px 1.5px at 25% 30%,#fff,transparent),
+    radial-gradient(1px 1px at 60% 70%,#fff,transparent),
+    radial-gradient(2px 2px at 80% 20%,#fff,transparent),
+    radial-gradient(1px 1px at 40% 80%,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 90% 60%,#fff,transparent);
+  background-size:300px 300px;opacity:.6;}
+
+/* 三套主题预览背景 */
+.t-galaxy .preview{background:radial-gradient(ellipse at 70% 30%,#3a1a52,#1a0a2e 50%,#0a0418);}
+.t-warm .preview{background:radial-gradient(ellipse at 50% 0%,#23264c,#15182f 50%,#080a18);}
+.t-pink .preview{background:linear-gradient(135deg,#fef6f9,#f3eaff);}
+
+.preview .badge-current{position:absolute;top:14px;right:14px;background:linear-gradient(135deg,#ffd966,#ff9a3c);color:#3a2a00;padding:4px 10px;border-radius:10px;font-size:11px;font-weight:700;z-index:5;box-shadow:0 4px 12px rgba(255,217,102,.4);}
+.preview .mini-phone{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:180px;height:200px;border-radius:18px;background:#000;padding:4px;box-shadow:0 12px 32px rgba(0,0,0,.5);overflow:hidden;}
+.preview .mini-screen{width:100%;height:100%;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;padding:14px 12px;}
+
+/* 各主题手机预览 */
+.t-galaxy .mini-screen{background:linear-gradient(180deg,#1f0d3a,#0a0418);}
+.t-galaxy .mini-screen .lg{font-size:18px;text-align:center;}
+.t-galaxy .mini-screen .br{font-size:14px;font-weight:800;text-align:center;margin-top:3px;background:linear-gradient(135deg,#a18cff,#ff8ad4);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.t-galaxy .mini-screen .sl{font-size:8px;color:rgba(255,255,255,.5);text-align:center;margin-top:2px;}
+.t-galaxy .mini-screen .bt{margin:10px 0 0;padding:7px;background:linear-gradient(135deg,#a18cff,#ff8ad4);color:#fff;text-align:center;border-radius:14px;font-size:10px;font-weight:700;}
+.t-galaxy .mini-screen .ic{display:flex;gap:6px;margin-top:8px;}
+.t-galaxy .mini-screen .ic span{flex:1;height:18px;border-radius:6px;background:rgba(180,140,255,.15);border:1px solid rgba(180,140,255,.25);}
+
+.t-warm .mini-screen{background:linear-gradient(180deg,#23264c,#080a18);}
+.t-warm .mini-screen .lg{font-size:18px;text-align:center;}
+.t-warm .mini-screen .br{font-size:14px;font-weight:800;text-align:center;margin-top:3px;background:linear-gradient(135deg,#ff8ab0,#7a9eff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.t-warm .mini-screen .sl{font-size:8px;color:rgba(168,196,255,.6);text-align:center;margin-top:2px;}
+.t-warm .mini-screen .bt{margin:10px 0 0;padding:7px;background:linear-gradient(135deg,#ff8ab0,#7a9eff);color:#fff;text-align:center;border-radius:14px;font-size:10px;font-weight:700;}
+.t-warm .mini-screen .ic{display:flex;gap:6px;margin-top:8px;}
+.t-warm .mini-screen .ic span{flex:1;height:18px;border-radius:6px;background:rgba(255,138,176,.12);border:1px solid rgba(255,138,176,.25);}
+
+.t-pink .mini-screen{background:linear-gradient(180deg,#fef6f9,#f3eaff);}
+.t-pink .mini-screen .lg{font-size:18px;text-align:center;}
+.t-pink .mini-screen .br{font-size:14px;font-weight:800;text-align:center;margin-top:3px;background:linear-gradient(135deg,#ff5a8a,#b66dff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.t-pink .mini-screen .sl{font-size:8px;color:#999;text-align:center;margin-top:2px;}
+.t-pink .mini-screen .bt{margin:10px 0 0;padding:7px;background:linear-gradient(135deg,#ff5a8a,#b66dff);color:#fff;text-align:center;border-radius:14px;font-size:10px;font-weight:700;box-shadow:0 4px 10px rgba(255,90,138,.3);}
+.t-pink .mini-screen .ic{display:flex;gap:6px;margin-top:8px;}
+.t-pink .mini-screen .ic span{flex:1;height:18px;border-radius:6px;background:#fff;border:1px solid #eee;}
+
+/* 卡片信息区 */
+.info{padding:20px;}
+.info .name{font-size:18px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.info .name .en{font-size:11px;color:var(--text3);font-weight:500;letter-spacing:1px;}
+.info .desc{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px;}
+
+.swatches{display:flex;gap:6px;margin-bottom:14px;}
+.swatches .sw{flex:1;height:32px;border-radius:6px;display:flex;align-items:flex-end;justify-content:center;padding:3px;font-size:8px;font-family:monospace;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6);}
+
+.entries{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+.entries a{text-decoration:none;text-align:center;padding:8px 0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;font-size:11px;color:var(--text);transition:background .2s;}
+.entries a:hover{background:rgba(255,255,255,.12);}
+.entries a .ei{display:block;font-size:14px;margin-bottom:2px;}
+
+/* 当前主题标识 */
+.set-current{margin-top:10px;padding:8px;background:linear-gradient(135deg,rgba(255,217,102,.15),rgba(255,154,60,.05));border:1px solid rgba(255,217,102,.3);border-radius:8px;text-align:center;font-size:11px;color:#ffd966;cursor:pointer;}
+.set-current:hover{background:linear-gradient(135deg,rgba(255,217,102,.25),rgba(255,154,60,.1));}
+.set-current.is-current{color:#fff;background:linear-gradient(135deg,#ffd966,#ff9a3c);font-weight:700;cursor:default;}
+
+/* 底部 */
+.footer{margin-top:60px;text-align:center;padding:30px 0;color:var(--text3);font-size:12px;border-top:1px solid var(--border);}
+.footer p{margin:4px 0;}
+.footer a{color:#a18cff;text-decoration:none;}
+
+/* 切换主题动效 */
+@keyframes flash{0%{transform:scale(1);}50%{transform:scale(1.04);}100%{transform:scale(1);}}
+.flash{animation:flash .4s ease;}
+
+/* Toast */
+.toast{position:fixed;top:24px;left:50%;transform:translateX(-50%);background:rgba(31,13,58,.95);color:#fff;padding:12px 24px;border-radius:24px;font-size:13px;z-index:1000;backdrop-filter:blur(20px);border:1px solid rgba(180,140,255,.3);box-shadow:0 8px 24px rgba(0,0,0,.5);opacity:0;transition:opacity .3s;pointer-events:none;}
+.toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="hero">
+    <div class="logo">✨</div>
+    <h1>Starluck Theme Center</h1>
+    <div class="sub">Every star shines alone, until it finds another.</div>
+    <div class="cn-sub">每颗星星都曾独自闪耀，直到遇见另一颗星</div>
+  </div>
+
+  <div class="themes-grid">
+
+    <!-- ===== 深紫银河 ===== -->
+    <div class="theme-card t-galaxy" data-theme="galaxy-purple">
+      <div class="preview">
+        <span class="badge-current" id="badge-galaxy" style="display:none">当前</span>
+        <div class="mini-phone"><div class="mini-screen">
+          <div class="lg">✨</div>
+          <div class="br">Starluck</div>
+          <div class="sl">每颗星，都在等另一颗</div>
+          <div class="bt">发出星语</div>
+          <div class="ic"><span></span><span></span><span></span></div>
+        </div></div>
+      </div>
+      <div class="info">
+        <div class="name">深紫银河 <span class="en">Galaxy Purple</span></div>
+        <div class="desc">最贴合宇宙星辰叙事，紫色银河的梦幻浪漫，适合做"命定邂逅"叙事。</div>
+        <div class="swatches">
+          <div class="sw" style="background:#0a0418">底</div>
+          <div class="sw" style="background:#1f0d3a">卡</div>
+          <div class="sw" style="background:linear-gradient(135deg,#a18cff,#ff8ad4)">主</div>
+          <div class="sw" style="background:#7ab5ff">辅</div>
+          <div class="sw" style="background:#ffd966;color:#3a2a00;text-shadow:none">金</div>
+        </div>
+        <div class="entries">
+          <a href="galaxy-purple/app.html" target="_blank"><span class="ei">📱</span>App</a>
+          <a href="galaxy-purple/admin.html" target="_blank"><span class="ei">⚙️</span>后台</a>
+          <a href="galaxy-purple/ui-spec.html" target="_blank"><span class="ei">📐</span>UI规格</a>
+        </div>
+        <div class="set-current" data-set="galaxy-purple">设为当前主题</div>
+      </div>
+    </div>
+
+    <!-- ===== 暖夜蓝 ===== -->
+    <div class="theme-card t-warm" data-theme="warm-night">
+      <div class="preview">
+        <span class="badge-current" id="badge-warm" style="display:none">当前</span>
+        <div class="mini-phone"><div class="mini-screen">
+          <div class="lg">💫</div>
+          <div class="br">Starluck</div>
+          <div class="sl">两颗孤独的星，一片夜空</div>
+          <div class="bt">遇见你的星</div>
+          <div class="ic"><span></span><span></span><span></span></div>
+        </div></div>
+      </div>
+      <div class="info">
+        <div class="name">暖夜蓝 <span class="en">Warm Night</span></div>
+        <div class="desc">流光粉 × 夜蓝的温暖夜空感，保留粉色亲和力同时具备深色宇宙气质，最易被大众接受。</div>
+        <div class="swatches">
+          <div class="sw" style="background:#080a18">底</div>
+          <div class="sw" style="background:#23264c">卡</div>
+          <div class="sw" style="background:linear-gradient(135deg,#ff8ab0,#7a9eff)">主</div>
+          <div class="sw" style="background:#a8c4ff;color:#080a18;text-shadow:none">辅</div>
+          <div class="sw" style="background:#ffd966;color:#3a2a00;text-shadow:none">金</div>
+        </div>
+        <div class="entries">
+          <a href="warm-night/app.html" target="_blank"><span class="ei">📱</span>App</a>
+          <a href="warm-night/admin.html" target="_blank"><span class="ei">⚙️</span>后台</a>
+          <a href="warm-night/ui-spec.html" target="_blank"><span class="ei">📐</span>UI规格</a>
+        </div>
+        <div class="set-current" data-set="warm-night">设为当前主题</div>
+      </div>
+    </div>
+
+    <!-- ===== 粉色原版（归档） ===== -->
+    <div class="theme-card t-pink" data-theme="pink-original">
+      <div class="preview">
+        <span class="badge-current" id="badge-pink" style="display:none">当前</span>
+        <div class="mini-phone"><div class="mini-screen">
+          <div class="lg">💕</div>
+          <div class="br">一青友人</div>
+          <div class="sl">遇见命中注定</div>
+          <div class="bt">打招呼</div>
+          <div class="ic"><span></span><span></span><span></span></div>
+        </div></div>
+      </div>
+      <div class="info">
+        <div class="name">粉色原版 <span class="en">Pink Original · 归档</span></div>
+        <div class="desc">初版「一青友人」粉紫浅色调，已作为历史版本归档保留，方便回溯与对比。</div>
+        <div class="swatches">
+          <div class="sw" style="background:#fef6f9;color:#666;text-shadow:none">底</div>
+          <div class="sw" style="background:#fff;color:#666;text-shadow:none">卡</div>
+          <div class="sw" style="background:linear-gradient(135deg,#ff5a8a,#b66dff)">主</div>
+          <div class="sw" style="background:#7c5aff">辅</div>
+          <div class="sw" style="background:#ffd75e;color:#3a2a00;text-shadow:none">金</div>
+        </div>
+        <div class="entries">
+          <a href="pink-original/app.html" target="_blank"><span class="ei">📱</span>App</a>
+          <a href="pink-original/admin.html" target="_blank"><span class="ei">⚙️</span>后台</a>
+          <a href="pink-original/ui-spec.html" target="_blank"><span class="ei">📐</span>UI规格</a>
+        </div>
+        <div class="set-current" data-set="pink-original">设为当前主题</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <p>Starluck · 主题中心 v1.0 · 2026-06-02</p>
+    <p>当前主题决定根目录 <code>/app.html</code>、<code>/admin.html</code>、<code>/产品文档/ui-spec.html</code> 的内容</p>
+    <p>点击「设为当前主题」会更新根目录文件 · 各主题原始版本永久保存在 <code>themes/{name}/</code> 内</p>
+    <p style="margin-top:14px"><a href="../Starluck-品牌与开发准则.md">📖 品牌与开发准则</a> · <a href="../产品文档/color-options.html">🎨 色彩方案对比</a></p>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* === 主题状态管理（localStorage） === */
+const CURRENT_KEY = 'starluck_current_theme';
+const DEFAULT_THEME = 'galaxy-purple';
+
+function getCurrent(){
+  return localStorage.getItem(CURRENT_KEY) || DEFAULT_THEME;
+}
+
+function setCurrent(theme){
+  localStorage.setItem(CURRENT_KEY, theme);
+  renderCurrent();
+  showToast(`已切换到「${themeLabel(theme)}」主题 · 请刷新根目录文件查看`);
+}
+
+function themeLabel(t){
+  return {'galaxy-purple':'深紫银河','warm-night':'暖夜蓝','pink-original':'粉色原版'}[t]||t;
+}
+
+function renderCurrent(){
+  const cur = getCurrent();
+  document.querySelectorAll('.theme-card').forEach(c=>{
+    const t = c.dataset.theme;
+    c.classList.toggle('current', t===cur);
+    const badge = document.getElementById('badge-'+t.split('-')[0]);
+    if(badge) badge.style.display = t===cur ? '' : 'none';
+    const btn = c.querySelector('.set-current');
+    if(btn){
+      if(t===cur){
+        btn.textContent = '✓ 当前主题';
+        btn.classList.add('is-current');
+      }else{
+        btn.textContent = '设为当前主题';
+        btn.classList.remove('is-current');
+      }
+    }
+  });
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+document.querySelectorAll('.set-current').forEach(btn=>{
+  btn.addEventListener('click', e=>{
+    e.stopPropagation();
+    const t = btn.dataset.set;
+    if(t === getCurrent()){ return; }
+    setCurrent(t);
+    btn.parentElement.parentElement.classList.add('flash');
+    setTimeout(()=>btn.parentElement.parentElement.classList.remove('flash'), 400);
+  });
+});
+
+renderCurrent();
+</script>
+
+</body>
+</html>

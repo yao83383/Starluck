@@ -1,0 +1,2 @@
+.sl-btn.hover { transform: scale(0.96); opacity: 0.92; }
+.sl-btn .loader { margin-right: 8rpx; }

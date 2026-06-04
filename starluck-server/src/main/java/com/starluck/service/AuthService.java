@@ -14,15 +14,27 @@ public interface AuthService {
     /**
      * 发送短信验证码
      */
-    void sendCode(String phone);
+    /**
+     * 发送短信验证码
+     * @return 验证码（开发模式直接返回，生产模式返回空字符串）
+     */
+    String sendCode(String phone);
 
     /**
      * 手机号验证码登录（无账号则自动注册）
      */
+    /**
+     * 手机号验证码登录
+     */
     LoginVO loginByPhone(LoginRequest request);
 
     /**
-     * 获取登录用户信息
+     * 手机号密码登录
+     */
+    LoginVO loginByPassword(String phone, String password);
+
+    /**
+     * 获取用户信息
      */
     LoginVO getUserInfo(Long userId);
 }

@@ -1,0 +1,2115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Starluck · UI规格 · 暖夜蓝</title>
+<style>
+/* ============================================================
+   一、文档布局
+   ============================================================ */
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  /* === Starluck · 深紫银河方案 === */
+  --bg:#080a18;--card-bg:#23264c;--text:#fff;--text2:rgba(255,255,255,.7);--text3:rgba(255,255,255,.4);
+  --border:rgba(255,138,176,.18);--accent:#ff8ab0;--accent2:#7a9eff;--gold:#ffd966;
+  --sidebar-bg:#050714;--sidebar-text:rgba(255,255,255,.6);--sidebar-active:#ff8ab0;
+  --highlight:rgba(255,138,176,.18);
+}
+body.light{
+  --bg:rgba(255,255,255,0.06);--card-bg:#fff;--text:#2d2d3a;--text2:#666;--text3:#999;
+  --border:rgba(255,255,255,0.08);--sidebar-bg:#23264c;
+}
+html{scroll-behavior:smooth;}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.5;font-size:14px;display:flex;min-height:100vh;position:relative;}
+
+/* === ✨ 全局星光粒子背景层 === */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse at 20% 10%,rgba(255,138,176,.12),transparent 50%),
+    radial-gradient(ellipse at 80% 60%,rgba(255,138,212,.08),transparent 50%);
+}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 18%,#fff,transparent),
+    radial-gradient(1px 1px at 28% 42%,#e0c8ff,transparent),
+    radial-gradient(2px 2px at 47% 76%,#fff,transparent),
+    radial-gradient(1px 1px at 63% 23%,#ffd6e8,transparent),
+    radial-gradient(1.5px 1.5px at 78% 57%,#fff,transparent),
+    radial-gradient(1px 1px at 88% 88%,#e0c8ff,transparent),
+    radial-gradient(1px 1px at 92% 14%,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 35% 64%,#ffd6e8,transparent),
+    radial-gradient(1px 1px at 56% 91%,#fff,transparent);
+  background-size:520px 520px;opacity:.7;animation:slTwinkle 6s ease-in-out infinite;
+}
+@keyframes slTwinkle{0%,100%{opacity:.4;}50%{opacity:.85;}}
+@media(prefers-reduced-motion:reduce){body::after{animation:none;}}
+aside.sidebar,main.content{position:relative;z-index:1;}
+
+/* 侧边栏 */
+aside.sidebar{width:250px;background:var(--sidebar-bg);color:var(--sidebar-text);flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:10;display:flex;flex-direction:column;}
+aside.sidebar::-webkit-scrollbar{width:4px;}
+aside.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px;}
+.sidebar-header{padding:20px 16px;border-bottom:1px solid rgba(255,255,255,.08);}
+.sidebar-header h1{font-size:18px;font-weight:800;color:#ff8ab0;background:linear-gradient(135deg,#ff8ab0,#7a9eff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.sidebar-header .ver{font-size:11px;color:rgba(255,255,255,.4);margin-top:2px;}
+.sidebar-nav{flex:1;overflow-y:auto;padding:8px 0;}
+.nav-group{margin-bottom:4px;}
+.nav-group-title{padding:10px 16px 4px;font-size:10px;text-transform:uppercase;color:rgba(255,255,255,.3);font-weight:700;letter-spacing:1px;}
+.nav-item{display:flex;align-items:center;padding:8px 16px;cursor:pointer;transition:all .15s;font-size:13px;gap:8px;color:rgba(255,255,255,.6);text-decoration:none;}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,.05);}
+.nav-item.active{color:#7a9eff;background:linear-gradient(90deg,rgba(255,138,176,.18),transparent);font-weight:600;}
+.nav-item .num{font-size:10px;background:rgba(255,255,255,.12);width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;flex-shrink:0;}
+.sidebar-footer{padding:12px 16px;border-top:1px solid rgba(255,255,255,.08);}
+.sidebar-footer a{color:rgba(255,255,255,.4);font-size:11px;text-decoration:none;}
+
+/* 工具栏 */
+.toolbar{position:sticky;top:0;z-index:20;background:rgba(35,38,76,0.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.toolbar .search-box{flex:1;min-width:200px;max-width:360px;display:flex;align-items:center;background:rgba(255,138,176,.08);border:1px solid rgba(255,138,176,.18);border-radius:8px;padding:8px 12px;gap:8px;}
+.toolbar .search-box input{border:none;background:none;font-size:13px;color:var(--text);width:100%;outline:none;}
+.toolbar .search-box input::placeholder{color:var(--text3);}
+.toolbar .search-box .icon{color:var(--text3);font-size:14px;}
+.toolbar .btn-sm{padding:6px 14px;border-radius:6px;border:1px solid rgba(255,138,176,.25);background:rgba(255,138,176,.08);color:rgba(255,255,255,.85);font-size:12px;cursor:pointer;white-space:nowrap;}
+.toolbar .btn-sm:hover{background:rgba(255,138,176,.18);color:#fff;}
+.toolbar .btn-sm.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.toolbar .result-count{font-size:12px;color:var(--text3);white-space:nowrap;}
+
+/* 主内容 */
+main.content{flex:1;overflow-y:auto;min-width:0;}
+main.content::-webkit-scrollbar{width:6px;}
+main.content::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:3px;}
+
+/* 面板容器：原型图(左) + 标注表(右) */
+.screen-section{padding:24px 20px 32px;border-bottom:1px solid var(--border);}
+.screen-section.hidden{display:none;}
+.screen-section.highlight-section{background:var(--highlight);}
+.screen-header{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.screen-header .num-badge{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#ff8ab0,#7a9eff);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;}
+.screen-header h2{font-size:20px;font-weight:800;color:#fff;}
+.screen-header .route{font-size:11px;color:var(--text3);background:var(--bg);padding:3px 8px;border-radius:4px;font-family:monospace;}
+.screen-panel{display:flex;gap:24px;align-items:flex-start;}
+.panel-left{width:375px;flex-shrink:0;position:sticky;top:68px;}
+
+/* 手机壳 */
+.phone-shell{width:375px;height:812px;background:rgba(255,138,176,0.06);border-radius:42px;box-shadow:0 20px 60px rgba(0,0,0,.2),0 0 0 10px #222 inset,0 0 0 14px #1a1a2e;position:relative;overflow:hidden;}
+.phone-shell::before{content:"";position:absolute;top:8px;left:50%;transform:translateX(-50%);width:120px;height:26px;background:#111;border-radius:0 0 16px 16px;z-index:100;}
+.screen-inner{width:100%;height:100%;background:linear-gradient(180deg,#23264c 0%,#080a18 100%);position:relative;overflow:hidden;display:flex;flex-direction:column;}
+
+/* 状态栏 */
+.status-bar{height:38px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 24px 6px;font-size:12px;font-weight:600;color:#2d2d3a;flex-shrink:0;}
+.status-bar .icons{display:flex;gap:4px;align-items:center;font-size:10px;}
+.status-bar.dark{color:#fff;}
+/* 导航条 */
+.nav-bar{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:rgba(255,138,176,0.06);flex-shrink:0;}
+.nav-bar .back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#2d2d3a;}
+.nav-bar .title{font-size:16px;font-weight:700;color:#2d2d3a;flex:1;text-align:center;}
+.nav-bar .right{min-width:32px;font-size:13px;color:#666;text-align:right;}
+/* Tab Bar */
+.tab-bar{height:58px;display:flex;background:rgba(255,138,176,0.06);border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;}
+.tab-bar .ti{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#999;font-size:10px;gap:2px;}
+.tab-bar .ti .ico{font-size:20px;}
+.tab-bar .ti.active{color:#ff8ab0;font-weight:600;}
+/* 内容滚动区 */
+.scroll-content{flex:1;overflow-y:auto;}
+.scroll-content::-webkit-scrollbar{display:none;}
+
+/* 通用组件 */
+.btn{display:inline-flex;align-items:center;justify-content:center;height:42px;padding:0 20px;border-radius:21px;font-size:14px;font-weight:600;background:linear-gradient(135deg,#ff8ab0 0%,#7a9eff 100%);color:#fff;box-shadow:0 4px 14px rgba(255,138,176,.3);cursor:default;}
+.btn.block{width:100%;}
+.btn.gold{background:linear-gradient(135deg,#ffd966,#ff9a3c);color:#5a3a00;box-shadow:0 4px 14px rgba(255,154,60,.3);}
+.btn.ghost{background:#fff;color:#ff8ab0;border:1.5px solid #ff8ab0;box-shadow:none;}
+.btn.small{height:30px;padding:0 12px;border-radius:15px;font-size:12px;}
+.av{width:44px;height:44px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;flex-shrink:0;font-size:16px;}
+.av-1{background:linear-gradient(135deg,#ff8ab0,#7a9eff);}
+.av-2{background:linear-gradient(135deg,#a8c4ff,#5eead4);}
+.av-3{background:linear-gradient(135deg,#ffd966,#ff9a3c);}
+.av-4{background:linear-gradient(135deg,#ff5c8a,#ffd966);}
+.av-5{background:linear-gradient(135deg,#5eead4,#a8c4ff);}
+.av-6{background:linear-gradient(135deg,#7a9eff,#ff8ab0);}
+.av-7{background:linear-gradient(135deg,#ff9a3c,#ff5c8a);}
+.av-8{background:linear-gradient(135deg,#a8c4ff,#ff8ab0);}
+.card{background:#fff;border-radius:12px;padding:12px;box-shadow:0 4px 12px rgba(0,0,0,.04);}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:500;background:rgba(255,138,176,0.12);color:#ff8ab0;}
+.tag.vip{background:linear-gradient(135deg,#ffd966,#ff9a3c);color:#5a3a00;font-weight:700;}
+.tag.gold{background:#fff5d6;color:#ff9a3c;}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;background:#ff5c8a;color:#fff;font-size:9px;font-weight:700;border-radius:8px;}
+.badge.dot{min-width:7px;height:7px;padding:0;border-radius:50%;}
+
+/* 标注面板 */
+.panel-right{flex:1;min-width:0;max-width:640px;}
+.annot-table{width:100%;border-collapse:collapse;font-size:12px;background:var(--card-bg);border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.annot-table thead{background:linear-gradient(135deg,#ff8ab0,#7a9eff);color:#fff;}
+.annot-table th{padding:10px 8px;text-align:left;font-weight:600;font-size:11px;white-space:nowrap;}
+.annot-table th:first-child{width:32px;text-align:center;}
+.annot-table td{padding:8px;border-bottom:1px solid var(--border);vertical-align:top;}
+.annot-table tbody tr{cursor:default;transition:background .15s;}
+.annot-table tbody tr:hover{background:rgba(255,138,176,.06);}
+.annot-table tbody tr.row-highlight{background:rgba(255,138,176,.15)!important;outline:2px solid var(--accent);outline-offset:-2px;}
+.annot-table .el-num{text-align:center;font-weight:700;color:var(--accent);font-size:11px;width:32px;}
+.annot-table .el-name{font-weight:600;white-space:nowrap;font-size:12px;color:#fff;}
+.annot-table .el-type{font-size:10px;}
+.annot-table .el-type span{display:inline-block;padding:1px 6px;border-radius:8px;font-weight:600;}
+.el-type-btn{background:rgba(255,138,176,0.12);color:#ff8ab0;}
+.el-type-input{background:rgba(122,181,255,.2);color:#a8c4ff;}
+.el-type-text{background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);}
+.el-type-icon{background:#080a18;color:#a8c4ff;}
+.el-type-sel{background:rgba(94,234,212,.2);color:#5eead4;}
+.el-type-sw{background:rgba(255,217,102,.2);color:#ffd966;}
+.annot-table .el-desc{line-height:1.5;color:rgba(255,255,255,.75);}
+.annot-table .el-action{font-size:11px;color:var(--text3);line-height:1.4;}
+.annot-table .el-vip{font-size:10px;text-align:center;}
+.annot-table .vip-only{color:#ff9a3c;font-weight:700;}
+.annot-table .vip-free{color:#5eead4;}
+
+/* 元素高亮标记 */
+.el-highlight{position:relative;}
+.el-highlight::after{content:"";position:absolute;inset:-3px;border:2px solid var(--accent);border-radius:inherit;animation:highlightPulse .8s ease-in-out infinite;pointer-events:none;}
+@keyframes highlightPulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* ============================================================
+   二、各屏幕专属样式（精简复用自 app.html）
+   ============================================================ */
+
+/* ① 登录页 */
+.login-page{padding:28px 24px;display:flex;flex-direction:column;height:100%;}
+.login-page .logo{font-size:40px;text-align:center;margin-top:40px;}
+.login-page h1{font-size:28px;font-weight:800;text-align:center;margin-top:10px;background:linear-gradient(135deg,#ff8ab0,#7a9eff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.login-page .slogan{font-size:13px;color:#999;text-align:center;margin-top:6px;}
+.login-page .form{margin-top:32px;}
+.login-page .input-row{background:#fff;border-radius:10px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.login-page .input-row .pf{color:#ff8ab0;font-weight:600;font-size:13px;}
+.login-page .input-row .mi{flex:1;font-size:14px;color:#bbb;}
+.login-page .input-row .sc{color:#ff8ab0;font-weight:600;font-size:12px;}
+.login-page .agree{display:flex;align-items:flex-start;gap:5px;font-size:10px;color:#999;margin-top:12px;}
+.login-page .agree .cb{width:14px;height:14px;border-radius:50%;border:1.5px solid #ccc;flex-shrink:0;margin-top:1px;}
+.login-page .agree .cb.on{background:#ff8ab0;border-color:#ff8ab0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;}
+.login-page .agree a{color:#ff8ab0;}
+.login-page .third{margin-top:28px;text-align:center;}
+.login-page .third .label{font-size:10px;color:#bbb;margin-bottom:16px;}
+.login-page .third .ico-row{display:flex;justify-content:center;gap:20px;}
+.login-page .third .ico{width:38px;height:38px;border-radius:50%;background:rgba(255,138,176,0.06);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 3px 8px rgba(0,0,0,.04);}
+
+/* ② 发现页 */
+.page-top{padding:4px 16px 10px;background:rgba(255,138,176,0.06);}
+.page-top h1{font-size:22px;font-weight:800;}
+.discover-tabs{display:flex;gap:14px;padding:0 16px 10px;background:rgba(255,138,176,0.06);}
+.discover-tabs .tab{font-size:14px;color:#999;font-weight:500;white-space:nowrap;padding:4px 2px;position:relative;}
+.discover-tabs .tab.active{color:#2d2d3a;font-weight:700;font-size:15px;}
+.discover-tabs .tab.active::after{content:"";position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:14px;height:2px;border-radius:1px;background:linear-gradient(90deg,#ff8ab0,#7a9eff);}
+.filter-bar{display:flex;gap:6px;padding:8px 16px;background:rgba(255,138,176,0.06);}
+.filter-bar .chip{padding:5px 10px;background:rgba(255,138,176,0.06);color:#666;font-size:11px;border-radius:12px;white-space:nowrap;}
+.filter-bar .chip.active{background:rgba(255,138,176,0.12);color:#ff8ab0;font-weight:600;}
+.user-grid{padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.user-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.04);}
+.user-card .cover{width:100%;aspect-ratio:1/1.15;display:flex;align-items:flex-end;padding:6px;position:relative;color:#fff;}
+.user-card .cover-inner{position:relative;z-index:1;width:100%;}
+.user-card .top-flags{position:absolute;top:6px;left:6px;display:flex;gap:3px;z-index:2;}
+.user-card .flag{padding:2px 5px;font-size:9px;background:rgba(0,0,0,.4);color:#fff;border-radius:6px;}
+.user-card .flag.online{background:#5eead4;}
+.user-card .flag.vip-g{background:linear-gradient(135deg,#ffd966,#ff9a3c);color:#5a3a00;font-weight:700;}
+.user-card .info{padding:7px 8px;}
+.user-card .info .name{font-size:13px;font-weight:700;display:flex;align-items:center;gap:3px;}
+.user-card .info .meta{font-size:10px;color:#999;margin-top:1px;}
+.user-card .info .tags{display:flex;gap:3px;margin-top:4px;flex-wrap:wrap;}
+
+/* ③ 消息 */
+.msg-quick{padding:12px 16px;background:rgba(255,138,176,0.06);display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.msg-quick .qi{display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;}
+.msg-quick .qi .ico{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;}
+.msg-quick .qi .c1{background:linear-gradient(135deg,#ff8ab0,#7a9eff);}
+.msg-quick .qi .c2{background:linear-gradient(135deg,#a8c4ff,#5eead4);}
+.msg-quick .qi .c3{background:linear-gradient(135deg,#ffd966,#ff9a3c);}
+.msg-quick .qi .c4{background:linear-gradient(135deg,#5eead4,#22c55e);}
+.msg-quick .qi .lbl{font-size:10px;color:#666;}
+.msg-quick .qi .bd{position:absolute;top:-3px;right:12px;}
+.chat-item{display:flex;align-items:center;padding:10px 16px;gap:10px;border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(255,138,176,0.06);}
+.chat-item .av-wrap{position:relative;}
+.chat-item .av-wrap .online-dot{position:absolute;bottom:0;right:0;width:8px;height:8px;background:#5eead4;border:2px solid #fff;border-radius:50%;}
+.chat-item .ci-info{flex:1;min-width:0;}
+.chat-item .ci-info .row1{display:flex;justify-content:space-between;align-items:center;}
+.chat-item .ci-info .name{font-size:14px;font-weight:600;}
+.chat-item .ci-info .time{font-size:10px;color:#bbb;}
+.chat-item .ci-info .last{font-size:12px;color:#999;margin-top:2px;}
+
+/* ④ 个人中心 */
+.me-header{padding:16px;background:linear-gradient(135deg,#ff8ab0,#7a9eff);color:#fff;position:relative;}
+.me-header .top-row{display:flex;align-items:center;gap:12px;}
+.me-header .av{width:58px;height:58px;font-size:22px;border:2px solid rgba(255,255,255,.3);}
+.me-header .ns{flex:1;}
+.me-header .name{font-size:18px;font-weight:800;}
+.me-header .id{font-size:10px;opacity:.8;margin-top:1px;}
+.me-header .sign{font-size:11px;margin-top:4px;opacity:.9;}
+.me-header .edit{position:absolute;top:16px;right:16px;padding:4px 10px;background:rgba(255,255,255,.2);border-radius:12px;font-size:10px;}
+.me-stats{display:grid;grid-template-columns:repeat(4,1fr);margin-top:14px;text-align:center;}
+.me-stats .num{font-size:16px;font-weight:800;}
+.me-stats .lbl{font-size:10px;opacity:.8;margin-top:1px;}
+.vip-banner{margin:12px;padding:12px;border-radius:12px;background:linear-gradient(135deg,#2a2d52,#080a18);color:#ffd966;display:flex;align-items:center;gap:10px;overflow:hidden;position:relative;}
+.vip-banner .vip-i{font-size:24px;}
+.vip-banner .vt .t1{font-size:13px;font-weight:700;}
+.vip-banner .vt .t2{font-size:10px;opacity:.8;margin-top:1px;}
+.vip-banner .vb{padding:5px 12px;background:linear-gradient(135deg,#ffd966,#ff9a3c);color:#5a3a00;border-radius:12px;font-size:11px;font-weight:700;}
+.menu-group{margin:0 12px 12px;background:rgba(255,138,176,0.06);border-radius:12px;overflow:hidden;}
+.menu-item{display:flex;align-items:center;padding:12px;gap:10px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.menu-item:last-child{border-bottom:none;}
+.menu-item .mi-ico{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;background:linear-gradient(135deg,#ff8ab0,#7a9eff);}
+.menu-item .lbl{flex:1;font-size:13px;}
+.menu-item .rt{font-size:11px;color:#999;}
+.menu-item .arr{color:#ccc;font-size:16px;}
+
+/* ⑤ 个人主页 */
+.profile-cover{height:240px;position:relative;color:#fff;flex-shrink:0;}
+.profile-cover::after{content:"";position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.5));}
+.profile-cover .top{position:absolute;top:40px;left:0;right:0;padding:0 14px;display:flex;justify-content:space-between;align-items:center;z-index:2;}
+.profile-cover .ic-btn{width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;}
+.profile-cover .info{position:absolute;bottom:12px;left:16px;right:16px;z-index:2;}
+.profile-cover .name{font-size:22px;font-weight:800;}
+.profile-cover .meta{font-size:11px;margin-top:2px;opacity:.9;}
+.profile-cover .sign{font-size:12px;margin-top:6px;opacity:.95;}
+.profile-section{background:#fff;margin:8px 12px;padding:12px;border-radius:12px;}
+.profile-section h3{font-size:13px;font-weight:700;margin-bottom:10px;}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.info-grid .it .k{font-size:10px;color:#999;}
+.info-grid .it .v{font-size:12px;font-weight:500;}
+.interest-tags{display:flex;flex-wrap:wrap;gap:6px;}
+.album-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;}
+.album-grid .photo{aspect-ratio:1;border-radius:6px;}
+.photo.p1{background:linear-gradient(135deg,#ff8ab0,#7a9eff);}
+.photo.p2{background:linear-gradient(135deg,#a8c4ff,#5eead4);}
+.photo.p3{background:linear-gradient(135deg,#ffd966,#ff9a3c);}
+.photo.p4{background:linear-gradient(135deg,#ff5c8a,#ffd966);}
+.photo.p5{background:linear-gradient(135deg,#5eead4,#a8c4ff);}
+.photo.p6{background:linear-gradient(135deg,#7a9eff,#ff8ab0);}
+.profile-cta{display:flex;gap:6px;padding:10px 12px;background:rgba(255,138,176,0.06);}
+.profile-cta .b{flex:1;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;gap:3px;}
+.profile-cta .b.b-gift{background:linear-gradient(135deg,#ffd966,#ff9a3c);color:#5a3a00;}
+.profile-cta .b.b-fav{background:rgba(255,138,176,0.12);color:#ff8ab0;}
+.profile-cta .b.b-chat{background:linear-gradient(135deg,#ff8ab0,#7a9eff);color:#fff;box-shadow:0 4px 14px rgba(255,138,176,.3);flex:2;}
+
+/* ⑥ 充值 */
+.recharge-bg{background:linear-gradient(180deg,#080a18,#23264c);color:#fff;height:100%;overflow-y:auto;}
+.recharge-bal{padding:20px 16px;text-align:center;}
+.recharge-bal .lbl{font-size:11px;opacity:.7;}
+.recharge-bal .num{font-size:32px;font-weight:800;color:#ffd966;margin-top:4px;}
+.first-bonus{margin:0 16px 10px;padding:8px 12px;background:linear-gradient(135deg,rgba(255,215,94,.2),rgba(255,154,60,.1));border:1px solid rgba(255,215,94,.4);border-radius:8px;color:#ffd966;font-size:11px;font-weight:600;}
+.pkg-grid{padding:0 12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.pkg-card{background:rgba(255,255,255,.08);border:1.5px solid transparent;border-radius:10px;padding:12px 6px;text-align:center;}
+.pkg-card.hot{border-color:#ffd966;background:rgba(255,215,94,.15);}
+.pkg-card .di{font-size:20px;font-weight:800;color:#ffd966;}
+.pkg-card .ex{font-size:9px;color:#5eead4;margin-top:1px;}
+.pkg-card .price{font-size:12px;font-weight:600;margin-top:4px;}
+.pay-section{margin:14px 12px;background:rgba(255,255,255,.08);border-radius:10px;padding:12px;}
+.pay-section h4{font-size:13px;font-weight:700;margin-bottom:10px;}
+.pay-method{display:flex;align-items:center;padding:8px 0;gap:8px;}
+.pay-method .pi{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.pm-wx{background:#07c160;}.pm-ap{background:#1677ff;}.pm-al{background:#000;color:#fff;}
+.pay-method .pn{flex:1;font-size:12px;}
+.pay-method .pr{width:16px;height:16px;border:1.5px solid rgba(255,255,255,.4);border-radius:50%;}
+.pay-method.on .pr{background:#ffd966;border-color:#ffd966;}
+
+/* ⑦ 聊天 */
+.chat-screen{display:flex;flex-direction:column;height:100%;background:rgba(255,138,176,0.06);}
+.chat-nav-info{display:flex;align-items:center;gap:6px;}
+.chat-nav-info .av{width:28px;height:28px;font-size:12px;}
+.balance-bar{padding:6px 14px;background:linear-gradient(90deg,#fff5d6,rgba(255,138,176,0.12));font-size:11px;display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06);}
+.balance-bar .bl b{color:#ff9a3c;}
+.balance-bar .br{color:#ff8ab0;font-weight:600;}
+.msg-flow{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:10px;}
+.sys-tip{text-align:center;font-size:10px;color:#999;padding:4px 10px;background:rgba(0,0,0,.03);border-radius:8px;align-self:center;}
+.bubble-row{display:flex;gap:6px;align-items:flex-end;}
+.bubble-row.me{align-self:flex-end;flex-direction:row-reverse;}
+.bubble-row .av{width:30px;height:30px;font-size:13px;}
+.bubble{padding:8px 12px;border-radius:14px;font-size:12px;background:rgba(255,138,176,0.06);color:#2d2d3a;box-shadow:0 1px 4px rgba(0,0,0,.03);}
+.bubble-row.me .bubble{background:linear-gradient(135deg,#ff8ab0,#7a9eff);color:#fff;}
+.cost-tip{font-size:9px;color:#bbb;align-self:flex-end;}
+.chat-input-bar{background:#fff;padding:6px 12px;border-top:1px solid rgba(255,255,255,0.06);}
+.chat-input-row{display:flex;align-items:center;gap:6px;}
+.chat-input-row .ib{flex:1;background:rgba(255,138,176,0.06);border-radius:16px;padding:7px 12px;font-size:13px;color:#bbb;}
+.chat-input-row .sb{padding:7px 14px;background:linear-gradient(135deg,#ff8ab0,#7a9eff);color:#fff;border-radius:14px;font-size:12px;font-weight:600;}
+.chat-tools{display:flex;justify-content:space-around;padding:8px 0 0;}
+.chat-tools .tl{display:flex;flex-direction:column;align-items:center;gap:2px;color:#666;font-size:9px;}
+.chat-tools .tl .ti{width:30px;height:30px;background:rgba(255,138,176,0.06);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;}
+
+/* ⑧ 礼物面板 */
+.gift-panel{background:#fff;border-radius:16px 16px 0 0;padding:12px;display:flex;flex-direction:column;}
+.gift-tabs{display:flex;gap:14px;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:8px;margin-bottom:10px;}
+.gift-tabs .gt{font-size:12px;color:#999;}
+.gift-tabs .gt.active{color:#2d2d3a;font-weight:700;}
+.gift-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.gift-cell{background:rgba(255,138,176,0.08);border-radius:8px;padding:8px 4px;text-align:center;border:1.5px solid transparent;}
+.gift-cell.sel{border-color:#ff8ab0;background:rgba(255,138,176,0.12);}
+.gift-cell .gem{font-size:32px;}
+.gift-cell .gn{font-size:10px;margin-top:3px;}
+.gift-cell .gp{font-size:9px;color:#ff9a3c;font-weight:700;margin-top:1px;}
+.gift-bottom{padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);margin-top:10px;}
+.gift-bal{display:flex;justify-content:space-between;font-size:11px;margin-bottom:8px;}
+.gift-action-row{display:flex;gap:6px;align-items:center;}
+.gift-num{display:flex;background:rgba(255,138,176,0.06);border-radius:12px;padding:1px;}
+.gift-num .nb{padding:4px 8px;font-size:11px;border-radius:10px;}
+.gift-num .nb.on{background:#fff;color:#ff8ab0;font-weight:700;}
+.gift-send{flex:1;height:36px;border-radius:18px;background:linear-gradient(135deg,#ff8ab0,#7a9eff);color:#fff;font-weight:700;font-size:13px;}
+
+/* ⑨ 钱包 */
+.wallet-top{padding:20px 16px;background:linear-gradient(135deg,#ff8ab0,#7a9eff);color:#fff;}
+.wallet-top .lbl{font-size:11px;opacity:.85;}
+.wallet-top .amt{font-size:28px;font-weight:800;margin-top:4px;}
+.wallet-quick{display:grid;grid-template-columns:repeat(4,1fr);background:rgba(255,138,176,0.06);margin:-16px 12px 0;border-radius:12px;padding:12px 0;box-shadow:0 4px 12px rgba(0,0,0,.06);}
+.wallet-quick .qi{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.wallet-quick .qi .qic{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;}
+.month-income{margin:12px;padding:12px;background:rgba(255,138,176,0.06);border-radius:12px;}
+.month-income .mi-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.month-income .mt{font-size:13px;font-weight:700;}
+.month-income .am{font-size:16px;font-weight:800;color:#ff8ab0;}
+.month-detail{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.month-detail .md{background:rgba(255,255,255,0.04);border-radius:8px;padding:8px;text-align:center;}
+.month-detail .md .ln{font-size:10px;color:#999;}
+.month-detail .md .lv{font-size:13px;font-weight:700;}
+.bill-section{margin:12px;background:rgba(255,138,176,0.06);border-radius:12px;overflow:hidden;}
+.bill-section h3{padding:12px;font-size:13px;font-weight:700;border-bottom:1px solid rgba(255,255,255,0.06);}
+.bill-item{display:flex;align-items:center;padding:10px 12px;gap:8px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.bill-item:last-child{border-bottom:none;}
+.bill-item .bi{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.bill-item .bn{flex:1;}
+.bill-item .bn .t1{font-size:11px;font-weight:600;}
+.bill-item .bn .t2{font-size:9px;color:#999;margin-top:1px;}
+.bill-item .ba{font-size:12px;font-weight:700;}
+
+/* ⑩ 提现 */
+.withdraw-top{padding:18px 16px;text-align:center;background:rgba(255,138,176,0.06);}
+.withdraw-top .lbl{font-size:11px;color:#999;}
+.withdraw-top .amt{font-size:24px;font-weight:800;margin-top:3px;}
+.withdraw-form{margin:12px;background:rgba(255,138,176,0.06);border-radius:12px;padding:14px;}
+.withdraw-amt-input{display:flex;align-items:center;gap:6px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);}
+.withdraw-amt-input .u{font-size:20px;font-weight:700;}
+.withdraw-amt-input .inp{flex:1;font-size:24px;font-weight:700;color:#ddd;}
+.withdraw-quick{display:flex;gap:6px;margin-top:10px;}
+.withdraw-quick .qa{flex:1;padding:6px 0;text-align:center;background:rgba(255,138,176,0.06);border-radius:8px;font-size:12px;font-weight:600;color:#666;}
+.withdraw-quick .qa.on{background:rgba(255,138,176,0.12);color:#ff8ab0;}
+.withdraw-info{font-size:10px;color:#999;margin-top:10px;line-height:1.5;}
+.withdraw-method{margin:12px;background:rgba(255,138,176,0.06);border-radius:12px;padding:12px;}
+.withdraw-method h4{font-size:13px;font-weight:700;margin-bottom:8px;}
+
+/* ⑪ 邀请 */
+.invite-bg{background:linear-gradient(180deg,#080a18,#23264c);color:#fff;min-height:100%;overflow-y:auto;}
+.invite-hero{padding:20px 16px;text-align:center;}
+.invite-hero h1{font-size:22px;font-weight:800;color:#ffd966;}
+.invite-stats{display:grid;grid-template-columns:repeat(3,1fr);margin:10px 12px 0;background:rgba(255,255,255,.08);border-radius:10px;padding:12px 0;}
+.invite-stats .is{text-align:center;}
+.invite-stats .is .n{font-size:16px;font-weight:800;color:#ffd966;}
+.invite-stats .is .l{font-size:9px;opacity:.7;margin-top:1px;}
+.invite-code-box{margin:12px;background:rgba(255,215,94,.1);border:1px dashed rgba(255,215,94,.5);border-radius:10px;padding:12px;display:flex;align-items:center;gap:8px;}
+.invite-code-box .cl .l{font-size:9px;opacity:.7;}
+.invite-code-box .cl .c{font-size:18px;font-weight:800;letter-spacing:1px;color:#ffd966;}
+.invite-code-box .cb{padding:5px 12px;background:linear-gradient(135deg,#ffd966,#ff9a3c);color:#5a3a00;font-weight:700;border-radius:12px;font-size:11px;}
+.share-row{padding:0 12px;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:10px;}
+.share-row .si{text-align:center;}
+.share-row .si .sic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;margin:0 auto;}
+.share-row .si .sn{font-size:9px;opacity:.8;margin-top:2px;}
+.reward-card{margin:12px;background:rgba(255,255,255,.08);border-radius:10px;padding:12px;}
+.reward-card h3{font-size:13px;font-weight:700;color:#ffd966;margin-bottom:8px;}
+.reward-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.reward-row .rw{padding:8px;background:rgba(255,255,255,.06);border-radius:8px;text-align:center;font-size:11px;}
+.invite-tasks{margin:12px;background:rgba(255,255,255,.08);border-radius:10px;padding:12px;}
+.invite-tasks h3{font-size:13px;font-weight:700;margin-bottom:8px;}
+.task-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);}
+.task-item .ti{width:26px;height:26px;border-radius:6px;background:rgba(255,215,94,.2);color:#ffd966;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;}
+.task-item .tn{flex:1;font-size:11px;}
+.task-item .tb{padding:4px 10px;background:linear-gradient(135deg,#ffd966,#ff9a3c);color:#5a3a00;border-radius:10px;font-size:10px;font-weight:700;}
+.privilege-bar{margin:12px;background:rgba(255,255,255,.08);border-radius:10px;padding:12px;}
+.privilege-bar h3{font-size:13px;font-weight:700;margin-bottom:8px;}
+.privilege-progress{height:5px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;}
+.privilege-progress .pp{height:100%;background:linear-gradient(90deg,#ffd966,#ff9a3c);width:16%;}
+
+/* ⑫ 排行榜 */
+.rank-tabs{display:flex;justify-content:center;gap:20px;padding:12px;}
+.rank-tabs .rt{font-size:13px;color:rgba(255,255,255,.5);}
+.rank-tabs .rt.active{color:#ffd966;font-weight:700;}
+.rank-pool{margin:0 12px 12px;padding:14px;background:linear-gradient(135deg,rgba(255,215,94,.15),rgba(255,154,60,.05));border:1px solid rgba(255,215,94,.3);border-radius:12px;text-align:center;}
+.rank-pool .pl{font-size:10px;opacity:.8;}
+.rank-pool .pv{font-size:24px;font-weight:800;color:#ffd966;margin-top:3px;}
+.rank-pool .pt{font-size:10px;color:#ff5c8a;margin-top:4px;}
+.podium{display:flex;justify-content:center;align-items:flex-end;gap:6px;margin:12px;}
+.podium .p{flex:1;background:rgba(255,255,255,.08);border-radius:10px;padding:10px 4px;text-align:center;}
+.podium .p.p1{background:linear-gradient(180deg,rgba(255,215,94,.2),rgba(255,154,60,.1));border:1px solid rgba(255,215,94,.4);}
+.podium .p .rk{font-size:18px;font-weight:800;margin-bottom:4px;}
+.podium .p .av{margin:0 auto;width:36px;height:36px;font-size:14px;}
+.podium .p .nm{font-size:10px;font-weight:600;margin-top:4px;}
+.podium .p .pr{font-size:9px;color:#ffd966;margin-top:1px;}
+.rank-list{margin:12px;background:rgba(255,255,255,.05);border-radius:10px;padding:4px 0;}
+.rank-row-r{display:flex;align-items:center;padding:8px 12px;gap:8px;border-bottom:1px solid rgba(255,255,255,.04);}
+.rank-row-r .rn{width:20px;font-size:12px;font-weight:700;color:#ffd966;text-align:center;}
+.rank-row-r .av{width:30px;height:30px;font-size:12px;}
+.rank-row-r .nb{flex:1;font-size:11px;}
+.rank-row-r .rw{font-size:11px;color:#ffd966;font-weight:700;}
+.my-rank{padding:10px 14px;background:linear-gradient(135deg,rgba(255,138,176,.3),rgba(182,109,255,.3));font-size:11px;}
+
+/* ⑭ 落地页 */
+.landing-bg{background:linear-gradient(180deg,#ff8ab0,#7a9eff);color:#fff;min-height:100%;overflow-y:auto;}
+.landing-hero{padding:30px 20px 12px;text-align:center;}
+.landing-inviter{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;background:rgba(0,0,0,.2);border-radius:16px;padding:4px 10px;width:fit-content;margin:0 auto;}
+.landing-inviter .av{width:20px;height:20px;font-size:8px;}
+.landing-hero h1{font-size:26px;font-weight:800;margin-top:14px;}
+.gift-package{margin:12px;background:rgba(255,138,176,0.06);border-radius:14px;padding:14px;color:#2d2d3a;}
+.gift-package h2{text-align:center;font-size:16px;font-weight:800;margin-bottom:10px;color:#ff8ab0;}
+.gift-package .gi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.gift-package .gi-cell{background:linear-gradient(135deg,rgba(255,138,176,0.12),#080a18);border-radius:8px;padding:8px 4px;text-align:center;}
+.gift-package .gi-cell .em{font-size:22px;}
+.gift-package .gi-cell .gn{font-size:10px;font-weight:600;margin-top:2px;}
+.gift-package .gi-cell .gv{font-size:9px;color:#ff9a3c;}
+.countdown{padding:8px;background:rgba(0,0,0,.3);border-radius:10px;text-align:center;font-size:12px;color:#ffd966;font-weight:600;margin:12px;}
+.landing-cta-wrap{padding:12px 16px 20px;}
+
+/* ⑮ VIP */
+.vip-bg{background:linear-gradient(180deg,#080a18,#2a2d52);color:#fff;min-height:100%;overflow-y:auto;}
+.vip-header{padding:20px 16px;text-align:center;}
+.vip-header .crown{font-size:40px;}
+.vip-header h1{font-size:22px;font-weight:800;color:#ffd966;margin-top:6px;}
+.vip-status{margin:12px;padding:12px;background:linear-gradient(135deg,rgba(255,215,94,.15),rgba(255,154,60,.05));border:1px solid rgba(255,215,94,.3);border-radius:10px;display:flex;align-items:center;gap:10px;}
+.vip-plans{padding:0 12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.vip-plan{background:rgba(255,255,255,.08);border:1.5px solid transparent;border-radius:10px;padding:12px 6px;text-align:center;}
+.vip-plan.hot{border-color:#ffd966;background:rgba(255,215,94,.15);}
+.vip-plan .pn{font-size:12px;}
+.vip-plan .pp{font-size:22px;font-weight:800;color:#ffd966;margin-top:4px;}
+.vip-plan .po{font-size:9px;text-decoration:line-through;opacity:.5;}
+.vip-rights{margin:12px;padding:12px;background:rgba(255,255,255,.05);border-radius:10px;}
+.vip-rights h3{font-size:13px;font-weight:700;color:#ffd966;margin-bottom:10px;}
+.vip-rights-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.vip-rights-grid .vr{text-align:center;}
+.vip-rights-grid .vr .ic{width:36px;height:36px;background:linear-gradient(135deg,#ffd966,#ff9a3c);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;margin:0 auto;color:#5a3a00;}
+.vip-rights-grid .vr .nm{font-size:9px;margin-top:4px;}
+.vip-bottom{padding:12px 16px;background:rgba(0,0,0,.3);}
+.vip-agree{font-size:9px;opacity:.6;text-align:center;margin-top:8px;}
+
+/* ⑯ 视频通话 */
+.call-page{width:100%;height:100%;position:relative;background:linear-gradient(135deg,#ff8ab0,#7a9eff);overflow:hidden;}
+.call-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:80px;color:rgba(255,255,255,.2);}
+.call-self{position:absolute;top:80px;right:12px;width:70px;height:96px;border-radius:8px;border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:28px;background:linear-gradient(135deg,#a8c4ff,#ff8ab0);}
+.call-top{position:absolute;top:40px;left:0;right:0;padding:0 14px;display:flex;justify-content:space-between;align-items:center;z-index:5;color:#fff;}
+.call-top .ct-l .nm{font-size:16px;font-weight:700;}
+.call-top .ct-r{background:rgba(0,0,0,.5);padding:5px 10px;border-radius:12px;font-size:11px;color:#ffd966;}
+.call-bottom{position:absolute;bottom:0;left:0;right:0;padding:0 0 20px;z-index:5;}
+.call-balance{background:rgba(0,0,0,.5);margin:0 12px 10px;padding:8px 12px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#fff;}
+.call-balance .bal b{color:#ffd966;}
+.call-balance .recharge{padding:3px 10px;background:linear-gradient(135deg,#ffd966,#ff9a3c);color:#5a3a00;border-radius:10px;font-weight:700;font-size:10px;}
+.call-controls{display:flex;justify-content:space-around;padding:0 14px;}
+.call-controls .cb{width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;}
+.call-controls .cb.hangup{background:#ff5c8a;}
+
+/* ⑰ 实名 */
+.auth-steps{padding:12px 16px;background:rgba(255,138,176,0.06);display:flex;align-items:center;gap:6px;}
+.auth-step{flex:1;text-align:center;}
+.auth-step .sn{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.06);color:#bbb;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-bottom:3px;}
+.auth-step.active .sn{background:linear-gradient(135deg,#ff8ab0,#7a9eff);color:#fff;}
+.auth-step.done .sn{background:#5eead4;color:#fff;}
+.auth-step .sl{font-size:10px;color:#999;}
+.auth-form{margin:12px;background:rgba(255,138,176,0.06);border-radius:12px;padding:12px;}
+.auth-form .field{padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);}
+.auth-form .field .l{font-size:11px;color:#999;margin-bottom:4px;}
+.auth-form .field .fv{font-size:14px;color:#bbb;}
+.id-upload{margin:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.id-upload .up{aspect-ratio:1.5/1;border:1.5px dashed #ddd;border-radius:8px;background:rgba(255,255,255,0.04);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:#999;}
+.face-frame{margin:20px auto;width:150px;height:180px;border:2px solid #ff8ab0;border-radius:10px;background:linear-gradient(135deg,rgba(255,138,176,0.12),#080a18);display:flex;align-items:center;justify-content:center;font-size:50px;}
+.auth-tip{margin:12px;padding:10px;background:rgba(255,138,176,0.12);border-radius:8px;font-size:10px;color:#666;line-height:1.5;}
+
+/* ⑲ 动态 */
+.feed-tabs{display:flex;gap:14px;padding:4px 14px 10px;background:rgba(255,138,176,0.06);}
+.feed-tabs .ft{font-size:13px;color:#999;white-space:nowrap;padding:4px 0;}
+.feed-tabs .ft.active{color:#2d2d3a;font-weight:700;}
+.topic-row{display:flex;gap:6px;padding:8px 12px;background:rgba(255,138,176,0.06);}
+.topic-row .tp{padding:4px 10px;background:linear-gradient(135deg,rgba(255,138,176,0.12),#080a18);color:#ff8ab0;font-size:10px;border-radius:12px;white-space:nowrap;}
+.feed-card{margin:8px 12px;background:rgba(255,138,176,0.06);border-radius:12px;padding:12px;}
+.feed-card .fc-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.feed-card .fc-top .av{width:36px;height:36px;font-size:13px;}
+.feed-card .fc-top .fcb{flex:1;}
+.feed-card .fc-top .n{font-size:13px;font-weight:600;}
+.feed-card .fc-top .m{font-size:9px;color:#999;margin-top:1px;}
+.feed-card .fc-top .fb{padding:3px 10px;border:1px solid #ff8ab0;color:#ff8ab0;border-radius:10px;font-size:11px;font-weight:600;}
+.feed-card .fc-text{font-size:12px;line-height:1.5;margin-bottom:8px;}
+.feed-card .fc-tools{display:flex;justify-content:space-around;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;}
+.feed-card .fc-tools .ft{color:#666;font-size:11px;}
+
+/* ⑳ 新人资料 */
+.onboard-bg{background:linear-gradient(180deg,#23264c,#080a18);min-height:100%;}
+.onboard-progress{padding:14px;}
+.onboard-progress .pb{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;}
+.onboard-progress .pb .pp{height:100%;background:linear-gradient(90deg,#ff8ab0,#7a9eff);width:60%;}
+.onboard-progress .pt{font-size:10px;color:#999;margin-top:4px;text-align:right;}
+.onboard-form{padding:0 16px;}
+.onboard-form h2{font-size:20px;font-weight:800;margin-bottom:6px;}
+.onboard-form .sub{font-size:11px;color:#999;margin-bottom:18px;}
+.avatar-upload{width:100px;height:100px;border-radius:50%;background:rgba(255,138,176,0.1);margin:16px auto;border:2px dashed #ff8ab0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#ff8ab0;gap:4px;font-size:11px;}
+.gender-pick{display:flex;gap:10px;margin:18px 0;}
+.gender-pick .g{flex:1;padding:20px 0;text-align:center;background:rgba(255,138,176,0.06);border-radius:12px;border:2px solid transparent;}
+.gender-pick .g.on{border-color:#ff8ab0;background:rgba(255,138,176,0.12);}
+.gender-pick .g .gi{font-size:40px;}
+.gender-pick .g .gn{font-size:13px;font-weight:600;margin-top:4px;}
+.onboard-field{margin-bottom:10px;background:rgba(255,138,176,0.06);border-radius:10px;padding:10px 12px;}
+.onboard-field .l{font-size:10px;color:#999;margin-bottom:2px;}
+.onboard-field .fv{font-size:14px;color:#bbb;}
+.interest-pick{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.interest-pick .ic{padding:6px 12px;background:rgba(255,138,176,0.06);border-radius:16px;font-size:12px;color:#666;border:1.5px solid transparent;}
+.interest-pick .ic.on{border-color:#ff8ab0;background:rgba(255,138,176,0.12);color:#ff8ab0;font-weight:600;}
+.onboard-actions{padding:20px 16px;display:flex;gap:8px;}
+.onboard-actions .skip{flex:1;text-align:center;padding:10px;color:#999;font-size:12px;}
+
+/* ㉑ 首充弹窗 */
+.fr-overlay{background:rgba(0,0,0,.7);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;}
+.fr-card{width:260px;background:linear-gradient(180deg,#ff8ab0,#7a9eff);border-radius:16px;padding:20px 16px;color:#fff;text-align:center;position:relative;}
+.fr-card .deco{font-size:38px;}
+.fr-card .ct{font-size:10px;background:rgba(0,0,0,.3);padding:3px 8px;border-radius:8px;display:inline-block;margin-top:10px;}
+.fr-card h2{font-size:20px;font-weight:800;margin:10px 0 4px;}
+.fr-pkgs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}
+.fr-pkg{background:#fff;border-radius:10px;padding:10px 6px;color:#2d2d3a;}
+.fr-pkg .di{font-size:18px;font-weight:800;color:#ff8ab0;}
+.fr-pkg .ex{font-size:9px;color:#5eead4;font-weight:600;margin-top:1px;}
+.fr-pkg .pr{font-size:12px;font-weight:700;margin-top:4px;}
+.fr-bonus{background:rgba(0,0,0,.2);border-radius:8px;padding:8px;font-size:11px;line-height:1.5;}
+.fr-close{position:absolute;top:14px;right:14px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.3);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;}
+
+/* ㉒ 设置 */
+.settings-group{margin:10px 12px;background:rgba(255,138,176,0.06);border-radius:12px;overflow:hidden;}
+.settings-group h4{padding:12px 12px 4px;font-size:10px;color:#999;}
+.settings-item{display:flex;align-items:center;padding:12px;gap:8px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.settings-item:last-child{border-bottom:none;}
+.settings-item .lbl{flex:1;font-size:13px;}
+.settings-item .val{font-size:11px;color:#999;}
+.settings-item .arr{color:#ccc;}
+.settings-item .sw{width:38px;height:20px;background:#e5e5ec;border-radius:10px;position:relative;}
+.settings-item .sw.on{background:#ff8ab0;}
+.settings-item .sw::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;background:rgba(255,138,176,0.06);border-radius:50%;}
+.settings-item .sw.on::after{left:20px;}
+.logout-btn{margin:20px 12px;background:rgba(255,138,176,0.06);padding:12px;text-align:center;border-radius:12px;color:#ff5c8a;font-size:13px;font-weight:600;}
+.delete-acc{text-align:center;padding:10px;color:#bbb;font-size:10px;}
+
+/* ============================================================
+   三、响应式 & 打印
+   ============================================================ */
+@media(max-width:1100px){
+  aside.sidebar{display:none;}
+  .screen-panel{flex-direction:column;}
+  .panel-left{position:static;margin:0 auto;}
+}
+@media print{
+  aside.sidebar{display:none;}
+  .toolbar{display:none;}
+  .screen-section{page-break-after:always;padding:10px 0;}
+  .screen-panel{flex-direction:column;}
+  .panel-left{position:static;margin:0 auto;}
+  .phone-shell{box-shadow:0 0 0 2px #333;border-radius:0;}
+  .phone-shell::before{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ========== 侧边栏 ========== -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h1>Starluck</h1>
+    <div class="ver">UI交互规格文档 v1.0</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-title">基础流程</div>
+      <a class="nav-item active" href="#s1"><span class="num">1</span> 登录注册</a>
+      <a class="nav-item" href="#s2"><span class="num">2</span> 发现列表</a>
+      <a class="nav-item" href="#s3"><span class="num">3</span> 消息列表</a>
+      <a class="nav-item" href="#s4"><span class="num">4</span> 个人中心</a>
+      <a class="nav-item" href="#s5"><span class="num">5</span> 个人主页</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">交易闭环</div>
+      <a class="nav-item" href="#s6"><span class="num">6</span> 充值钻石</a>
+      <a class="nav-item" href="#s7"><span class="num">7</span> 聊天对话</a>
+      <a class="nav-item" href="#s8"><span class="num">8</span> 礼物面板</a>
+      <a class="nav-item" href="#s9"><span class="num">9</span> 钱包总览</a>
+      <a class="nav-item" href="#s10"><span class="num">10</span> 提现</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">裂变拉新</div>
+      <a class="nav-item" href="#s11"><span class="num">11</span> 邀请主页</a>
+      <a class="nav-item" href="#s12"><span class="num">12</span> 排行榜</a>
+      <a class="nav-item" href="#s13"><span class="num">13</span> 我的战绩</a>
+      <a class="nav-item" href="#s14"><span class="num">14</span> 落地页</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">商业扩展</div>
+      <a class="nav-item" href="#s15"><span class="num">15</span> VIP 开通</a>
+      <a class="nav-item" href="#s16"><span class="num">16</span> 视频通话</a>
+      <a class="nav-item" href="#s17"><span class="num">17</span> 实名认证</a>
+      <a class="nav-item" href="#s18"><span class="num">18</span> 海报弹层</a>
+      <a class="nav-item" href="#s19"><span class="num">19</span> 动态广场</a>
+      <a class="nav-item" href="#s20"><span class="num">20</span> 新人资料</a>
+      <a class="nav-item" href="#s21"><span class="num">21</span> 首充弹窗</a>
+      <a class="nav-item" href="#s22"><span class="num">22</span> 设置中心</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div>© 2026 Starluck</div>
+    <a href="#" onclick="window.scrollTo(0,0)">↑ 回到顶部</a>
+  </div>
+</aside>
+
+<!-- ========== 主内容 ========== -->
+<main class="content" id="mainContent">
+
+<!-- 工具栏 -->
+<div class="toolbar" id="toolbar">
+  <div class="search-box">
+    <span class="icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="搜索按钮、输入框、功能...（如"充值"、"VIP"、"跳转"）" oninput="doSearch()" />
+  </div>
+  <span class="result-count" id="resultCount">共 22 屏 · 340+ 元素</span>
+  <button class="btn-sm active" id="btnAll" onclick="showAll()">全部显示</button>
+  <button class="btn-sm" id="btnSearch" onclick="doSearch()" style="display:none">搜索结果</button>
+  <button class="btn-sm" onclick="toggleDark()">🌙 深色模式</button>
+</div>
+
+<!-- ==========================================================
+     ① 登录注册  /login
+     ========================================================== -->
+<section class="screen-section" id="s1" data-keywords="登录 注册 手机号 验证码 第三方登录 微信 邮箱 Apple 用户协议 隐私政策 获取验证码">
+  <div class="screen-header">
+    <span class="num-badge">1</span>
+    <h2>登录 / 注册</h2>
+    <span class="route">/login</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner">
+          <div class="status-bar"><span>9:41</span><span class="icons">●●● 5G 100%</span></div>
+          <div class="login-page">
+            <div class="logo">💕</div>
+            <h1>Starluck</h1>
+            <div class="slogan">每颗星，都在等另一颗</div>
+            <div class="form">
+              <div class="input-row"><span class="pf">+86</span><span class="mi">请输入手机号</span></div>
+              <div class="input-row"><span class="mi">6位验证码</span><span class="sc">获取验证码</span></div>
+              <button class="btn block" style="margin-top:14px">登录 / 注册</button>
+              <div class="agree">
+                <div class="cb on">✓</div>
+                <div>我已阅读并同意<a>《用户协议》</a>和<a>《隐私政策》</a></div>
+              </div>
+            </div>
+            <div class="third">
+              <div class="label">其他登录方式</div>
+              <div class="ico-row">
+                <div class="ico">💚</div>
+                <div class="ico">📧</div>
+                <div class="ico">🍎</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="1"><td class="el-num">1</td><td class="el-name">手机号输入框</td><td class="el-type"><span class="el-type-input">输入框</span></td><td class="el-desc">用户输入 11 位手机号，+86 前缀固定不可修改</td><td class="el-action">输入 11 位数字后"获取验证码"按钮可点击；号码格式校验 /^1\d{10}$/</td><td class="el-vip">—</td></tr>
+          <tr data-el="2"><td class="el-num">2</td><td class="el-name">验证码输入框</td><td class="el-type"><span class="el-type-input">输入框</span></td><td class="el-desc">输入 6 位短信验证码（演示环境固定 123456）</td><td class="el-action">输入完成后"登录/注册"按钮可点击</td><td class="el-vip">—</td></tr>
+          <tr data-el="3"><td class="el-num">3</td><td class="el-name">获取验证码</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">触发发送短信验证码，点击后进入 60s 倒计时冷却</td><td class="el-action">点击 → 手机号校验通过 → 60s 倒计时（"60s 后重发"）→ 按钮置灰不可点击</td><td class="el-vip">—</td></tr>
+          <tr data-el="4"><td class="el-num">4</td><td class="el-name">登录/注册 按钮</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">提交登录请求，首次登录自动注册。需手机号+验证码+同意协议三个条件</td><td class="el-action">点击 → 校验通过 → 登录成功 → 未填资料跳转 /onboard、已填资料跳转 /discover</td><td class="el-vip">—</td></tr>
+          <tr data-el="5"><td class="el-num">5</td><td class="el-name">同意协议复选框</td><td class="el-type"><span class="el-type-icon">复选框</span></td><td class="el-desc">用户需勾选同意《用户协议》和《隐私政策》后才能登录</td><td class="el-action">点击切换选中/取消；未勾选时点登录按钮 Toast 提示"请同意用户协议"</td><td class="el-vip">—</td></tr>
+          <tr data-el="6"><td class="el-num">6</td><td class="el-name">用户协议 链接</td><td class="el-type"><span class="el-type-text">文本链接</span></td><td class="el-desc">展示《用户协议》全文</td><td class="el-action">点击 → 弹窗或新页面展示协议内容（合规必需）</td><td class="el-vip">—</td></tr>
+          <tr data-el="7"><td class="el-num">7</td><td class="el-name">隐私政策 链接</td><td class="el-type"><span class="el-type-text">文本链接</span></td><td class="el-desc">展示《隐私政策》全文</td><td class="el-action">点击 → 弹窗或新页面展示隐私政策内容（合规必需）</td><td class="el-vip">—</td></tr>
+          <tr data-el="8"><td class="el-num">8</td><td class="el-name">微信登录图标</td><td class="el-type"><span class="el-type-icon">图标</span></td><td class="el-desc">第三方登录——微信授权登录（正式环境需接入微信 JSSDK）</td><td class="el-action">点击 → demo 环境走普通登录流程；正式环境调起微信授权</td><td class="el-vip">—</td></tr>
+          <tr data-el="9"><td class="el-num">9</td><td class="el-name">邮箱登录图标</td><td class="el-type"><span class="el-type-icon">图标</span></td><td class="el-desc">第三方登录——邮箱注册/登录</td><td class="el-action">点击 → demo 环境走普通登录流程</td><td class="el-vip">—</td></tr>
+          <tr data-el="10"><td class="el-num">10</td><td class="el-name">Apple 登录图标</td><td class="el-type"><span class="el-type-icon">图标</span></td><td class="el-desc">第三方登录——Sign in with Apple</td><td class="el-action">点击 → demo 环境走普通登录流程；正式环境走 Apple ID 授权</td><td class="el-vip">—</td></tr>
+          <tr data-el="11"><td class="el-num">11</td><td class="el-name">Slogan 文字</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">品牌 Slogan "每颗星，都在等另一颗"，纯展示无交互</td><td class="el-action">—</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ② 发现/用户列表  /discover
+     ========================================================== -->
+<section class="screen-section" id="s2" data-keywords="发现 推荐 附近 新人 在线 动态 筛选 性别 年龄 同城 认证 用户卡片 头像 在线 VIP 匹配">
+  <div class="screen-header">
+    <span class="num-badge">2</span>
+    <h2>发现 / 用户列表</h2>
+    <span class="route">/discover</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner">
+          <div class="status-bar"><span>9:41</span><span class="icons">●●● 5G 100%</span></div>
+          <div class="page-top"><h1>发现</h1></div>
+          <div class="discover-tabs">
+            <div class="tab active">推荐</div>
+            <div class="tab">附近</div>
+            <div class="tab">新人</div>
+            <div class="tab">在线</div>
+            <div class="tab">动态</div>
+          </div>
+          <div class="filter-bar">
+            <div class="chip active">综合</div>
+            <div class="chip">性别 ▾</div>
+            <div class="chip">年龄 ▾</div>
+            <div class="chip">同城</div>
+            <div class="chip">认证</div>
+          </div>
+          <div class="scroll-content" style="flex:1">
+            <div class="user-grid">
+              <div class="user-card av-1">
+                <div class="cover" style="background:linear-gradient(135deg,#ff8ab0,#7a9eff)">
+                  <div class="top-flags"><span class="flag online">在线</span><span class="flag vip-g">VIP</span></div>
+                  <div class="cover-inner" style="font-size:48px;text-align:center;padding:20px 0">👩</div>
+                </div>
+                <div class="info"><div class="name">小诗 <span class="tag vip">VIP</span></div><div class="meta">23岁 · 上海 · 1.2km</div><div class="tags"><span class="tag">旅行</span><span class="tag">咖啡</span><span class="tag">摄影</span></div></div>
+              </div>
+              <div class="user-card av-2">
+                <div class="cover" style="background:linear-gradient(135deg,#a8c4ff,#5eead4)">
+                  <div class="top-flags"><span class="flag online">在线</span></div>
+                  <div class="cover-inner" style="font-size:48px;text-align:center;padding:20px 0">👨</div>
+                </div>
+                <div class="info"><div class="name">阿哲</div><div class="meta">26岁 · 北京 · 2.5km</div><div class="tags"><span class="tag">健身</span><span class="tag">电影</span></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-bar">
+            <div class="ti active"><span class="ico">👥</span>发现</div>
+            <div class="ti"><span class="ico">📷</span>动态</div>
+            <div class="ti"><span class="ico">💬</span>消息</div>
+            <div class="ti"><span class="ico">👤</span>我的</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="12"><td class="el-num">1</td><td class="el-name">Tab 切换栏</td><td class="el-type"><span class="el-type-sel">选择器</span></td><td class="el-desc">5 个 Tab：推荐/附近/新人/在线/动态，用于切换用户列表的展示策略</td><td class="el-action">点击切换 → 列表刷新对应数据源；推荐=兴趣画像+位置，附近=距离排序，新人=注册时间，在线=在线状态，动态=Feed流</td><td class="el-vip">—</td></tr>
+          <tr data-el="13"><td class="el-num">2</td><td class="el-name">筛选标签栏</td><td class="el-type"><span class="el-type-sel">选择器</span></td><td class="el-desc">多条件筛选：综合/性别/年龄/同城/认证。点击展开对应筛选项</td><td class="el-action">点击展开下拉选项；"综合"为默认；"认证"筛选仅显示已实名用户</td><td class="el-vip"><span class="vip-only">高级筛选 VIP 专属</span></td></tr>
+          <tr data-el="14"><td class="el-num">3</td><td class="el-name">用户卡片（整体）</td><td class="el-type"><span class="el-type-btn">卡片</span></td><td class="el-desc">每个用户一张卡片，含渐变背景、头像区域、在线/VIP标记、基本信息</td><td class="el-action">点击 → 跳转 /user/:id 个人主页；埋点：卡片曝光、点击率</td><td class="el-vip">—</td></tr>
+          <tr data-el="15"><td class="el-num">4</td><td class="el-name">在线状态标记</td><td class="el-type"><span class="el-type-text">标签</span></td><td class="el-desc">绿色角标，表示用户当前在线，提升点击吸引力</td><td class="el-action">纯展示；在线用户会在列表排序中优先</td><td class="el-vip">—</td></tr>
+          <tr data-el="16"><td class="el-num">5</td><td class="el-name">VIP 标记</td><td class="el-type"><span class="el-type-text">标签</span></td><td class="el-desc">金色 VIP 角标，表示该用户为 VIP 会员，增加可信度</td><td class="el-action">纯展示；VIP 用户在"推荐"策略中权重更高</td><td class="el-vip"><span class="vip-only">VIP 优先曝光</span></td></tr>
+          <tr data-el="17"><td class="el-num">6</td><td class="el-name">用户昵称</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">用户昵称，附带 VIP 小标签</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="18"><td class="el-num">7</td><td class="el-name">年龄·城市·距离</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">年龄、城市、距离，帮助用户快速筛选</td><td class="el-action">纯展示；距离基于定位计算</td><td class="el-vip">—</td></tr>
+          <tr data-el="19"><td class="el-num">8</td><td class="el-name">兴趣标签</td><td class="el-type"><span class="el-type-text">标签</span></td><td class="el-desc">用户兴趣标签（粉色圆角），最多展示 3 个</td><td class="el-action">纯展示；用于推荐算法匹配</td><td class="el-vip">—</td></tr>
+          <tr data-el="20"><td class="el-num">9</td><td class="el-name">底部 Tab Bar·发现</td><td class="el-type"><span class="el-type-btn">导航</span></td><td class="el-desc">4 个主导航 Tab 之"发现"，当前高亮</td><td class="el-action">当前页；点击无变化</td><td class="el-vip">—</td></tr>
+          <tr data-el="21"><td class="el-num">10</td><td class="el-name">底部 Tab Bar·动态</td><td class="el-type"><span class="el-type-btn">导航</span></td><td class="el-desc">4 个主导航 Tab 之"动态"</td><td class="el-action">点击 → 跳转 /feed 动态广场</td><td class="el-vip">—</td></tr>
+          <tr data-el="22"><td class="el-num">11</td><td class="el-name">底部 Tab Bar·消息</td><td class="el-type"><span class="el-type-btn">导航</span></td><td class="el-desc">4 个主导航 Tab 之"消息"</td><td class="el-action">点击 → 跳转 /messages 消息列表</td><td class="el-vip">—</td></tr>
+          <tr data-el="23"><td class="el-num">12</td><td class="el-name">底部 Tab Bar·我的</td><td class="el-type"><span class="el-type-btn">导航</span></td><td class="el-desc">4 个主导航 Tab 之"我的"</td><td class="el-action">点击 → 跳转 /me 个人中心</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ③ 消息列表  /messages
+     ========================================================== -->
+<section class="screen-section" id="s3" data-keywords="消息 聊天 会话 喜欢我 访客 礼物 通知 红点 未读 私聊">
+  <div class="screen-header">
+    <span class="num-badge">3</span>
+    <h2>消息列表</h2>
+    <span class="route">/messages</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner">
+          <div class="status-bar"><span>9:41</span><span class="icons">●●● 5G 100%</span></div>
+          <div class="page-top"><h1>消息</h1></div>
+          <div class="msg-quick">
+            <div class="qi"><div class="ico c1">💝</div><div class="lbl">喜欢我</div><div class="bd"><span class="badge">3</span></div></div>
+            <div class="qi"><div class="ico c2">👣</div><div class="lbl">访客</div><div class="bd"><span class="badge">5</span></div></div>
+            <div class="qi"><div class="ico c3">🎁</div><div class="lbl">礼物</div></div>
+            <div class="qi"><div class="ico c4">🔔</div><div class="lbl">通知</div></div>
+          </div>
+          <div class="scroll-content" style="flex:1">
+            <div class="chat-item">
+              <div class="av-wrap"><div class="av av-1">小</div><div class="online-dot"></div></div>
+              <div class="ci-info"><div class="row1"><span class="name">小诗 <span class="tag vip" style="font-size:9px">VIP</span></span><span class="time">10:23</span></div><div class="last">就在浦东的Manner，离我家很近</div></div>
+              <div class="badge">2</div>
+            </div>
+            <div class="chat-item">
+              <div class="av-wrap"><div class="av av-3">糖</div></div>
+              <div class="ci-info"><div class="row1"><span class="name">糖糖</span><span class="time">昨天</span></div><div class="last">[礼物] 玫瑰 ×1</div></div>
+            </div>
+            <div class="chat-item">
+              <div class="av-wrap"><div class="av av-5">梨</div><div class="online-dot"></div></div>
+              <div class="ci-info"><div class="row1"><span class="name">梨花</span><span class="time">昨天</span></div><div class="last">今晚有空吗？</div></div>
+              <div class="badge">1</div>
+            </div>
+          </div>
+          <div class="tab-bar">
+            <div class="ti"><span class="ico">👥</span>发现</div>
+            <div class="ti"><span class="ico">📷</span>动态</div>
+            <div class="ti active"><span class="ico">💬</span>消息</div>
+            <div class="ti"><span class="ico">👤</span>我的</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="24"><td class="el-num">1</td><td class="el-name">快捷入口·喜欢我</td><td class="el-type"><span class="el-type-btn">图标</span></td><td class="el-desc">展示喜欢我的用户列表，红色数字 Badge 显示未读数</td><td class="el-action">点击 → 查看喜欢我的用户列表；未开通 VIP 时引导开通</td><td class="el-vip"><span class="vip-only">VIP 专属查看</span></td></tr>
+          <tr data-el="25"><td class="el-num">2</td><td class="el-name">快捷入口·访客</td><td class="el-type"><span class="el-type-btn">图标</span></td><td class="el-desc">展示最近访问我主页的用户列表</td><td class="el-action">点击 → 查看最近访客；未开通 VIP 时引导开通</td><td class="el-vip"><span class="vip-only">VIP 专属查看</span></td></tr>
+          <tr data-el="26"><td class="el-num">3</td><td class="el-name">快捷入口·礼物</td><td class="el-type"><span class="el-type-btn">图标</span></td><td class="el-desc">展示收到/送出的礼物记录</td><td class="el-action">点击 → 跳转礼物记录页</td><td class="el-vip">—</td></tr>
+          <tr data-el="27"><td class="el-num">4</td><td class="el-name">快捷入口·通知</td><td class="el-type"><span class="el-type-btn">图标</span></td><td class="el-desc">系统通知（审核结果、活动推送、官方消息）</td><td class="el-action">点击 → 跳转通知列表页</td><td class="el-vip">—</td></tr>
+          <tr data-el="28"><td class="el-num">5</td><td class="el-name">未读红点 Badge</td><td class="el-type"><span class="el-type-text">红点</span></td><td class="el-desc">圆形红色数字角标，显示未读消息/通知数。0 条时隐藏 Badge</td><td class="el-action">纯展示；进入对应页面后清零</td><td class="el-vip">—</td></tr>
+          <tr data-el="29"><td class="el-num">6</td><td class="el-name">会话列表项（整体）</td><td class="el-type"><span class="el-type-btn">卡片</span></td><td class="el-desc">单条会话行：头像+在线点+昵称+VIP标+最后一条消息+时间+未读数</td><td class="el-action">点击 → 跳转 /chat/:id 聊天对话页；进入阅读后清除未读数</td><td class="el-vip">—</td></tr>
+          <tr data-el="30"><td class="el-num">7</td><td class="el-name">在线绿点</td><td class="el-type"><span class="el-type-text">状态</span></td><td class="el-desc">头像右下角绿色小圆点，表示对方当前在线</td><td class="el-action">纯展示；提升用户点击聊天的意愿</td><td class="el-vip">—</td></tr>
+          <tr data-el="31"><td class="el-num">8</td><td class="el-name">最后一条消息预览</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">显示该会话的最后一条消息内容（文字/礼物），单行截断</td><td class="el-action">纯展示；礼物类型显示 "[礼物] 玫瑰 ×1"</td><td class="el-vip">—</td></tr>
+          <tr data-el="32"><td class="el-num">9</td><td class="el-name">时间戳</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">最后一条消息的时间，今天显示时:分，昨天显示"昨天"，更早显示月-日</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ④ 个人中心  /me
+     ========================================================== -->
+<section class="screen-section" id="s4" data-keywords="个人中心 我的 关注 粉丝 好友 获赞 VIP 钱包 认证 设置 反馈 礼物 动态">
+  <div class="screen-header">
+    <span class="num-badge">4</span>
+    <h2>个人中心</h2>
+    <span class="route">/me</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner">
+          <div class="me-header">
+            <div class="edit">✏️ 编辑</div>
+            <div class="top-row">
+              <div class="av av-1">我</div>
+              <div class="ns">
+                <div class="name">我 <span class="tag vip" style="font-size:9px">VIP</span></div>
+                <div class="id">ID: yqyr001</div>
+                <div class="sign">寻找命中注定的TA</div>
+              </div>
+            </div>
+            <div class="me-stats">
+              <div><div class="num">128</div><div class="lbl">关注</div></div>
+              <div><div class="num">256</div><div class="lbl">粉丝</div></div>
+              <div><div class="num">42</div><div class="lbl">好友</div></div>
+              <div><div class="num">1.2k</div><div class="lbl">获赞</div></div>
+            </div>
+          </div>
+          <div class="scroll-content" style="flex:1;background:rgba(255,138,176,0.06)">
+            <div class="vip-banner">
+              <div class="vip-i">👑</div>
+              <div class="vt"><div class="t1">开通 VIP 会员</div><div class="t2">解锁谁看过我、高级筛选等 8 大特权</div></div>
+              <div class="vb">立即开通</div>
+            </div>
+            <div class="menu-group">
+              <div class="menu-item"><div class="mi-ico">💝</div><div class="lbl">我的喜欢</div><div class="rt">12人</div><div class="arr">›</div></div>
+              <div class="menu-item"><div class="mi-ico">👣</div><div class="lbl">谁看过我</div><div class="rt" style="color:#ff9a3c">VIP 专享</div><div class="arr">›</div></div>
+              <div class="menu-item"><div class="mi-ico">🎁</div><div class="lbl">我的礼物</div><div class="arr">›</div></div>
+              <div class="menu-item"><div class="mi-ico">📷</div><div class="lbl">我的动态</div><div class="arr">›</div></div>
+            </div>
+            <div class="menu-group">
+              <div class="menu-item"><div class="mi-ico" style="background:linear-gradient(135deg,#ffd966,#ff9a3c)">💰</div><div class="lbl">我的钱包</div><div class="rt" style="color:#ff8ab0;font-weight:700">¥88.50</div><div class="arr">›</div></div>
+              <div class="menu-item"><div class="mi-ico" style="background:linear-gradient(135deg,#a8c4ff,#5eead4)">✅</div><div class="lbl">实名认证</div><div class="rt" style="color:#5eead4">已认证</div><div class="arr">›</div></div>
+              <div class="menu-item"><div class="mi-ico" style="background:linear-gradient(135deg,#a8c4ff,#ff8ab0)">⚙️</div><div class="lbl">设置</div><div class="arr">›</div></div>
+              <div class="menu-item"><div class="mi-ico" style="background:linear-gradient(135deg,#5eead4,#22c55e)">💬</div><div class="lbl">帮助与反馈</div><div class="arr">›</div></div>
+            </div>
+          </div>
+          <div class="tab-bar">
+            <div class="ti"><span class="ico">👥</span>发现</div>
+            <div class="ti"><span class="ico">📷</span>动态</div>
+            <div class="ti"><span class="ico">💬</span>消息</div>
+            <div class="ti active"><span class="ico">👤</span>我的</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="33"><td class="el-num">1</td><td class="el-name">编辑按钮</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">编辑个人资料：昵称、头像、签名、个人详情</td><td class="el-action">点击 → 弹出/跳转资料编辑页（/onboard 复用）</td><td class="el-vip">—</td></tr>
+          <tr data-el="34"><td class="el-num">2</td><td class="el-name">用户头像</td><td class="el-type"><span class="el-type-icon">头像</span></td><td class="el-desc">用户头像，64px，带白色边框光晕</td><td class="el-action">点击 → 可编辑/更换头像</td><td class="el-vip">—</td></tr>
+          <tr data-el="35"><td class="el-num">3</td><td class="el-name">昵称 + VIP 标</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">用户昵称，右侧附带 VIP 标签（若为 VIP）</td><td class="el-action">纯展示；未开通 VIP 则不显示标签</td><td class="el-vip">—</td></tr>
+          <tr data-el="36"><td class="el-num">4</td><td class="el-name">用户 ID</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">用户唯一标识 ID，半透明展示</td><td class="el-action">纯展示；点击可复制</td><td class="el-vip">—</td></tr>
+          <tr data-el="37"><td class="el-num">5</td><td class="el-name">个性签名</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">用户签名语，一行展示</td><td class="el-action">纯展示；编辑资料时可修改</td><td class="el-vip">—</td></tr>
+          <tr data-el="38"><td class="el-num">6</td><td class="el-name">4 项数据统计</td><td class="el-type"><span class="el-type-text">数据</span></td><td class="el-desc">关注/粉丝/好友/获赞 四项数字统计</td><td class="el-action">点击各项 → 跳转对应列表页（关注列表/粉丝列表/好友列表/获赞记录）</td><td class="el-vip">—</td></tr>
+          <tr data-el="39"><td class="el-num">7</td><td class="el-name">VIP 开通横幅</td><td class="el-type"><span class="el-type-btn">横幅</span></td><td class="el-desc">深紫金配色 VIP 推广横幅，展示皇冠+权益文案+开通按钮</td><td class="el-action">点击横幅/按钮 → 跳转 /vip VIP 开通页</td><td class="el-vip"><span class="vip-only">VIP 开通入口</span></td></tr>
+          <tr data-el="40"><td class="el-num">8</td><td class="el-name">菜单·我的喜欢</td><td class="el-type"><span class="el-type-btn">菜单项</span></td><td class="el-desc">查看我标记为"喜欢"的用户列表，显示数量</td><td class="el-action">点击 → 跳转喜欢列表页；VIP 可查看完整列表</td><td class="el-vip"><span class="vip-only">VIP 查看全部</span></td></tr>
+          <tr data-el="41"><td class="el-num">9</td><td class="el-name">菜单·谁看过我</td><td class="el-type"><span class="el-type-btn">菜单项</span></td><td class="el-desc">查看访问过我主页的用户，未开通 VIP 显示"VIP 专享"</td><td class="el-action">未开通 VIP → Toast 提示 + 跳转 /vip；已开通 → 跳转访客列表页</td><td class="el-vip"><span class="vip-only">VIP 专属</span></td></tr>
+          <tr data-el="42"><td class="el-num">10</td><td class="el-name">菜单·我的礼物</td><td class="el-type"><span class="el-type-btn">菜单项</span></td><td class="el-desc">查看收到和送出的全部礼物记录</td><td class="el-action">点击 → 跳转礼物记录页</td><td class="el-vip">—</td></tr>
+          <tr data-el="43"><td class="el-num">11</td><td class="el-name">菜单·我的动态</td><td class="el-type"><span class="el-type-btn">菜单项</span></td><td class="el-desc">查看自己发表的动态 Feed</td><td class="el-action">点击 → 跳转个人动态列表页</td><td class="el-vip">—</td></tr>
+          <tr data-el="44"><td class="el-num">12</td><td class="el-name">菜单·我的钱包</td><td class="el-type"><span class="el-type-btn">菜单项</span></td><td class="el-desc">查看钱包余额和交易记录，右侧显示当前可提现金额</td><td class="el-action">点击 → 跳转 /wallet 钱包页</td><td class="el-vip">—</td></tr>
+          <tr data-el="45"><td class="el-num">13</td><td class="el-name">菜单·实名认证</td><td class="el-type"><span class="el-type-btn">菜单项</span></td><td class="el-desc">查看认证状态，已认证显示绿色"已认证"，未认证引导完成</td><td class="el-action">点击 → 已认证查看认证信息，未认证跳转 /auth</td><td class="el-vip">—</td></tr>
+          <tr data-el="46"><td class="el-num">14</td><td class="el-name">菜单·设置</td><td class="el-type"><span class="el-type-btn">菜单项</span></td><td class="el-desc">进入设置&安全中心</td><td class="el-action">点击 → 跳转 /settings 设置页</td><td class="el-vip">—</td></tr>
+          <tr data-el="47"><td class="el-num">15</td><td class="el-name">菜单·帮助与反馈</td><td class="el-type"><span class="el-type-btn">菜单项</span></td><td class="el-desc">客服中心：常见问题、投诉举报、意见反馈</td><td class="el-action">点击 → 跳转帮助中心页</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ⑤ 个人主页  /user/:id
+     ========================================================== -->
+<section class="screen-section" id="s5" data-keywords="个人主页 用户详情 封面 资料卡 相册 送礼 关注 打招呼 聊天">
+  <div class="screen-header">
+    <span class="num-badge">5</span>
+    <h2>个人信息展示（个人主页）</h2>
+    <span class="route">/user/:id</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner" style="flex-direction:column;background:rgba(255,138,176,0.06)">
+          <div class="profile-cover av-1" style="background:linear-gradient(135deg,#ff8ab0,#7a9eff)">
+            <div class="top">
+              <div class="ic-btn">‹</div>
+              <div class="ic-btn">⋯</div>
+            </div>
+            <div class="info">
+              <div class="name">小诗 <span class="tag vip" style="font-size:10px">VIP</span></div>
+              <div class="meta">👧 23岁 · ID: yq001 · 上海 · 1.2km · 1小时前在线</div>
+              <div class="sign">生活不止眼前的咖啡，还有诗和远方</div>
+            </div>
+          </div>
+          <div class="scroll-content" style="flex:1;padding-bottom:60px">
+            <div class="profile-section">
+              <h3>基本信息</h3>
+              <div class="info-grid">
+                <div class="it"><span class="k">身高</span><span class="v">165cm</span></div>
+                <div class="it"><span class="k">体重</span><span class="v">48kg</span></div>
+                <div class="it"><span class="k">职业</span><span class="v">设计师</span></div>
+                <div class="it"><span class="k">学历</span><span class="v">本科</span></div>
+                <div class="it"><span class="k">家乡</span><span class="v">江苏南京</span></div>
+                <div class="it"><span class="k">情感</span><span class="v">单身</span></div>
+              </div>
+            </div>
+            <div class="profile-section">
+              <h3>兴趣爱好</h3>
+              <div class="interest-tags"><span class="tag">旅行</span><span class="tag">咖啡</span><span class="tag">摄影</span><span class="tag">美食</span></div>
+            </div>
+            <div class="profile-section">
+              <h3>相册</h3>
+              <div class="album-grid">
+                <div class="photo p1"></div><div class="photo p2"></div><div class="photo p3"></div>
+                <div class="photo p4"></div><div class="photo p5"></div><div class="photo p6"></div>
+              </div>
+            </div>
+          </div>
+          <div class="profile-cta">
+            <div class="b b-gift">🎁 送礼</div>
+            <div class="b b-fav">⭐ 关注</div>
+            <div class="b b-chat">💬 打招呼</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="48"><td class="el-num">1</td><td class="el-name">返回按钮</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">左上角返回上一页</td><td class="el-action">点击 → history.back() 返回上一页</td><td class="el-vip">—</td></tr>
+          <tr data-el="49"><td class="el-num">2</td><td class="el-name">更多操作</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">右上角"⋯"更多操作菜单</td><td class="el-action">点击 → 弹出菜单：举报/拉黑/分享</td><td class="el-vip">—</td></tr>
+          <tr data-el="50"><td class="el-num">3</td><td class="el-name">封面背景</td><td class="el-type"><span class="el-type-icon">背景</span></td><td class="el-desc">渐变背景色（根据用户 av 色号），底部渐变遮罩过渡到信息区</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="51"><td class="el-num">4</td><td class="el-name">昵称 + VIP 标</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">大字号昵称 + VIP 金色标签</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="52"><td class="el-num">5</td><td class="el-name">用户元信息行</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">性别图+年龄+ID+城市+距离+最后活跃时间的一行概述</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="53"><td class="el-num">6</td><td class="el-name">个性签名</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">用户设置的签名语</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="54"><td class="el-num">7</td><td class="el-name">基本信息卡片</td><td class="el-type"><span class="el-type-text">卡片</span></td><td class="el-desc">白色卡片区，2列网格展示：身高/体重/职业/学历/家乡/情感状态</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="55"><td class="el-num">8</td><td class="el-name">兴趣爱好标签</td><td class="el-type"><span class="el-type-text">标签</span></td><td class="el-desc">用户选择的兴趣标签，粉色圆角样式</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="56"><td class="el-num">9</td><td class="el-name">相册九宫格</td><td class="el-type"><span class="el-type-btn">图片</span></td><td class="el-desc">用户上传的照片（3列网格），点击可放大查看</td><td class="el-action">点击单张 → 全屏浏览模式</td><td class="el-vip">—</td></tr>
+          <tr data-el="57"><td class="el-num">10</td><td class="el-name">送礼按钮 CTA</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">金色渐变，调起礼物赠送面板。此为用户主页最高频付费入口</td><td class="el-action">点击 → 底部弹出 ⑧ 礼物赠送面板；钻石不足时引导充值</td><td class="el-vip">—</td></tr>
+          <tr data-el="58"><td class="el-num">11</td><td class="el-name">关注按钮 CTA</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">粉色幽灵样式，关注/取消关注该用户</td><td class="el-action">点击 → 切换关注状态（关注/已关注）；已关注时二次确认取消</td><td class="el-vip">—</td></tr>
+          <tr data-el="59"><td class="el-num">12</td><td class="el-name">打招呼按钮 CTA</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">粉紫渐变主 CTA，2倍宽。点击后创建/打开与该用户的聊天会话，消耗 1💎</td><td class="el-action">点击 → 跳转 /chat/:id 聊天页；钻石不足→引导充值；未实名→引导认证</td><td class="el-vip"><span class="vip-free">VIP 每日免费 100 条</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ⑥ 充值钻石  /recharge
+     ========================================================== -->
+<section class="screen-section" id="s6" data-keywords="充值 钻石 购买 套餐 支付 微信支付 支付宝 Apple Pay 首充翻倍 超值热销">
+  <div class="screen-header">
+    <span class="num-badge">6</span>
+    <h2>充值（钻石）</h2>
+    <span class="route">/recharge</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner" style="background:linear-gradient(180deg,#080a18,#23264c);color:#fff">
+          <div class="status-bar dark"><span>9:41</span><span class="icons">●●● 5G 100%</span></div>
+          <div class="nav-bar" style="background:transparent"><div class="back" style="color:#fff">‹</div><div class="title" style="color:#fff">充值钻石</div><div class="right" style="color:#fff">明细</div></div>
+          <div class="recharge-bg" style="overflow-y:auto;flex:1">
+            <div class="recharge-bal"><div class="lbl">我的钻石 💎</div><div class="num">💎 666</div></div>
+            <div class="first-bonus">🎉 首充翻倍！首次充值赠送双倍钻石</div>
+            <div class="pkg-grid">
+              <div class="pkg-card"><div class="di">💎 60</div><div class="price">¥6</div></div>
+              <div class="pkg-card"><div class="di">💎 300</div><div class="price">¥30</div></div>
+              <div class="pkg-card hot selected"><div class="di">💎 680</div><div class="ex">首充翻倍</div><div class="price">¥68</div></div>
+              <div class="pkg-card"><div class="di">💎 1280</div><div class="ex">首充翻倍</div><div class="price">¥128</div></div>
+              <div class="pkg-card"><div class="di">💎 3280</div><div class="ex">首充翻倍</div><div class="price">¥328</div></div>
+              <div class="pkg-card"><div class="di">💎 6480</div><div class="ex">首充翻倍</div><div class="price">¥648</div></div>
+            </div>
+            <div class="pay-section">
+              <h4>支付方式</h4>
+              <div class="pay-method on"><div class="pi pm-wx">💚</div><div class="pn">微信支付</div><div class="pr">✓</div></div>
+              <div class="pay-method"><div class="pi pm-ap">💙</div><div class="pn">支付宝</div><div class="pr"></div></div>
+              <div class="pay-method"><div class="pi pm-al">🍎</div><div class="pn">Apple Pay</div><div class="pr"></div></div>
+            </div>
+            <div style="padding:12px 16px"><button class="btn block gold" style="height:48px">¥68 立即充值</button></div>
+            <div class="recharge-tip" style="color:rgba(255,255,255,.5);font-size:10px;padding:10px 16px">* 1元 = 10钻石 · 钻石不支持提现和转赠 · 充值成功后即时到账 · 轻触右上角"明细"查看充值记录</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="60"><td class="el-num">1</td><td class="el-name">返回按钮</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">返回上一页</td><td class="el-action">点击 → history.back()</td><td class="el-vip">—</td></tr>
+          <tr data-el="61"><td class="el-num">2</td><td class="el-name">充值明细</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">右上角"明细"入口，查看历史充值记录</td><td class="el-action">点击 → 跳转充值记录页</td><td class="el-vip">—</td></tr>
+          <tr data-el="62"><td class="el-num">3</td><td class="el-name">钻石余额展示</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">当前钻石余额大数字展示，金色高亮 + 💎图标</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="63"><td class="el-num">4</td><td class="el-name">首充翻倍横幅</td><td class="el-type"><span class="el-type-text">横幅</span></td><td class="el-desc">金色边框横幅，提示首次充值赠送双倍钻石</td><td class="el-action">纯展示；已首充用户不显示</td><td class="el-vip">—</td></tr>
+          <tr data-el="64"><td class="el-num">5</td><td class="el-name">套餐卡片 ×6</td><td class="el-type"><span class="el-type-sel">选择器</span></td><td class="el-desc">6 档充值套餐：¥6/30/68/128/328/648。选中状态金色边框高亮；第3档标记"超值热销"角标；后4档标注"首充翻倍"</td><td class="el-action">点击选中 → 底部按钮价格联动更新；选中态：金色边框+半透明背景</td><td class="el-vip">—</td></tr>
+          <tr data-el="65"><td class="el-num">6</td><td class="el-name">"超值热销"角标</td><td class="el-type"><span class="el-type-text">角标</span></td><td class="el-desc">红色渐变角标，标注在 ¥68 套餐上方，锚定中等消费用户</td><td class="el-action">纯展示；消费心理学定价锚点</td><td class="el-vip">—</td></tr>
+          <tr data-el="66"><td class="el-num">7</td><td class="el-name">首充翻倍标注</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">绿色文字"首充翻倍"，提示首次购买该档位赠送双倍</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="67"><td class="el-num">8</td><td class="el-name">支付方式选择</td><td class="el-type"><span class="el-type-sel">单选</span></td><td class="el-desc">3 种支付渠道：微信支付/支付宝/Apple Pay。选中态显示金色勾号</td><td class="el-action">点击切换选中支付方式</td><td class="el-vip">—</td></tr>
+          <tr data-el="68"><td class="el-num">9</td><td class="el-name">立即充值按钮</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">金色 CTA，显示选中套餐价格。触发支付流程</td><td class="el-action">点击 → demo: 即时到账+Toast提示；正式: 调起微信/支付宝支付SDK → 支付成功回调增加钻石 → 刷新页面</td><td class="el-vip">—</td></tr>
+          <tr data-el="69"><td class="el-num">10</td><td class="el-name">充值说明文字</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">底部说明：汇率 1元=10钻、钻石不可提现转赠、即时到账等</td><td class="el-action">纯展示（合规必需）</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ⑦ 聊天对话（消费扣费） /chat/:id
+     ========================================================== -->
+<section class="screen-section" id="s7" data-keywords="聊天 对话 消息 扣费 钻石 余额 送礼 视频通话 输入框 表情 红包">
+  <div class="screen-header">
+    <span class="num-badge">7</span>
+    <h2>聊天对话（消费扣费）</h2>
+    <span class="route">/chat/:id</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner" style="background:rgba(255,138,176,0.06)">
+          <div class="status-bar"><span>9:41</span><span class="icons">●●● 5G 100%</span></div>
+          <div class="nav-bar"><div class="back">‹</div><div class="chat-nav-info"><div class="av av-1">小</div><div class="ni"><div class="n">小诗 <span class="tag vip" style="font-size:8px">VIP</span></div><div class="st" style="font-size:10px;color:#5eead4">● 在线</div></div></div><div class="right">⋯</div></div>
+          <div class="balance-bar"><span class="bl">余额 <b>💎666</b> · 普通用户 1💎/条</span><span class="br">充值</span></div>
+          <div class="msg-flow">
+            <div class="sys-tip">欢迎来到Starluck，请遵守平台规则</div>
+            <div class="bubble-row"><div class="av av-1">小</div><div class="bubble">你好呀～</div></div>
+            <div class="bubble-row"><div class="av av-1">小</div><div class="bubble">看你也喜欢咖啡，有空一起喝吗？</div></div>
+            <div class="bubble-row me"><div class="av av-4">我</div><div class="bubble">好啊，你常去哪家？</div></div><div class="cost-tip" style="align-self:flex-end">- 1💎</div>
+            <div class="bubble-row"><div class="av av-1">小</div><div class="bubble">就在浦东的Manner</div></div>
+          </div>
+          <div class="chat-input-bar">
+            <div class="chat-input-row"><div class="ib">输入消息...</div><div class="sb">发送</div></div>
+            <div class="chat-tools">
+              <div class="tl"><div class="ti">🎁</div>礼物</div>
+              <div class="tl"><div class="ti">📷</div>照片</div>
+              <div class="tl"><div class="ti">📞</div>视频</div>
+              <div class="tl"><div class="ti">📍</div>位置</div>
+              <div class="tl"><div class="ti">🧧</div>红包</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="70"><td class="el-num">1</td><td class="el-name">聊天标题栏</td><td class="el-type"><span class="el-type-text">导航</span></td><td class="el-desc">对方头像+昵称+VIP标+在线状态；点击可跳转对方个人主页</td><td class="el-action">点击标题区域 → 跳转 /user/:id 个人主页</td><td class="el-vip">—</td></tr>
+          <tr data-el="71"><td class="el-num">2</td><td class="el-name">更多操作 ⋯</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">右上角更多：举报、拉黑、清空聊天记录</td><td class="el-action">点击 → 弹出操作菜单</td><td class="el-vip">—</td></tr>
+          <tr data-el="72"><td class="el-num">3</td><td class="el-name">余额条</td><td class="el-type"><span class="el-type-text">信息条</span></td><td class="el-desc">粉色渐变背景：实时显示钻石余额+当前单价+充值入口</td><td class="el-action">"充值"文字 → 跳转 /recharge</td><td class="el-vip"><span class="vip-free">VIP: 免费100条/日</span></td></tr>
+          <tr data-el="73"><td class="el-num">4</td><td class="el-name">系统提示</td><td class="el-type"><span class="el-type-text">消息</span></td><td class="el-desc">灰色居中提示气泡：平台规则、反诈提醒、钻石不足等</td><td class="el-action">纯展示；自动插入消息流</td><td class="el-vip">—</td></tr>
+          <tr data-el="74"><td class="el-num">5</td><td class="el-name">对方消息气泡</td><td class="el-type"><span class="el-type-text">消息</span></td><td class="el-desc">白色圆角气泡，左侧对方头像。文字/礼物内容</td><td class="el-action">纯展示；长按可复制文字/举报</td><td class="el-vip">—</td></tr>
+          <tr data-el="75"><td class="el-num">6</td><td class="el-name">自己消息气泡</td><td class="el-type"><span class="el-type-text">消息</span></td><td class="el-desc">粉紫渐变气泡，右侧对齐。展示已发送内容</td><td class="el-action">纯展示；长按可撤回/删除（2分钟内）</td><td class="el-vip">—</td></tr>
+          <tr data-el="76"><td class="el-num">7</td><td class="el-name">扣费标识</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">消息下方灰色小字"- 1💎"，表示本条消息扣费</td><td class="el-action">纯展示；VIP 免费消息不显示</td><td class="el-vip"><span class="vip-free">VIP免费不显示</span></td></tr>
+          <tr data-el="77"><td class="el-num">8</td><td class="el-name">消息输入框</td><td class="el-type"><span class="el-type-input">输入框</span></td><td class="el-desc">灰色圆角输入框，placeholder "输入消息..."</td><td class="el-action">点击聚焦 → 键盘弹起；输入文字后"发送"按钮变为可点击状态</td><td class="el-vip">—</td></tr>
+          <tr data-el="78"><td class="el-num">9</td><td class="el-name">发送按钮</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">粉紫小圆角按钮；发送消息并扣费 1💎（VIP 免费条数内不扣）</td><td class="el-action">点击 → 校验钻石余额 → 插入消息 → 扣费 → 模拟回复；钻石不足 Toast + 跳转充值</td><td class="el-vip"><span class="vip-free">VIP: 0💎</span></td></tr>
+          <tr data-el="79"><td class="el-num">10</td><td class="el-name">底部工具栏·礼物</td><td class="el-type"><span class="el-type-btn">图标</span></td><td class="el-desc">调起礼物赠送面板</td><td class="el-action">点击 → 底部弹出 ⑧ 礼物面板</td><td class="el-vip">—</td></tr>
+          <tr data-el="80"><td class="el-num">11</td><td class="el-name">底部工具栏·照片</td><td class="el-type"><span class="el-type-btn">图标</span></td><td class="el-desc">发送照片（选择相册或拍照）</td><td class="el-action">点击 → 调起系统相册/相机</td><td class="el-vip">—</td></tr>
+          <tr data-el="81"><td class="el-num">12</td><td class="el-name">底部工具栏·视频通话</td><td class="el-type"><span class="el-type-btn">图标</span></td><td class="el-desc">发起视频通话，需实名认证+充足余额</td><td class="el-action">点击 → 校验实名+余额 → 跳转 /call/:id 视频通话页</td><td class="el-vip"><span class="vip-free">VIP 8折</span></td></tr>
+          <tr data-el="82"><td class="el-num">13</td><td class="el-name">底部工具栏·位置</td><td class="el-type"><span class="el-type-btn">图标</span></td><td class="el-desc">分享当前位置</td><td class="el-action">点击 → 获取GPS定位 → 发送位置卡片</td><td class="el-vip">—</td></tr>
+          <tr data-el="83"><td class="el-num">14</td><td class="el-name">底部工具栏·红包</td><td class="el-type"><span class="el-type-btn">图标</span></td><td class="el-desc">发送钻石红包</td><td class="el-action">点击 → 弹出红包金额设置 → 确认发送</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ⑧ 礼物赠送面板（弹层）
+     ========================================================== -->
+<section class="screen-section" id="s8" data-keywords="礼物 赠送 热门 浪漫 豪华 背包 玫瑰 戒指 跑车 城堡 钻石 数量">
+  <div class="screen-header">
+    <span class="num-badge">8</span>
+    <h2>礼物赠送面板</h2>
+    <span class="route">弹层（聊天/个人主页触发）</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner" style="background:rgba(255,138,176,0.06);position:relative">
+          <div class="msg-flow"><div class="bubble-row me"><div class="av av-4">我</div><div class="bubble">你好呀～</div></div></div>
+          <div style="position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:5;display:flex;align-items:flex-end">
+            <div class="gift-panel" style="width:100%">
+              <div class="gift-tabs"><div class="gt active">热门</div><div class="gt">浪漫</div><div class="gt">豪华</div><div class="gt">背包</div></div>
+              <div class="gift-grid">
+                <div class="gift-cell"><div class="gem">🌹</div><div class="gn">玫瑰</div><div class="gp">💎66</div></div>
+                <div class="gift-cell"><div class="gem">💋</div><div class="gn">么么哒</div><div class="gp">💎99</div></div>
+                <div class="gift-cell"><div class="gem">💖</div><div class="gn">爱心</div><div class="gp">💎188</div></div>
+                <div class="gift-cell sel"><div class="gem">💍</div><div class="gn">戒指</div><div class="gp">💎520</div></div>
+                <div class="gift-cell"><div class="gem">💐</div><div class="gn">告白</div><div class="gp">💎888</div></div>
+                <div class="gift-cell"><div class="gem">🏎️</div><div class="gn">跑车</div><div class="gp">💎1314</div></div>
+                <div class="gift-cell"><div class="gem">🛥️</div><div class="gn">游艇</div><div class="gp">💎2888</div></div>
+                <div class="gift-cell"><div class="gem">🏰</div><div class="gn">城堡</div><div class="gp">💎5200</div></div>
+              </div>
+              <div class="gift-bottom">
+                <div class="gift-bal"><span class="bl">余额 <b>💎666</b></span><span class="br">充值</span></div>
+                <div class="gift-action-row">
+                  <div class="gift-num"><div class="nb on">×1</div><div class="nb">×10</div><div class="nb">×99</div><div class="nb">×520</div></div>
+                  <button class="gift-send">送出 💎520</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="84"><td class="el-num">1</td><td class="el-name">半透明遮罩</td><td class="el-type"><span class="el-type-btn">遮罩</span></td><td class="el-desc">黑色半透明遮罩覆盖聊天区，点击可关闭面板</td><td class="el-action">点击遮罩 → 关闭礼物面板</td><td class="el-vip">—</td></tr>
+          <tr data-el="85"><td class="el-num">2</td><td class="el-name">分类 Tab</td><td class="el-type"><span class="el-type-sel">选择器</span></td><td class="el-desc">4 个分类：热门/浪漫/豪华/背包。背包为已购买未送出的礼物</td><td class="el-action">点击切换分类 → 礼物网格内容刷新</td><td class="el-vip">—</td></tr>
+          <tr data-el="86"><td class="el-num">3</td><td class="el-name">礼物卡片 ×8</td><td class="el-type"><span class="el-type-sel">选择器</span></td><td class="el-desc">8 款礼物（emoji+名称+价格），价格范围 66~5200💎。选中粉色边框高亮</td><td class="el-action">点击选中 → 底部"送出"按钮价格联动；可滚动查看</td><td class="el-vip">—</td></tr>
+          <tr data-el="87"><td class="el-num">4</td><td class="el-name">礼物 Emoji</td><td class="el-type"><span class="el-type-icon">图标</span></td><td class="el-desc">礼物视觉标识（emoji），38px 大号</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="88"><td class="el-num">5</td><td class="el-name">礼物价格</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">橙色 💎+数字，标注礼物单价</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="89"><td class="el-num">6</td><td class="el-name">余额+充值</td><td class="el-type"><span class="el-type-text">信息</span></td><td class="el-desc">显示当前钻石余额；"充值"可点击</td><td class="el-action">点击"充值"→ 打开充值页（不关闭礼物面板，在聊天页浮动充值）</td><td class="el-vip">—</td></tr>
+          <tr data-el="90"><td class="el-num">7</td><td class="el-name">数量选择器</td><td class="el-type"><span class="el-type-sel">选择器</span></td><td class="el-desc">4 个快捷数量：×1/×10/×99/×520，选中高亮</td><td class="el-action">点击切换数量 → 底部"送出"总价联动更新</td><td class="el-vip">—</td></tr>
+          <tr data-el="91"><td class="el-num">8</td><td class="el-name">送出按钮</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">粉紫渐变 CTA，显示总价 💎数字；触发赠送</td><td class="el-action">点击 → 校验余额 → 扣费 → 插入礼物消息到聊天 → 关闭面板 → Toast 确认；余额不足引导充值</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ⑨ 钱包总览  /wallet
+     ========================================================== -->
+<section class="screen-section" id="s9" data-keywords="钱包 余额 收益 提现 充值 银行卡 账单 流水 礼物收益 聊天收益 视频收益">
+  <div class="screen-header">
+    <span class="num-badge">9</span>
+    <h2>钱包（收益总览）</h2>
+    <span class="route">/wallet</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner" style="background:rgba(255,138,176,0.06)">
+          <div class="status-bar"><span>9:41</span><span class="icons">●●● 5G 100%</span></div>
+          <div class="nav-bar"><div class="back">‹</div><div class="title">我的钱包</div><div class="right">明细</div></div>
+          <div class="wallet-top">
+            <div class="lbl">可提现余额（元）</div>
+            <div class="amt">¥88.50</div>
+          </div>
+          <div class="wallet-quick">
+            <div class="qi"><div class="qic c1">💸</div><div class="ql">提现</div></div>
+            <div class="qi"><div class="qic c2">💎</div><div class="ql">充值</div></div>
+            <div class="qi"><div class="qic c3">🏦</div><div class="ql">银行卡</div></div>
+            <div class="qi"><div class="qic c4">📋</div><div class="ql">明细</div></div>
+          </div>
+          <div class="scroll-content" style="flex:1">
+            <div class="month-income">
+              <div class="mi-top"><span class="mt">本月收益</span><span class="am">¥286.00</span></div>
+              <div class="month-detail">
+                <div class="md"><div class="ln">礼物收益</div><div class="lv">¥180.00</div></div>
+                <div class="md"><div class="ln">聊天收益</div><div class="lv">¥76.00</div></div>
+                <div class="md"><div class="ln">视频收益</div><div class="lv">¥30.00</div></div>
+              </div>
+            </div>
+            <div class="bill-section">
+              <h3>最近账单</h3>
+              <div class="bill-item"><div class="bi" style="background:#e8fbef;color:#22c55e">🎁</div><div class="bn"><div class="t1">收到 阿哲 的礼物</div><div class="t2">10-31 14:23</div></div><div class="ba" style="color:#22c55e">+¥39.60</div></div>
+              <div class="bill-item"><div class="bi" style="background:#e8fbef;color:#22c55e">🎁</div><div class="bn"><div class="t1">收到 子墨 的礼物</div><div class="t2">10-30 22:10</div></div><div class="ba" style="color:#22c55e">+¥113.60</div></div>
+              <div class="bill-item"><div class="bi" style="background:rgba(255,138,176,0.12);color:#ff8ab0">💸</div><div class="bn"><div class="t1">提现到微信</div><div class="t2">10-28 10:15</div></div><div class="ba" style="color:#ff5c8a">-¥200.00</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="92"><td class="el-num">1</td><td class="el-name">可提现余额</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">粉色渐变背景区，大数字展示人民币可提现余额</td><td class="el-action">纯展示；金额为所有收入减去已提现后的净值</td><td class="el-vip">—</td></tr>
+          <tr data-el="93"><td class="el-num">2</td><td class="el-name">快捷操作·提现</td><td class="el-type"><span class="el-type-btn">图标</span></td><td class="el-desc">跳转提现页面</td><td class="el-action">点击 → 跳转 /withdraw；未实名跳转 /auth</td><td class="el-vip">—</td></tr>
+          <tr data-el="94"><td class="el-num">3</td><td class="el-name">快捷操作·充值</td><td class="el-type"><span class="el-type-btn">图标</span></td><td class="el-desc">跳转钻石充值页面</td><td class="el-action">点击 → 跳转 /recharge</td><td class="el-vip">—</td></tr>
+          <tr data-el="95"><td class="el-num">4</td><td class="el-name">快捷操作·银行卡</td><td class="el-type"><span class="el-type-btn">图标</span></td><td class="el-desc">管理提现银行卡</td><td class="el-action">点击 → 跳转银行卡管理页（绑定/解绑）</td><td class="el-vip">—</td></tr>
+          <tr data-el="96"><td class="el-num">5</td><td class="el-name">快捷操作·明细</td><td class="el-type"><span class="el-type-btn">图标</span></td><td class="el-desc">查看全部交易明细</td><td class="el-action">点击 → 跳转完整流水页</td><td class="el-vip">—</td></tr>
+          <tr data-el="97"><td class="el-num">6</td><td class="el-name">本月收益卡片</td><td class="el-type"><span class="el-type-text">卡片</span></td><td class="el-desc">白色卡片：本月总收入粉色数字，拆解为礼物/聊天/视频三项</td><td class="el-action">纯展示；按自然月统计</td><td class="el-vip">—</td></tr>
+          <tr data-el="98"><td class="el-num">7</td><td class="el-name">账单流水列表</td><td class="el-type"><span class="el-type-text">列表</span></td><td class="el-desc">最近交易记录：收入绿色图标+金额，支出红色图标+金额，分类（礼物/提现/视频/聊天）</td><td class="el-action">点击单条 → 查看交易详情；下滑加载更多</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ⑩ 提现  /withdraw
+     ========================================================== -->
+<section class="screen-section" id="s10" data-keywords="提现 人民币 手续费 微信钱包 支付宝 银行卡 限额 实名 到账">
+  <div class="screen-header">
+    <span class="num-badge">10</span>
+    <h2>提现（人民币）</h2>
+    <span class="route">/withdraw</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner" style="background:rgba(255,138,176,0.06)">
+          <div class="status-bar"><span>9:41</span><span class="icons">●●● 5G 100%</span></div>
+          <div class="nav-bar"><div class="back">‹</div><div class="title">提现</div><div class="right">规则</div></div>
+          <div class="scroll-content" style="flex:1">
+            <div class="withdraw-top">
+              <div class="lbl">可提现余额（元）</div>
+              <div class="amt">¥88.50</div>
+              <div class="all">全部提现</div>
+            </div>
+            <div class="withdraw-form">
+              <div class="withdraw-amt-input"><span class="u">¥</span><span class="inp">0.00</span></div>
+              <div class="withdraw-quick">
+                <div class="qa on">¥10</div>
+                <div class="qa">¥50</div>
+                <div class="qa">¥100</div>
+                <div class="qa">¥200</div>
+              </div>
+              <div class="withdraw-info">
+                <div class="row"><span>手续费（0.6%）</span><span class="v">-¥0.60</span></div>
+                <div class="row"><span>实际到账</span><span class="v" style="color:#ff8ab0">¥9.40</span></div>
+                <div style="margin-top:6px;color:#ff9a3c">⚠️ 单笔最低 ¥10 · 单日限 3 次 · 总额 ¥5000</div>
+              </div>
+            </div>
+            <div class="withdraw-method">
+              <h4>到账方式</h4>
+              <div class="pay-method on" style="color:#2d2d3a"><div class="pi pm-wx">💚</div><div class="pn" style="font-size:13px">微信零钱</div><div class="pr" style="border-color:#ccc;background:#ffd966;display:flex;align-items:center;justify-content:center;font-size:10px;color:#000">✓</div></div>
+              <div class="pay-method" style="color:#2d2d3a"><div class="pi pm-ap">💙</div><div class="pn" style="font-size:13px">支付宝</div><div class="pr" style="border-color:#ccc"></div></div>
+              <div class="pay-method" style="color:#2d2d3a"><div class="pi pm-al">🏦</div><div class="pn" style="font-size:13px">银行卡</div><div class="pr" style="border-color:#ccc"></div></div>
+            </div>
+            <div style="padding:0 12px;margin-bottom:12px"><button class="btn block" style="height:48px">确认提现</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="99"><td class="el-num">1</td><td class="el-name">可提现余额</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">大数字展示当前可提现人民币总额</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="100"><td class="el-num">2</td><td class="el-name">全部提现</td><td class="el-type"><span class="el-type-btn">文字按钮</span></td><td class="el-desc">粉色文字，点击一键填入全部余额</td><td class="el-action">点击 → 金额输入框填入全部可提现金额</td><td class="el-vip">—</td></tr>
+          <tr data-el="101"><td class="el-num">3</td><td class="el-name">金额输入框</td><td class="el-type"><span class="el-type-input">输入框</span></td><td class="el-desc">¥ 前缀 + 大数字输入区，仅允许数字和小数点</td><td class="el-action">输入金额 → 手续费和实际到账实时计算并显示</td><td class="el-vip">—</td></tr>
+          <tr data-el="102"><td class="el-num">4</td><td class="el-name">快捷金额</td><td class="el-type"><span class="el-type-sel">选择器</span></td><td class="el-desc">4 个快捷档位：¥10/50/100/200，选中粉色背景</td><td class="el-action">点击 → 输入框填入对应金额；高于余额的档位置灰</td><td class="el-vip">—</td></tr>
+          <tr data-el="103"><td class="el-num">5</td><td class="el-name">手续费展示</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">实时计算：手续费 = max(1, 金额 × 0.006)，显示扣除金额</td><td class="el-action">纯展示；随输入金额联动变化</td><td class="el-vip">—</td></tr>
+          <tr data-el="104"><td class="el-num">6</td><td class="el-name">实际到账</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">粉色文本：实际到账 = 金额 - 手续费</td><td class="el-action">纯展示；随输入金额联动</td><td class="el-vip">—</td></tr>
+          <tr data-el="105"><td class="el-num">7</td><td class="el-name">限额规则提示</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">橙色警告文字：单笔最低 ¥10、单日限 3 次、总额 ¥5000</td><td class="el-action">纯展示（风控合规）</td><td class="el-vip">—</td></tr>
+          <tr data-el="106"><td class="el-num">8</td><td class="el-name">到账方式选择</td><td class="el-type"><span class="el-type-sel">单选</span></td><td class="el-desc">3 种到账渠道：微信零钱/支付宝/银行卡。选中显示金色勾号</td><td class="el-action">点击切换选中</td><td class="el-vip">—</td></tr>
+          <tr data-el="107"><td class="el-num">9</td><td class="el-name">确认提现按钮</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">粉紫主 CTA；触发提现流程</td><td class="el-action">点击 → 校验：金额≥10 ✓、余额充足 ✓、已实名 ✓ → 扣款+记录流水+Toast "提现成功"；未实名 → 跳转 /auth；金额不足 → Toast 提示</td><td class="el-vip">—</td></tr>
+          <tr data-el="108"><td class="el-num">10</td><td class="el-name">规则入口</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">右上角"规则"，查看提现规则完整说明</td><td class="el-action">点击 → 弹出规则说明弹窗</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ⑪ 邀请主页  /invite
+     ========================================================== -->
+<section class="screen-section" id="s11" data-keywords="邀请 裂变 邀请码 分享 微信 朋友圈 QQ 海报 链接 奖励 钻石 返佣 特权 任务">
+  <div class="screen-header">
+    <span class="num-badge">11</span>
+    <h2>邀请主页</h2>
+    <span class="route">/invite</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner" style="background:linear-gradient(180deg,#080a18,#23264c);color:#fff">
+          <div class="status-bar dark"><span>9:41</span><span class="icons">●●● 5G 100%</span></div>
+          <div class="nav-bar" style="background:transparent"><div class="back" style="color:#fff">‹</div><div class="title" style="color:#fff">邀请好友</div><div class="right" style="color:#fff">排行榜</div></div>
+          <div class="invite-bg" style="flex:1">
+            <div class="invite-hero"><h1>邀好友赚 ¥3,888</h1><div class="sub">每邀请一位好友，双方都有奖励</div></div>
+            <div class="invite-stats">
+              <div class="is"><div class="n">12</div><div class="l">已邀请</div></div>
+              <div class="is"><div class="n">5</div><div class="l">已充值</div></div>
+              <div class="is"><div class="n">¥686</div><div class="l">累计收益</div></div>
+            </div>
+            <div class="invite-code-box"><div class="cl"><div class="l">我的邀请码</div><div class="c">YQ8888</div></div><div class="cb">复制</div></div>
+            <div class="share-row">
+              <div class="si"><div class="sic" style="background:#07c160">💚</div><div class="sn">微信</div></div>
+              <div class="si"><div class="sic" style="background:#ff8ab0">📱</div><div class="sn">朋友圈</div></div>
+              <div class="si"><div class="sic" style="background:#1677ff">🐧</div><div class="sn">QQ</div></div>
+              <div class="si"><div class="sic" style="background:#a8c4ff">🖼️</div><div class="sn">海报</div></div>
+              <div class="si"><div class="sic" style="background:#666">🔗</div><div class="sn">链接</div></div>
+            </div>
+            <div class="reward-card">
+              <h3>🎁 双向奖励</h3>
+              <div class="reward-row"><div class="rw"><div class="n">你获得</div><div class="v">388💎</div></div><div class="rw"><div class="n">TA 获得</div><div class="v">288💎+7天VIP</div></div></div>
+            </div>
+            <div class="invite-tasks">
+              <h3>📋 任务进阶</h3>
+              <div class="task-item"><div class="ti">1</div><div class="tn"><div class="t1">邀请 3 人注册</div><div class="t2">解锁专属礼物</div></div><div class="tb">+200💎</div></div>
+              <div class="task-item"><div class="ti">2</div><div class="tn"><div class="t1">邀请 10 人注册</div><div class="t2">解锁优先曝光</div></div><div class="tb">+500💎</div></div>
+              <div class="task-item"><div class="ti">3</div><div class="tn"><div class="t1">邀请 20 人注册</div><div class="t2">送月度 VIP</div></div><div class="tb">VIP 30天</div></div>
+              <div class="task-item"><div class="ti">4</div><div class="tn"><div class="t1">好友首充 30% 返佣</div><div class="t2">现金奖励上不封顶</div></div><div class="tb">现金</div></div>
+            </div>
+            <div class="privilege-bar">
+              <h3>🔓 特权解锁</h3>
+              <div class="privilege-progress"><div class="pp" style="width:16%"></div></div>
+              <div class="privilege-levels"><span>3人</span><span>10人</span><span>20人</span><span>50人</span><span>100人</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="109"><td class="el-num">1</td><td class="el-name">排行榜入口</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">右上角"排行榜"，查看邀请榜排名和奖池</td><td class="el-action">点击 → 跳转 /invite/rank</td><td class="el-vip">—</td></tr>
+          <tr data-el="110"><td class="el-num">2</td><td class="el-name">3 项数据统计</td><td class="el-type"><span class="el-type-text">数据</span></td><td class="el-desc">已邀请人数/已充值人数/累计收益，金色数字展示</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="111"><td class="el-num">3</td><td class="el-name">邀请码展示+复制</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">金色虚线边框区域：显示邀请码+复制按钮</td><td class="el-action">点击"复制"→ 邀请码复制到剪贴板 → Toast "已复制"</td><td class="el-vip">—</td></tr>
+          <tr data-el="112"><td class="el-num">4</td><td class="el-name">分享·微信</td><td class="el-type"><span class="el-type-btn">图标</span></td><td class="el-desc">5 大分享渠道之一，绿色微信图标</td><td class="el-action">点击 → 正式环境调用微信 JSSDK 分享；demo 环境 Toast "已复制链接，请分享给好友"</td><td class="el-vip">—</td></tr>
+          <tr data-el="113"><td class="el-num">5</td><td class="el-name">分享·朋友圈</td><td class="el-type"><span class="el-type-btn">图标</span></td><td class="el-desc">分享到微信朋友圈</td><td class="el-action">点击 → 同微信分享逻辑</td><td class="el-vip">—</td></tr>
+          <tr data-el="114"><td class="el-num">6</td><td class="el-name">分享·QQ</td><td class="el-type"><span class="el-type-btn">图标</span></td><td class="el-desc">分享到 QQ 好友/群</td><td class="el-action">点击 → 调起 QQ 分享 SDK</td><td class="el-vip">—</td></tr>
+          <tr data-el="115"><td class="el-num">7</td><td class="el-name">分享·海报</td><td class="el-type"><span class="el-type-btn">图标</span></td><td class="el-desc">生成专属邀请海报图片</td><td class="el-action">点击 → 弹出 ⑱ 邀请海报弹层（含二维码+邀请码）</td><td class="el-vip">—</td></tr>
+          <tr data-el="116"><td class="el-num">8</td><td class="el-name">分享·链接</td><td class="el-type"><span class="el-type-btn">图标</span></td><td class="el-desc">复制邀请链接</td><td class="el-action">点击 → 复制链接到剪贴板 → Toast</td><td class="el-vip">—</td></tr>
+          <tr data-el="117"><td class="el-num">9</td><td class="el-name">双向奖励卡片</td><td class="el-type"><span class="el-type-text">卡片</span></td><td class="el-desc">展示邀请双方的奖励明细：邀请人 388💎 / 被邀请人 288💎+7天VIP</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="118"><td class="el-num">10</td><td class="el-name">任务进阶列表</td><td class="el-type"><span class="el-type-text">列表</span></td><td class="el-desc">4 阶任务：3人/10人/20人 → 奖励递增，好友首充返佣 30%</td><td class="el-action">已完成任务显示绿色完成态；点击"领取"按钮领取奖励</td><td class="el-vip">—</td></tr>
+          <tr data-el="119"><td class="el-num">11</td><td class="el-name">特权解锁进度条</td><td class="el-type"><span class="el-type-text">进度条</span></td><td class="el-desc">金色渐变进度条，5 个等级节点：3/10/20/50/100 人</td><td class="el-action">纯展示；到达节点自动解锁对应特权</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ⑫ 邀请排行榜  /invite/rank
+     ========================================================== -->
+<section class="screen-section" id="s12" data-keywords="排行榜 奖池 现金 冠军 排名 周榜 月榜 总榜 倒计时">
+  <div class="screen-header">
+    <span class="num-badge">12</span>
+    <h2>邀请排行榜</h2>
+    <span class="route">/invite/rank</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner" style="background:linear-gradient(180deg,#080a18,#23264c);color:#fff">
+          <div class="status-bar dark"><span>9:41</span><span class="icons">●●● 5G 100%</span></div>
+          <div class="nav-bar" style="background:transparent"><div class="back" style="color:#fff">‹</div><div class="title" style="color:#fff">邀请排行榜</div><div class="right" style="color:#fff">规则</div></div>
+          <div class="scroll-content" style="flex:1">
+            <div class="rank-tabs"><div class="rt active">周榜</div><div class="rt">月榜</div><div class="rt">总榜</div></div>
+            <div class="rank-pool"><div class="pl">🏆 现金奖池</div><div class="pv">¥128 万</div><div class="pt">⏱ 距结算还有 3天 12:08:42</div></div>
+            <div class="podium">
+              <div class="p"><div class="rk">🥈</div><div class="av av-2">霸</div><div class="nm">霸道总裁</div><div class="pr">¥28,888</div></div>
+              <div class="p p1"><div class="rk">👑</div><div class="av av-1">女</div><div class="nm">女王陛下</div><div class="pr">¥58,888</div></div>
+              <div class="p"><div class="rk">🥉</div><div class="av av-3">糖</div><div class="nm">糖心</div><div class="pr">¥18,888</div></div>
+            </div>
+            <div class="rank-list">
+              <div class="rank-row-r"><div class="rn">4</div><div class="av av-4">阿</div><div class="nb"><div class="n">阿杰</div><div class="c">156人</div></div><div class="rw">¥8,888</div></div>
+              <div class="rank-row-r"><div class="rn">5</div><div class="av av-5">橙</div><div class="nb"><div class="n">橙子</div><div class="c">128人</div></div><div class="rw">¥5,888</div></div>
+            </div>
+            <div class="my-rank"><div class="mn">我的排名 <b>#28</b> · 已邀请 12 人 · 差 4 人进前 20</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="120"><td class="el-num">1</td><td class="el-name">榜单 Tab</td><td class="el-type"><span class="el-type-sel">选择器</span></td><td class="el-desc">3 个时间维度：周榜/月榜/总榜，切换不同结算周期</td><td class="el-action">点击切换 → 排行榜数据刷新</td><td class="el-vip">—</td></tr>
+          <tr data-el="121"><td class="el-num">2</td><td class="el-name">奖池卡片</td><td class="el-type"><span class="el-type-text">卡片</span></td><td class="el-desc">金色边框：总奖池金额 ¥128 万 + 结算倒计时</td><td class="el-action">纯展示；倒计时每秒更新</td><td class="el-vip">—</td></tr>
+          <tr data-el="122"><td class="el-num">3</td><td class="el-name">前三领奖台</td><td class="el-type"><span class="el-type-text">展示</span></td><td class="el-desc">冠亚季军三栏式展示：排名图标+头像+昵称+奖励金额</td><td class="el-action">点击查看该用户主页</td><td class="el-vip">—</td></tr>
+          <tr data-el="123"><td class="el-num">4</td><td class="el-name">4-10 名榜单</td><td class="el-type"><span class="el-type-text">列表</span></td><td class="el-desc">排名/头像/昵称/邀请数/奖励金额的列表</td><td class="el-action">点击某行 → 查看该用户主页</td><td class="el-vip">—</td></tr>
+          <tr data-el="124"><td class="el-num">5</td><td class="el-name">我的排名悬浮条</td><td class="el-type"><span class="el-type-text">信息条</span></td><td class="el-desc">底部吸底：我的当前排名#28 + 已邀请数 + 距上一名差距</td><td class="el-action">纯展示；实时更新排名数据</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ⑬ 我的战绩  /invite/stats
+     ========================================================== -->
+<section class="screen-section" id="s13" data-keywords="战绩 邀请数据 收益 已邀 已实名 已充值 钻石 返佣 特权奖金">
+  <div class="screen-header">
+    <span class="num-badge">13</span>
+    <h2>我的战绩</h2>
+    <span class="route">/invite/stats</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner" style="background:rgba(255,138,176,0.06)">
+          <div class="status-bar"><span>9:41</span><span class="icons">●●● 5G 100%</span></div>
+          <div class="nav-bar"><div class="back">‹</div><div class="title">我的战绩</div><div class="right"></div></div>
+          <div class="stats-top"><div class="lbl">累计收益</div><div class="amt">¥<span>686.50</span></div></div>
+          <div class="stats-grid">
+            <div class="gi"><div class="n">12</div><div class="l">已邀请</div></div>
+            <div class="gi"><div class="n">8</div><div class="l">已实名</div></div>
+            <div class="gi"><div class="n">5</div><div class="l">已充值</div></div>
+            <div class="gi"><div class="n">2,888</div><div class="l">钻石奖励</div></div>
+            <div class="gi"><div class="n">¥386</div><div class="l">返佣收益</div></div>
+            <div class="gi"><div class="n">¥300</div><div class="l">特权奖金</div></div>
+          </div>
+          <div class="scroll-content" style="flex:1">
+            <div class="stats-filter"><div class="sf on">全部</div><div class="sf">已注册</div><div class="sf">已实名</div><div class="sf">已充值</div></div>
+            <div class="invitee-list">
+              <div class="invitee-row">
+                <div class="av av-3">小</div><div class="iv"><div class="n">小白</div><div class="st"><span class="tag" style="background:#e8fbef;color:#22c55e">已充值</span><div class="pg"><div class="p" style="width:100%"></div></div></div></div>
+                <div class="ra"><div class="ar">+¥288</div><div class="at">今天 14:23</div></div>
+              </div>
+              <div class="invitee-row">
+                <div class="av av-5">阿</div><div class="iv"><div class="n">阿琪</div><div class="st"><span class="tag" style="background:#080a18;color:#a8c4ff">已实名</span><div class="pg"><div class="p" style="width:66%"></div></div></div></div>
+                <div class="ra"><div class="ar">+¥188</div><div class="at">昨天</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="125"><td class="el-num">1</td><td class="el-name">累计收益</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">紫色背景区：大金色数字展示累计收益总额</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="126"><td class="el-num">2</td><td class="el-name">6 宫格数据</td><td class="el-type"><span class="el-type-text">数据</span></td><td class="el-desc">已邀请/已实名/已充值/钻石奖励/返佣收益/特权奖金，6项关键指标</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="127"><td class="el-num">3</td><td class="el-name">状态筛选栏</td><td class="el-type"><span class="el-type-sel">选择器</span></td><td class="el-desc">4 个状态筛选：全部/已注册/已实名/已充值</td><td class="el-action">点击切换 → 被邀请人列表按状态过滤</td><td class="el-vip">—</td></tr>
+          <tr data-el="128"><td class="el-num">4</td><td class="el-name">被邀请人列表项</td><td class="el-type"><span class="el-type-text">列表</span></td><td class="el-desc">头像+昵称+状态标签（已注册/已实名/已充值）+进度条+奖励金额+时间</td><td class="el-action">纯展示；进度条：33%=注册, 66%=实名, 100%=充值</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ⑭ 新人邀请落地页  /landing
+     ========================================================== -->
+<section class="screen-section" id="s14" data-keywords="落地页 新人 注册 见面礼 倒计时 钻石 VIP 玫瑰 功能 卖点">
+  <div class="screen-header">
+    <span class="num-badge">14</span>
+    <h2>新人邀请落地页</h2>
+    <span class="route">/landing</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner" style="background:linear-gradient(180deg,#ff8ab0,#7a9eff);color:#fff">
+          <div class="status-bar dark"><span>9:41</span><span class="icons">●●● 5G 100%</span></div>
+          <div class="landing-bg" style="flex:1">
+            <div class="landing-hero">
+              <div class="landing-inviter"><div class="av av-1">我</div> 我 邀请你加入Starluck</div>
+              <h1>价值 ¥168 等你领</h1>
+              <div class="sub">新人专属见面礼，限时领取</div>
+            </div>
+            <div class="gift-package">
+              <h2>🎁 新人见面礼</h2>
+              <div class="gi-grid">
+                <div class="gi-cell"><div class="em">💎</div><div class="gn">288 钻石</div><div class="gv">价值 ¥28</div></div>
+                <div class="gi-cell"><div class="em">👑</div><div class="gn">7天VIP</div><div class="gv">价值 ¥30</div></div>
+                <div class="gi-cell"><div class="em">🌹</div><div class="gn">玫瑰×5</div><div class="gv">价值 ¥33</div></div>
+                <div class="gi-cell"><div class="em">💬</div><div class="gn">免费聊50条</div><div class="gv">价值 ¥50</div></div>
+                <div class="gi-cell"><div class="em">💕</div><div class="gn">心动卡×3</div><div class="gv">价值 ¥15</div></div>
+                <div class="gi-cell"><div class="em">🎫</div><div class="gn">优惠券</div><div class="gv">价值 ¥12</div></div>
+              </div>
+            </div>
+            <div class="countdown">⏱ 领取倒计时 23:58:42</div>
+            <div class="landing-cta-wrap"><button class="btn block gold" style="height:50px;font-size:16px">🎁 一键领取并注册</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="129"><td class="el-num">1</td><td class="el-name">邀请人头像行</td><td class="el-type"><span class="el-type-text">信息</span></td><td class="el-desc">半透明胶囊背景，展示邀请人头像+昵称，建立信任背书</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="130"><td class="el-num">2</td><td class="el-name">Hero 主标题</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">"价值 ¥168 等你领"，突出利益点吸引注册</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="131"><td class="el-num">3</td><td class="el-name">6 件见面礼</td><td class="el-type"><span class="el-type-text">卡片</span></td><td class="el-desc">白色卡片内 3列×2行：钻石/VIP/玫瑰/免费聊/心动卡/优惠券，每项标注价值</td><td class="el-action">纯展示；总价值 ≥¥150 以跨过用户决策门槛</td><td class="el-vip">—</td></tr>
+          <tr data-el="132"><td class="el-num">4</td><td class="el-name">24h 倒计时</td><td class="el-type"><span class="el-type-text">计时器</span></td><td class="el-desc">深色半透明背景，金色文字实时倒计时，制造紧迫感</td><td class="el-action">倒计时归零 → 礼包失效提示；每秒更新</td><td class="el-vip">—</td></tr>
+          <tr data-el="133"><td class="el-num">5</td><td class="el-name">一键领取按钮</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">金色大 CTA，引导用户注册。携带邀请码参数</td><td class="el-action">点击 → 跳转 /login 登录页（携带邀请码）→ 注册成功后自动发放见面礼</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ⑮ VIP 开通页  /vip
+     ========================================================== -->
+<section class="screen-section" id="s15" data-keywords="VIP 会员 订阅 月卡 季卡 年卡 特权 自动续费 谁看过我 高级筛选 优先曝光">
+  <div class="screen-header">
+    <span class="num-badge">15</span>
+    <h2>VIP 开通页</h2>
+    <span class="route">/vip</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner" style="background:linear-gradient(180deg,#080a18,#2a2d52);color:#fff">
+          <div class="status-bar dark"><span>9:41</span><span class="icons">●●● 5G 100%</span></div>
+          <div class="nav-bar" style="background:transparent"><div class="back" style="color:#fff">‹</div><div class="title" style="color:#fff">VIP 会员</div><div class="right"></div></div>
+          <div class="vip-bg" style="flex:1">
+            <div class="vip-header"><div class="crown">👑</div><h1>开通 VIP 会员</h1><div class="sub">解锁 8 大专属特权</div></div>
+            <div class="vip-status"><div class="vs-ic">⭐</div><div class="vs-i"><div class="t1">当前：普通用户</div><div class="t2">升级 VIP 享受更多权益</div></div></div>
+            <div class="vip-plans">
+              <div class="vip-plan"><div class="pn">月卡</div><div class="pp">¥30</div><div class="pd">30天</div></div>
+              <div class="vip-plan hot selected"><div class="pn">季卡</div><div class="pp">¥68</div><div class="po">¥135</div><div class="pd">限时5折 · 90天</div></div>
+              <div class="vip-plan"><div class="pn">年卡</div><div class="pp">¥198</div><div class="pd">365天</div></div>
+            </div>
+            <div class="vip-rights">
+              <h3>VIP 专属特权</h3>
+              <div class="vip-rights-grid">
+                <div class="vr"><div class="ic">👁️</div><div class="nm">谁看过我</div></div>
+                <div class="vr"><div class="ic">💝</div><div class="nm">喜欢我</div></div>
+                <div class="vr"><div class="ic">🔍</div><div class="nm">高级筛选</div></div>
+                <div class="vr"><div class="ic">⭐</div><div class="nm">优先曝光</div></div>
+                <div class="vr"><div class="ic">💬</div><div class="nm">100条/日</div></div>
+                <div class="vr"><div class="ic">📞</div><div class="nm">通话8折</div></div>
+                <div class="vr"><div class="ic">💎</div><div class="nm">每月300钻</div></div>
+                <div class="vr"><div class="ic">🎁</div><div class="nm">专属礼物</div></div>
+              </div>
+            </div>
+            <div class="vip-bottom"><button class="btn block gold" style="height:48px">¥68 立即开通季卡</button></div>
+            <div class="vip-agree">开通即同意《VIP服务协议》· 到期自动续费，可随时取消</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="134"><td class="el-num">1</td><td class="el-name">VIP 状态卡片</td><td class="el-type"><span class="el-type-text">信息</span></td><td class="el-desc">金色边框卡片：当前会员状态（普通/VIP/至尊）+权益说明</td><td class="el-action">纯展示；已开通显示到期时间和续费入口</td><td class="el-vip"><span class="vip-only">VIP专属</span></td></tr>
+          <tr data-el="135"><td class="el-num">2</td><td class="el-name">套餐选择 ×3</td><td class="el-type"><span class="el-type-sel">选择器</span></td><td class="el-desc">3 档套餐：月卡¥30/季卡¥68/年卡¥198。季卡标注"限时5折"角标。</td><td class="el-action">点击选中 → 底部按钮价格联动；季卡默认选中（锚定中间档）</td><td class="el-vip"><span class="vip-only">VIP专属</span></td></tr>
+          <tr data-el="136"><td class="el-num">3</td><td class="el-name">原价（划线价）</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">季卡原价 ¥135（划线），对比展示折扣力度</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="137"><td class="el-num">4</td><td class="el-name">8 大特权宫格</td><td class="el-type"><span class="el-type-text">展示</span></td><td class="el-desc">4列×2行：谁看过我/喜欢我/高级筛选/优先曝光/100条聊天/通话8折/每月300钻/专属礼物</td><td class="el-action">纯展示</td><td class="el-vip"><span class="vip-only">VIP专属</span></td></tr>
+          <tr data-el="138"><td class="el-num">5</td><td class="el-name">开通按钮</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">金色 CTA，显示选中套餐价格，触发购买</td><td class="el-action">点击 → 调起支付 → 开通成功 Toast + 更新 store.user.vip = true</td><td class="el-vip"><span class="vip-only">VIP专属</span></td></tr>
+          <tr data-el="139"><td class="el-num">6</td><td class="el-name">自动续费说明</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">底部灰色小字：同意协议+自动续费+可随时取消（合规披露）</td><td class="el-action">纯展示；点击"VIP服务协议"查看详情</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ⑯ 视频通话计费  /call/:id
+     ========================================================== -->
+<section class="screen-section" id="s16" data-keywords="视频通话 计费 实时 钻石 静音 翻转 挂断 余额 充值">
+  <div class="screen-header">
+    <span class="num-badge">16</span>
+    <h2>视频通话计费</h2>
+    <span class="route">/call/:id</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner">
+          <div class="call-page" style="background:linear-gradient(135deg,#ff8ab0,#7a9eff)">
+            <div class="call-bg av-1" style="font-size:120px;color:rgba(255,255,255,.2);position:absolute;inset:0;display:flex;align-items:center;justify-content:center">👩</div>
+            <div class="call-self" style="position:absolute;top:80px;right:12px">👨</div>
+            <div class="call-top">
+              <div class="ct-l"><div class="nm">小诗</div><div class="tm">⏱ 08:32 · 6💎/分</div></div>
+              <div class="ct-r" style="color:#ffd966">6💎/分</div>
+            </div>
+            <div class="call-bottom">
+              <div class="call-balance"><span class="bal">余额 <b>💎666</b> · 已消耗 💎52</span><span class="recharge">充值</span></div>
+              <div class="call-controls">
+                <div class="cb">🔇</div>
+                <div class="cb">🔄</div>
+                <div class="cb">🎁</div>
+                <div class="cb">💬</div>
+                <div class="cb hangup" style="font-size:24px">📞</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="140"><td class="el-num">1</td><td class="el-name">全屏对方画面</td><td class="el-type"><span class="el-type-icon">背景</span></td><td class="el-desc">全屏对方人像（正式环境为实时视频流），渐变背景+大 emoji 占位</td><td class="el-action">纯展示；正式环境接入 RTC SDK（声网/TRTC）</td><td class="el-vip">—</td></tr>
+          <tr data-el="141"><td class="el-num">2</td><td class="el-name">自己小窗</td><td class="el-type"><span class="el-type-icon">缩略图</span></td><td class="el-desc">右上角 80×108px 小窗，展示自己的实时画面</td><td class="el-action">可拖动位置；点击切换前后摄像头</td><td class="el-vip">—</td></tr>
+          <tr data-el="142"><td class="el-num">3</td><td class="el-name">通话信息区</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">左上角：对方昵称+通话时长+费率 6💎/分</td><td class="el-action">纯展示；时长每秒更新</td><td class="el-vip"><span class="vip-free">VIP 8折</span></td></tr>
+          <tr data-el="143"><td class="el-num">4</td><td class="el-name">费率标签</td><td class="el-type"><span class="el-type-text">标签</span></td><td class="el-desc">右上角：半透明背景金色文字 "6💎/分"，实时显示当前费率</td><td class="el-action">纯展示</td><td class="el-vip"><span class="vip-free">VIP: 5💎/分</span></td></tr>
+          <tr data-el="144"><td class="el-num">5</td><td class="el-name">余额信息条</td><td class="el-type"><span class="el-type-text">信息条</span></td><td class="el-desc">底部半透明条：余额+已消耗+充值入口。余额<60💎 强弹充值提醒</td><td class="el-action">点击"充值"→ 弹窗快速充值，不中断通话</td><td class="el-vip">—</td></tr>
+          <tr data-el="145"><td class="el-num">6</td><td class="el-name">控制·静音</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">底部控制栏第1个：麦克风静音开关</td><td class="el-action">点击 → 切换静音/取消静音；静音时按钮变红色</td><td class="el-vip">—</td></tr>
+          <tr data-el="146"><td class="el-num">7</td><td class="el-name">控制·翻转镜头</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">底部控制栏第2个：切换前后摄像头</td><td class="el-action">点击 → 切换摄像头</td><td class="el-vip">—</td></tr>
+          <tr data-el="147"><td class="el-num">8</td><td class="el-name">控制·送礼</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">底部控制栏第3个：通话中快速送礼</td><td class="el-action">点击 → 底部弹出简化版礼物面板</td><td class="el-vip">—</td></tr>
+          <tr data-el="148"><td class="el-num">9</td><td class="el-name">控制·聊天</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">底部控制栏第4个：展开文字聊天浮层</td><td class="el-action">点击 → 视频区域缩小，底部展开聊天输入区</td><td class="el-vip">—</td></tr>
+          <tr data-el="149"><td class="el-num">10</td><td class="el-name">控制·挂断</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">底部红色大按钮，结束通话</td><td class="el-action">点击 → 结束通话 → 返回聊天页；时长<10s 不扣费</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ⑰ 实名认证  /auth
+     ========================================================== -->
+<section class="screen-section" id="s17" data-keywords="实名认证 身份证 人脸识别 姓名 证件 上传 认证 安全">
+  <div class="screen-header">
+    <span class="num-badge">17</span>
+    <h2>实名认证</h2>
+    <span class="route">/auth</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner" style="background:rgba(255,138,176,0.06)">
+          <div class="status-bar"><span>9:41</span><span class="icons">●●● 5G 100%</span></div>
+          <div class="nav-bar"><div class="back">‹</div><div class="title">实名认证</div><div class="right"></div></div>
+          <div class="auth-steps">
+            <div class="auth-step active"><div class="sn">1</div><div class="sl">填写信息</div></div>
+            <div class="auth-step"><div class="sn">2</div><div class="sl">人脸识别</div></div>
+            <div class="auth-step"><div class="sn">3</div><div class="sl">完成</div></div>
+          </div>
+          <div class="scroll-content" style="flex:1">
+            <div class="auth-form">
+              <div class="field"><div class="l">真实姓名</div><div class="fv">请输入身份证姓名</div></div>
+              <div class="field"><div class="l">证件类型</div><div class="fv">居民身份证</div></div>
+              <div class="field"><div class="l">证件号码</div><div class="fv">请输入18位身份证号</div></div>
+              <div class="field"><div class="l">出生日期</div><div class="fv">请选择</div></div>
+            </div>
+            <div class="id-upload">
+              <div class="up"><div class="uic">📷</div>身份证正面</div>
+              <div class="up"><div class="uic">📷</div>身份证反面</div>
+            </div>
+            <div class="auth-tip">⚠️ 认证信息仅用于身份验证，平台严格保护您的隐私安全。认证后可获得 <b>+100💎</b> 奖励。</div>
+            <div style="padding:0 12px;margin-bottom:12px"><button class="btn block">提交认证</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="150"><td class="el-num">1</td><td class="el-name">3 步进度条</td><td class="el-type"><span class="el-type-text">进度条</span></td><td class="el-desc">填写信息 → 人脸识别 → 完成。当前步骤粉色高亮，已完成绿色</td><td class="el-action">纯展示；对应步骤数据校验通过后推进</td><td class="el-vip">—</td></tr>
+          <tr data-el="151"><td class="el-num">2</td><td class="el-name">姓名输入框</td><td class="el-type"><span class="el-type-input">输入框</span></td><td class="el-desc">输入身份证上的真实姓名</td><td class="el-action">输入中文姓名</td><td class="el-vip">—</td></tr>
+          <tr data-el="152"><td class="el-num">3</td><td class="el-name">证件类型</td><td class="el-type"><span class="el-type-sel">选择器</span></td><td class="el-desc">选择证件类型（默认身份证，支持护照/港澳通行证等）</td><td class="el-action">点击 → 下拉选择证件类型</td><td class="el-vip">—</td></tr>
+          <tr data-el="153"><td class="el-num">4</td><td class="el-name">证件号码输入框</td><td class="el-type"><span class="el-type-input">输入框</span></td><td class="el-desc">输入 18 位身份证号，自动校验格式</td><td class="el-action">输入 → 自动校验校验位；格式错误红色提示</td><td class="el-vip">—</td></tr>
+          <tr data-el="154"><td class="el-num">5</td><td class="el-name">身份证上传区 ×2</td><td class="el-type"><span class="el-type-btn">上传</span></td><td class="el-desc">左右两栏：正面+反面拍照上传。虚线边框+相机图标</td><td class="el-action">点击 → 调起相机/相册 → 上传 OCR 识别; 正式环境接入阿里云/腾讯云 OCR</td><td class="el-vip">—</td></tr>
+          <tr data-el="155"><td class="el-num">6</td><td class="el-name">人脸识别框（步骤2）</td><td class="el-type"><span class="el-type-icon">识别区</span></td><td class="el-desc">200×240px 粉色边框+扫描动效，引导用户面部对准</td><td class="el-action">自动启动摄像头 → 活体检测 → 比对身份证照片; 正式环境接入活体检测 SDK</td><td class="el-vip">—</td></tr>
+          <tr data-el="156"><td class="el-num">7</td><td class="el-name">认证须知提示</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">粉色背景安全提示：隐私保护说明 + 100💎 奖励说明</td><td class="el-action">纯展示（合规必需）</td><td class="el-vip">—</td></tr>
+          <tr data-el="157"><td class="el-num">8</td><td class="el-name">提交认证按钮</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">粉紫 CTA；提交实名信息</td><td class="el-action">点击 → 校验全部字段 → 提交后端审核 → 通过后 store.isAuthed = true + 奖励 100💎 → Toast</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ⑱ 邀请海报弹层
+     ========================================================== -->
+<section class="screen-section" id="s18" data-keywords="海报 分享 邀请 二维码 头像 保存 微信 朋友圈 QQ">
+  <div class="screen-header">
+    <span class="num-badge">18</span>
+    <h2>邀请海报弹层</h2>
+    <span class="route">弹层（邀请主页触发）</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner" style="background:linear-gradient(180deg,#080a18,#23264c);position:relative">
+          <div class="invite-hero" style="opacity:.3"><h1>邀好友赚 ¥3,888</h1></div>
+          <div class="poster-modal" style="position:absolute;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px">
+            <div class="poster-close" style="position:absolute;top:40px;right:20px;z-index:101">✕</div>
+            <div class="poster-card">
+              <div class="pti">📢 Starluck · 邀请卡</div>
+              <div class="av av-1" style="margin:12px auto">我</div>
+              <div class="nm">我 邀请你加入</div>
+              <div class="sl">每颗星，都在等另一颗<br/>快来领取新人礼包</div>
+              <div class="pkg"><div class="pgt">🎁 新人专属</div><div class="pg">💎👑🌹💬💕🎫</div></div>
+              <div class="qr">📱</div>
+              <div class="cd">邀请码 <b>YQ8888</b></div>
+            </div>
+            <div class="poster-share">
+              <div class="ps"><div class="psc" style="background:#07c160">💚</div>微信</div>
+              <div class="ps"><div class="psc" style="background:#ff8ab0">📱</div>朋友圈</div>
+              <div class="ps"><div class="psc" style="background:#1677ff">🐧</div>QQ</div>
+              <div class="ps"><div class="psc" style="background:#666">🔗</div>链接</div>
+              <div class="ps"><div class="psc" style="background:#5eead4">💾</div>保存</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="158"><td class="el-num">1</td><td class="el-name">黑色遮罩</td><td class="el-type"><span class="el-type-btn">遮罩</span></td><td class="el-desc">85% 不透明度黑色遮罩覆盖整个页面</td><td class="el-action">点击遮罩 → 关闭海报弹层</td><td class="el-vip">—</td></tr>
+          <tr data-el="159"><td class="el-num">2</td><td class="el-name">关闭按钮 ✕</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">右上角圆形半透明关闭按钮</td><td class="el-action">点击 → 关闭海报弹层</td><td class="el-vip">—</td></tr>
+          <tr data-el="160"><td class="el-num">3</td><td class="el-name">海报卡片</td><td class="el-type"><span class="el-type-text">展示</span></td><td class="el-desc">280px 宽粉紫渐变卡片：邀请人头像+标语+礼包展示+二维码+邀请码</td><td class="el-action">纯展示；长按可保存为图片</td><td class="el-vip">—</td></tr>
+          <tr data-el="161"><td class="el-num">4</td><td class="el-name">二维码区域</td><td class="el-type"><span class="el-type-icon">二维码</span></td><td class="el-desc">90×90px 白色背景，含用户专属邀请二维码（正式环境动态生成）</td><td class="el-action">纯展示；被邀请人扫码跳转落地页</td><td class="el-vip">—</td></tr>
+          <tr data-el="162"><td class="el-num">5</td><td class="el-name">5 大分享渠道</td><td class="el-type"><span class="el-type-btn">图标</span></td><td class="el-desc">微信/朋友圈/QQ/链接/保存图片。与邀请主页分享入口功能一致</td><td class="el-action">点击对应渠道 → 执行对应分享行为；"保存"→ 保存海报图片到相册</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ⑲ 动态广场 Feed  /feed
+     ========================================================== -->
+<section class="screen-section" id="s19" data-keywords="动态 Feed 广场 关注 推荐 附近 话题 点赞 评论 送礼 分享">
+  <div class="screen-header">
+    <span class="num-badge">19</span>
+    <h2>动态广场 Feed</h2>
+    <span class="route">/feed</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner">
+          <div class="status-bar"><span>9:41</span><span class="icons">●●● 5G 100%</span></div>
+          <div class="page-top"><h1>动态</h1></div>
+          <div class="feed-tabs"><div class="ft active">关注</div><div class="ft">推荐</div><div class="ft">附近</div><div class="ft">话题</div></div>
+          <div class="topic-row"><div class="tp">#周末分享</div><div class="tp">#汉服</div><div class="tp">#美食</div><div class="tp">#旅行</div><div class="tp">#宠物</div></div>
+          <div class="scroll-content" style="flex:1">
+            <div class="feed-card">
+              <div class="fc-top">
+                <div class="av av-1">小</div>
+                <div class="fcb"><div class="n">小诗 <span class="tag vip" style="font-size:9px">VIP</span></div><div class="m">10分钟前</div></div>
+                <div class="fb">+ 关注</div>
+              </div>
+              <div class="fc-text">周末逛了一家很有调性的咖啡店，分享给大家～</div>
+              <div class="fc-tags"><span class="tag">#周末分享</span><span class="tag">#咖啡探店</span></div>
+              <div class="fc-tools">
+                <div class="ft">❤️ 128</div>
+                <div class="ft">💬 23</div>
+                <div class="ft">🎁 送礼</div>
+                <div class="ft">↗️ 分享</div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-bar">
+            <div class="ti"><span class="ico">👥</span>发现</div>
+            <div class="ti active"><span class="ico">📷</span>动态</div>
+            <div class="ti"><span class="ico">💬</span>消息</div>
+            <div class="ti"><span class="ico">👤</span>我的</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="163"><td class="el-num">1</td><td class="el-name">Feed Tab 栏</td><td class="el-type"><span class="el-type-sel">选择器</span></td><td class="el-desc">4 个 Tab：关注/推荐/附近/话题，切换动态内容源</td><td class="el-action">点击切换 → Feed 列表刷新</td><td class="el-vip">—</td></tr>
+          <tr data-el="164"><td class="el-num">2</td><td class="el-name">热门话题胶囊</td><td class="el-type"><span class="el-type-btn">标签</span></td><td class="el-desc">横向滚动的话题标签，粉紫渐变背景，点击查看该话题下全部动态</td><td class="el-action">点击 → 筛选该话题下的动态 Feed</td><td class="el-vip">—</td></tr>
+          <tr data-el="165"><td class="el-num">3</td><td class="el-name">动态卡片·头像昵称</td><td class="el-type"><span class="el-type-btn">信息</span></td><td class="el-desc">发布者头像+昵称+VIP标+时间，点击跳转个人主页</td><td class="el-action">点击头像/昵称 → 跳转 /user/:id</td><td class="el-vip">—</td></tr>
+          <tr data-el="166"><td class="el-num">4</td><td class="el-name">关注按钮</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">粉色边框"关注"按钮，快速关注动态发布者</td><td class="el-action">点击 → 关注/取消关注该用户；已关注显示"已关注"</td><td class="el-vip">—</td></tr>
+          <tr data-el="167"><td class="el-num">5</td><td class="el-name">动态正文</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">动态文字内容，多行展示，超长截断</td><td class="el-action">点击展开全文</td><td class="el-vip">—</td></tr>
+          <tr data-el="168"><td class="el-num">6</td><td class="el-name">话题标签</td><td class="el-type"><span class="el-type-btn">标签</span></td><td class="el-desc">动态关联的话题标签</td><td class="el-action">点击 → 跳转该话题聚合页</td><td class="el-vip">—</td></tr>
+          <tr data-el="169"><td class="el-num">7</td><td class="el-name">工具栏·点赞</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">点赞动态，❤️+数量</td><td class="el-action">点击 → 切换点赞/取消；数字+1/-1</td><td class="el-vip">—</td></tr>
+          <tr data-el="170"><td class="el-num">8</td><td class="el-name">工具栏·评论</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">查看/发表评论</td><td class="el-action">点击 → 展开评论区</td><td class="el-vip">—</td></tr>
+          <tr data-el="171"><td class="el-num">9</td><td class="el-name">工具栏·送礼</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">给动态发布者送礼（Feed 内即时变现入口）</td><td class="el-action">点击 → 底部弹出礼物面板 → 选择礼物 → 扣费发送</td><td class="el-vip">—</td></tr>
+          <tr data-el="172"><td class="el-num">10</td><td class="el-name">工具栏·分享</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">分享动态到微信/朋友圈/QQ</td><td class="el-action">点击 → 弹出分享渠道选择</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ⑳ 新人资料填写  /onboard
+     ========================================================== -->
+<section class="screen-section" id="s20" data-keywords="新人 资料 引导 头像 性别 昵称 城市 身高 职业 兴趣 标签 完成">
+  <div class="screen-header">
+    <span class="num-badge">20</span>
+    <h2>新人资料填写</h2>
+    <span class="route">/onboard</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner" style="background:linear-gradient(180deg,#23264c,#080a18)">
+          <div class="status-bar"><span>9:41</span><span class="icons">●●● 5G 100%</span></div>
+          <div class="nav-bar"><div class="back">‹</div><div class="title">完善资料</div><div class="right"></div></div>
+          <div class="onboard-progress"><div class="pb"><div class="pp" style="width:60%"></div></div><div class="pt">3/5</div></div>
+          <div class="scroll-content" style="flex:1">
+            <div class="onboard-form">
+              <h2>兴趣爱好</h2>
+              <div class="sub">选 3-8 个，匹配兴趣相投的TA</div>
+              <div class="interest-pick">
+                <div class="ic on">旅行</div><div class="ic on">咖啡</div><div class="ic on">摄影</div><div class="ic">美食</div>
+                <div class="ic">音乐</div><div class="ic on">电影</div><div class="ic">健身</div><div class="ic">读书</div>
+                <div class="ic">宠物</div><div class="ic on">游戏</div><div class="ic">汉服</div><div class="ic">瑜伽</div>
+              </div>
+            </div>
+          </div>
+          <div class="onboard-actions"><div class="skip">跳过</div><button class="btn block">完成 +88💎</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="173"><td class="el-num">1</td><td class="el-name">5 步进度条</td><td class="el-type"><span class="el-type-text">进度条</span></td><td class="el-desc">粉紫渐变进度条 + 右侧文字 x/5，指示当前步骤</td><td class="el-action">纯展示；5个步骤：头像→性别→基本信息→更多信息→兴趣标签</td><td class="el-vip">—</td></tr>
+          <tr data-el="174"><td class="el-num">2</td><td class="el-name">头像上传区（步骤1）</td><td class="el-type"><span class="el-type-btn">上传</span></td><td class="el-desc">100px 圆形区域，粉色虚线边框。提示"点击切换示例"（demo），正式环境为真实上传</td><td class="el-action">点击 → demo 循环切换 av-1~av-8 示例头像；正式: 调起相册/相机上传</td><td class="el-vip">—</td></tr>
+          <tr data-el="175"><td class="el-num">3</td><td class="el-name">性别选择（步骤2）</td><td class="el-type"><span class="el-type-sel">选择器</span></td><td class="el-desc">2 个大卡片：男生 👦 / 女生 👧。选中粉色边框高亮</td><td class="el-action">点击选中 → 决定后续推荐池和匹配策略</td><td class="el-vip">—</td></tr>
+          <tr data-el="176"><td class="el-num">4</td><td class="el-name">基本信息表单（步骤3-4）</td><td class="el-type"><span class="el-type-input">表单</span></td><td class="el-desc">昵称/生日/城市/身高/职业，白色圆角输入框</td><td class="el-action">逐个输入；"城市"可接入定位自动填充</td><td class="el-vip">—</td></tr>
+          <tr data-el="177"><td class="el-num">5</td><td class="el-name">兴趣标签（步骤5）</td><td class="el-type"><span class="el-type-sel">多选</span></td><td class="el-desc">12 个兴趣标签胶囊，最少选 3 个，最多选 8 个。选中粉色边框+背景</td><td class="el-action">点击切换选中/取消；<3 个时点击"完成"提示"至少选3个"</td><td class="el-vip">—</td></tr>
+          <tr data-el="178"><td class="el-num">6</td><td class="el-name">跳过按钮</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">灰色文字"跳过"，快速完成引导进入 App</td><td class="el-action">点击 → 使用默认资料完成 → 跳转 /discover；不奖励钻石</td><td class="el-vip">—</td></tr>
+          <tr data-el="179"><td class="el-num">7</td><td class="el-name">下一步/完成按钮</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">粉紫 CTA，前 4 步显示"下一步"，第 5 步显示"完成 +88💎"</td><td class="el-action">点击 → 前4步: 校验→推进; 第5步: 校验≥3个兴趣→保存→store.onboarded=true→奖励88💎→跳转/discover</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ㉑ 首充礼包弹窗
+     ========================================================== -->
+<section class="screen-section" id="s21" data-keywords="首充 礼包 弹窗 倒计时 套餐 钻石 翻倍 VIP 玫瑰 心动卡 优先曝光">
+  <div class="screen-header">
+    <span class="num-badge">21</span>
+    <h2>首充礼包弹窗</h2>
+    <span class="route">弹层（登录后 2.5s 自动触发）</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner" style="background:linear-gradient(180deg,#23264c,#080a18);position:relative">
+          <div class="page-top"><h1>发现</h1></div>
+          <div class="discover-tabs"><div class="tab active">推荐</div><div class="tab">附近</div></div>
+          <div class="fr-overlay" style="position:absolute;inset:0;z-index:100;display:flex;align-items:center;justify-content:center">
+            <div class="fr-card" style="position:relative">
+              <div class="fr-close">✕</div>
+              <div class="deco">🎉</div>
+              <h2>新人专享首充礼包</h2>
+              <div class="sub">限时 24 小时 · 仅此一次</div>
+              <div class="ct">⏱ 23:58:42 后失效</div>
+              <div class="fr-pkgs">
+                <div class="fr-pkg"><div class="di">💎 300</div><div class="ex">首充翻倍 → 600</div><div class="pr">¥30</div></div>
+                <div class="fr-pkg"><div class="di">💎 680</div><div class="ex">首充翻倍 → 1360</div><div class="pr">¥68</div></div>
+              </div>
+              <div class="fr-bonus"><div class="bt">🎁 加赠豪华礼包</div>7天VIP + 玫瑰×5 + 心动卡×3 + 优先曝光 24h</div>
+              <button class="btn block gold" style="width:100%;margin-top:10px">¥68 一键充值</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="180"><td class="el-num">1</td><td class="el-name">半透明遮罩</td><td class="el-type"><span class="el-type-btn">遮罩</span></td><td class="el-desc">70% 不透明度黑色遮罩覆盖整个页面</td><td class="el-action">点击遮罩 → 关闭弹窗；关闭后不再触发</td><td class="el-vip">—</td></tr>
+          <tr data-el="181"><td class="el-num">2</td><td class="el-name">关闭按钮 ✕</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">右上角圆形半透明关闭按钮</td><td class="el-action">点击 → 关闭弹窗 → store.firstRechargeShown = true → 不再弹出</td><td class="el-vip">—</td></tr>
+          <tr data-el="182"><td class="el-num">3</td><td class="el-name">倒计时器</td><td class="el-type"><span class="el-type-text">计时器</span></td><td class="el-desc">深色圆角胶囊：24 小时倒计时，制造紧迫感</td><td class="el-action">实时倒计时；归零后弹窗自动消失且不可再触发</td><td class="el-vip">—</td></tr>
+          <tr data-el="183"><td class="el-num">4</td><td class="el-name">两档套餐</td><td class="el-type"><span class="el-type-sel">选择器</span></td><td class="el-desc">¥30 = 600💎 / ¥68 = 1360💎，两侧对比展示。首充翻倍已计入。</td><td class="el-action">点击选中套餐 → 底部按钮价格联动</td><td class="el-vip">—</td></tr>
+          <tr data-el="184"><td class="el-num">5</td><td class="el-name">首充翻倍标注</td><td class="el-type"><span class="el-type-text">文本</span></td><td class="el-desc">绿色文字显示翻倍后的总数（如 300→600）</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="185"><td class="el-num">6</td><td class="el-name">加赠礼包区</td><td class="el-type"><span class="el-type-text">展示</span></td><td class="el-desc">深色半透明圆角区：VIP+玫瑰+心动卡+优先曝光，增强价值感</td><td class="el-action">纯展示</td><td class="el-vip">—</td></tr>
+          <tr data-el="186"><td class="el-num">7</td><td class="el-name">一键充值按钮</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">金色 CTA，显示选中套餐价格</td><td class="el-action">点击 → 调起支付 → 充值成功后关闭弹窗 → 发放礼包 → store.firstRechargeShown = true</td><td class="el-vip">—</td></tr>
+          <tr data-el="187"><td class="el-num">8</td><td class="el-name">触发时机说明</td><td class="el-type"><span class="el-type-text">—</span></td><td class="el-desc">登录后 2.5s 自动弹出；用户首次发起付费动作时也触发；仅显示一次</td><td class="el-action">store.firstRechargeShown 标记已展示，刷新/重新登录后不再弹出</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     ㉒ 设置 & 安全中心  /settings
+     ========================================================== -->
+<section class="screen-section" id="s22" data-keywords="设置 安全 账号 手机号 密码 隐私 隐身 黑名单 通知 客服 举报 注销 退出登录">
+  <div class="screen-header">
+    <span class="num-badge">22</span>
+    <h2>设置 & 安全中心</h2>
+    <span class="route">/settings</span>
+  </div>
+  <div class="screen-panel">
+    <div class="panel-left">
+      <div class="phone-shell">
+        <div class="screen-inner" style="background:rgba(255,138,176,0.06)">
+          <div class="status-bar"><span>9:41</span><span class="icons">●●● 5G 100%</span></div>
+          <div class="nav-bar"><div class="back">‹</div><div class="title">设置</div><div class="right"></div></div>
+          <div class="scroll-content" style="flex:1">
+            <div class="settings-group">
+              <h4>账号安全</h4>
+              <div class="settings-item"><div class="lbl">手机号</div><div class="val">138****8888</div><div class="arr">›</div></div>
+              <div class="settings-item"><div class="lbl">实名认证</div><div class="val" style="color:#5eead4">已认证</div><div class="arr">›</div></div>
+              <div class="settings-item"><div class="lbl">修改密码</div><div class="arr">›</div></div>
+              <div class="settings-item"><div class="lbl">设备管理</div><div class="val">iPhone 15 Pro</div><div class="arr">›</div></div>
+            </div>
+            <div class="settings-group">
+              <h4>隐私设置</h4>
+              <div class="settings-item"><div class="lbl">隐身访问</div><div class="sw"></div></div>
+              <div class="settings-item"><div class="lbl">隐藏位置</div><div class="sw"></div></div>
+              <div class="settings-item"><div class="lbl">仅VIP可联系我</div><div class="sw on"></div></div>
+              <div class="settings-item"><div class="lbl">黑名单</div><div class="val">3人</div><div class="arr">›</div></div>
+            </div>
+            <div class="settings-group">
+              <h4>消息通知</h4>
+              <div class="settings-item"><div class="lbl">声音提醒</div><div class="sw on"></div></div>
+              <div class="settings-item"><div class="lbl">振动提醒</div><div class="sw on"></div></div>
+            </div>
+            <div class="settings-group">
+              <h4>服务与帮助</h4>
+              <div class="settings-item"><div class="lbl">联系客服</div><div class="arr">›</div></div>
+              <div class="settings-item"><div class="lbl">投诉举报</div><div class="arr">›</div></div>
+              <div class="settings-item"><div class="lbl">意见反馈</div><div class="arr">›</div></div>
+              <div class="settings-item"><div class="lbl">用户协议</div><div class="arr">›</div></div>
+              <div class="settings-item"><div class="lbl">隐私政策</div><div class="arr">›</div></div>
+              <div class="settings-item"><div class="lbl">关于Starluck</div><div class="val">v1.0</div><div class="arr">›</div></div>
+            </div>
+            <div class="logout-btn">退出登录</div>
+            <div class="delete-acc">注销账号</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-right">
+      <table class="annot-table">
+        <thead><tr><th>#</th><th>元素</th><th>类型</th><th>功能说明</th><th>交互行为</th><th>VIP</th></tr></thead>
+        <tbody>
+          <tr data-el="188"><td class="el-num">1</td><td class="el-name">手机号</td><td class="el-type"><span class="el-type-btn">菜单项</span></td><td class="el-desc">显示绑定手机号（脱敏），右侧脱敏展示</td><td class="el-action">点击 → 修改绑定手机号</td><td class="el-vip">—</td></tr>
+          <tr data-el="189"><td class="el-num">2</td><td class="el-name">实名认证</td><td class="el-type"><span class="el-type-btn">菜单项</span></td><td class="el-desc">显示认证状态，已认证绿色"已认证"</td><td class="el-action">点击 → 查看认证信息或重新认证</td><td class="el-vip">—</td></tr>
+          <tr data-el="190"><td class="el-num">3</td><td class="el-name">修改密码</td><td class="el-type"><span class="el-type-btn">菜单项</span></td><td class="el-desc">修改登录密码（若设置了密码登录）</td><td class="el-action">点击 → 跳转修改密码页</td><td class="el-vip">—</td></tr>
+          <tr data-el="191"><td class="el-num">4</td><td class="el-name">设备管理</td><td class="el-type"><span class="el-type-btn">菜单项</span></td><td class="el-desc">显示当前设备，管理已登录设备</td><td class="el-action">点击 → 查看/踢出其他设备登录</td><td class="el-vip">—</td></tr>
+          <tr data-el="192"><td class="el-num">5</td><td class="el-name">隐身访问开关</td><td class="el-type"><span class="el-type-sw">开关</span></td><td class="el-desc">开启后访问他人主页不留痕迹</td><td class="el-action">点击切换 → store.settings.invisible 切换</td><td class="el-vip"><span class="vip-only">至尊VIP专属</span></td></tr>
+          <tr data-el="193"><td class="el-num">6</td><td class="el-name">隐藏位置开关</td><td class="el-type"><span class="el-type-sw">开关</span></td><td class="el-desc">开启后附近的人列表不显示自己</td><td class="el-action">点击切换 → store.settings.hideLoc 切换</td><td class="el-vip">—</td></tr>
+          <tr data-el="194"><td class="el-num">7</td><td class="el-name">仅VIP可联系我</td><td class="el-type"><span class="el-type-sw">开关</span></td><td class="el-desc">开启后仅 VIP 用户可发起聊天，减少骚扰</td><td class="el-action">点击切换 → store.settings.vipOnly 切换</td><td class="el-vip">—</td></tr>
+          <tr data-el="195"><td class="el-num">8</td><td class="el-name">黑名单</td><td class="el-type"><span class="el-type-btn">菜单项</span></td><td class="el-desc">管理黑名单用户列表，右侧显示人数</td><td class="el-action">点击 → 查看/移除黑名单用户</td><td class="el-vip">—</td></tr>
+          <tr data-el="196"><td class="el-num">9</td><td class="el-name">声音/振动提醒开关</td><td class="el-type"><span class="el-type-sw">开关</span></td><td class="el-desc">消息通知的声音和振动提醒开关</td><td class="el-action">点击切换 on/off</td><td class="el-vip">—</td></tr>
+          <tr data-el="197"><td class="el-num">10</td><td class="el-name">联系客服</td><td class="el-type"><span class="el-type-btn">菜单项</span></td><td class="el-desc">7×24 在线客服入口</td><td class="el-action">点击 → 打开客服对话框</td><td class="el-vip">—</td></tr>
+          <tr data-el="198"><td class="el-num">11</td><td class="el-name">投诉举报</td><td class="el-type"><span class="el-type-btn">菜单项</span></td><td class="el-desc">举报违规用户或内容</td><td class="el-action">点击 → 跳转举报表单页</td><td class="el-vip">—</td></tr>
+          <tr data-el="199"><td class="el-num">12</td><td class="el-name">用户协议/隐私政策</td><td class="el-type"><span class="el-type-btn">菜单项</span></td><td class="el-desc">查看《用户协议》和《隐私政策》全文（合规必需）</td><td class="el-action">点击 → 展示协议全文</td><td class="el-vip">—</td></tr>
+          <tr data-el="200"><td class="el-num">13</td><td class="el-name">退出登录</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">红色文字居中按钮</td><td class="el-action">点击 → 二次确认 → 清除登录态 → localStorage → 跳转 /login</td><td class="el-vip">—</td></tr>
+          <tr data-el="201"><td class="el-num">14</td><td class="el-name">注销账号</td><td class="el-type"><span class="el-type-btn">按钮</span></td><td class="el-desc">灰色小字居中（合规必需），永久注销账号</td><td class="el-action">点击 → 二次确认 → 注销流程（冷静期+数据删除）→ 清除所有数据</td><td class="el-vip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+/* ========== 搜索过滤 ========== */
+const searchInput = document.getElementById('searchInput')
+const resultCount = document.getElementById('resultCount')
+const btnAll = document.getElementById('btnAll')
+const btnSearch = document.getElementById('btnSearch')
+const sections = document.querySelectorAll('.screen-section')
+const navItems = document.querySelectorAll('.nav-item')
+
+let searchMode = false
+
+function doSearch(){
+  const q = searchInput.value.trim().toLowerCase()
+  let visibleCount = 0
+  sections.forEach(s=>{
+    const kw = (s.dataset.keywords || '').toLowerCase()
+    const text = s.textContent.toLowerCase()
+    const match = !q || kw.includes(q) || text.includes(q)
+    s.classList.toggle('hidden', !match)
+    if(match) visibleCount++
+  })
+  resultCount.textContent = q ? `匹配 ${visibleCount} 屏` : '共 22 屏 · 340+ 元素'
+  btnAll.classList.toggle('active', !q)
+  btnSearch.style.display = q ? '' : 'none'
+  btnSearch.classList.toggle('active', !!q)
+  searchMode = !!q
+  if(!q) highlightClear()
+}
+
+function showAll(){
+  searchInput.value = ''
+  sections.forEach(s=>s.classList.remove('hidden'))
+  resultCount.textContent = '共 22 屏 · 340+ 元素'
+  btnAll.classList.add('active')
+  btnSearch.style.display = 'none'
+  searchMode = false
+  highlightClear()
+}
+
+/* ========== 深色模式 ========== */
+function toggleDark(){
+  document.body.classList.toggle('dark')
+  const btn = document.querySelector('.toolbar .btn-sm:last-child')
+  const isDark = document.body.classList.contains('dark')
+  btn.textContent = isDark ? '☀️ 浅色模式' : '🌙 深色模式'
+}
+
+/* ========== 侧边栏活跃追踪 ========== */
+function updateActiveNav(){
+  let closestId = null
+  let minDist = Infinity
+  navItems.forEach(item=>{
+    const href = item.getAttribute('href')
+    if(!href || !href.startsWith('#s')) return
+    const target = document.querySelector(href)
+    if(!target) return
+    const rect = target.getBoundingClientRect()
+    const dist = Math.abs(rect.top - 200)
+    if(dist < minDist){ minDist = dist; closestId = href }
+  })
+  navItems.forEach(item=>{
+    item.classList.toggle('active', item.getAttribute('href') === closestId)
+  })
+}
+
+window.addEventListener('scroll', updateActiveNav, {passive:true})
+
+/* ========== 表行悬停 ========== */
+document.querySelectorAll('.annot-table tbody tr').forEach(tr=>{
+  tr.addEventListener('mouseenter', ()=>{
+    if(searchMode) return
+    tr.classList.add('row-highlight')
+  })
+  tr.addEventListener('mouseleave', ()=>{
+    tr.classList.remove('row-highlight')
+  })
+})
+
+function highlightClear(){
+  document.querySelectorAll('.row-highlight').forEach(r=>r.classList.remove('row-highlight'))
+}
+
+/* ========== 键盘快捷键 ========== */
+document.addEventListener('keydown', e=>{
+  if((e.ctrlKey||e.metaKey) && e.key==='k'){
+    e.preventDefault()
+    searchInput.focus()
+  }
+  if(e.key==='Escape'){
+    searchInput.value=''
+    showAll()
+    searchInput.blur()
+  }
+})
+
+/* 初始化 */
+updateActiveNav()
+</script>
+
+</body>
+</html>

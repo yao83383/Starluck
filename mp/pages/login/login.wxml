@@ -1,0 +1,76 @@
+<view class="page page-bg-radial" style="{{themeStyle}}">
+  <starfield density="normal"></starfield>
+
+  <view class="login">
+    <view class="logo">✨</view>
+    <view class="brand-name fs-xxl">Starluck</view>
+    <view class="slogan text-2">每颗星，都在等另一颗</view>
+    <view class="slogan-en text-3">Every star shines alone, until it finds another.</view>
+
+    <!-- 登录方式切换 -->
+    <view class="mode-tabs">
+      <view class="mode-tab {{mode==='sms'?'on':''}}" data-mode="sms" bindtap="switchMode">验证码登录</view>
+      <view class="mode-tab {{mode==='password'?'on':''}}" data-mode="password" bindtap="switchMode">密码登录</view>
+    </view>
+
+    <view class="form">
+      <!-- 手机号 -->
+      <view class="input-row">
+        <text class="prefix">+86</text>
+        <input
+          class="ipt"
+          type="number"
+          maxlength="11"
+          placeholder="请输入手机号"
+          placeholder-class="ph"
+          value="{{phone}}"
+          bindinput="onPhoneInput"
+        />
+      </view>
+
+      <!-- 验证码模式 -->
+      <block wx:if="{{mode==='sms'}}">
+        <view class="input-row">
+          <input
+            class="ipt"
+            type="number"
+            maxlength="6"
+            placeholder="6位验证码"
+            placeholder-class="ph"
+            value="{{code}}"
+            bindinput="onCodeInput"
+          />
+          <text class="send-code {{cd>0?'disabled':''}}" bindtap="sendCode">{{cd>0?cd+'s 后重发':'获取验证码'}}</text>
+        </view>
+      </block>
+
+      <!-- 密码模式 -->
+      <block wx:if="{{mode==='password'}}">
+        <view class="input-row">
+          <input
+            class="ipt"
+            type="text"
+            password="true"
+            maxlength="20"
+            placeholder="请输入密码"
+            placeholder-class="ph"
+            value="{{password}}"
+            bindinput="onPwdInput"
+          />
+        </view>
+      </block>
+
+      <sl-button type="primary" block bindtap="doLogin" loading="{{loading}}" disabled="{{loading}}">
+        {{loading?'登录中...':'登录'}}
+      </sl-button>
+
+      <view class="agree" bindtap="toggleAgree">
+        <view class="cb {{agreed?'on':''}}">{{agreed?'✓':''}}</view>
+        <text class="text-3">我已阅读并同意</text>
+        <text class="link">《用户协议》</text>
+        <text class="text-3">和</text>
+        <text class="link">《隐私政策》</text>
+      </view>
+    </view>
+  </view>
+</view>

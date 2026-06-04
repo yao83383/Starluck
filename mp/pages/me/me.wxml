@@ -1,0 +1,113 @@
+<view class="page" style="{{themeStyle}}">
+  <starfield density="light"></starfield>
+
+  <view class="status-bar" style="height:{{statusBarHeight}}px;"></view>
+
+  <view class="me-header">
+    <view class="me-header-bg"></view>
+    <view class="hd-content">
+      <view class="top-row">
+        <view class="av av-{{store.user.av}} av-lg">{{store.user.name[0]}}</view>
+        <view class="ns flex-1">
+          <view class="row">
+            <text class="name">{{store.user.name}}</text>
+            <text wx:if="{{store.user.vip}}" class="sl-tag vip" style="margin-left:10rpx;font-size:18rpx">VIP</text>
+          </view>
+          <view class="id text-3">ID: {{store.user.id}}</view>
+          <view class="sign text-2">{{store.user.sign}}</view>
+        </view>
+        <view class="edit" bindtap="openOnboard">编辑</view>
+      </view>
+
+      <view class="stats">
+        <view class="st"><view class="num">128</view><view class="lbl text-3">关注</view></view>
+        <view class="st"><view class="num">256</view><view class="lbl text-3">粉丝</view></view>
+        <view class="st"><view class="num">42</view><view class="lbl text-3">好友</view></view>
+        <view class="st"><view class="num">1.2k</view><view class="lbl text-3">获赞</view></view>
+      </view>
+    </view>
+  </view>
+
+  <scroll-view class="me-body" scroll-y="true" enhanced="true" show-scrollbar="false">
+
+    <view class="vip-banner" bindtap="openVip">
+      <view class="crown">👑</view>
+      <view class="vt flex-1">
+        <view class="t1">开通星耀会员</view>
+        <view class="t2 text-2">解锁谁看过我、高级筛选等 8 大特权</view>
+      </view>
+      <view class="vb">立即开通</view>
+    </view>
+
+    <view class="menu-group">
+      <view class="menu-item" data-url="/pages/wallet/wallet" bindtap="goMenu">
+        <view class="mi-ico" style="background:linear-gradient(135deg,#ffd966,#ff9a3c)">💰</view>
+        <view class="lbl flex-1">我的钱包</view>
+        <text class="rt text-brand">¥{{store.cash}}</text>
+        <text class="arr text-3">›</text>
+      </view>
+      <view class="menu-item" data-url="/pages/recharge/recharge" bindtap="goMenu">
+        <view class="mi-ico" style="background:linear-gradient(135deg,#a8c4ff,#5eead4)">✨</view>
+        <view class="lbl flex-1">星屑充值</view>
+        <text class="rt text-2">{{store.diamonds}} ✨</text>
+        <text class="arr text-3">›</text>
+      </view>
+    </view>
+
+    <view class="menu-group">
+      <view class="menu-item">
+        <view class="mi-ico">💝</view>
+        <view class="lbl flex-1">我的喜欢</view>
+        <text class="rt text-3">12人</text>
+        <text class="arr text-3">›</text>
+      </view>
+      <view class="menu-item">
+        <view class="mi-ico">👣</view>
+        <view class="lbl flex-1">谁看过我</view>
+        <text class="rt text-gold">VIP 专享</text>
+        <text class="arr text-3">›</text>
+      </view>
+      <view class="menu-item">
+        <view class="mi-ico">🎁</view>
+        <view class="lbl flex-1">我的星愿</view>
+        <text class="arr text-3">›</text>
+      </view>
+      <view class="menu-item">
+        <view class="mi-ico">📷</view>
+        <view class="lbl flex-1">我的动态</view>
+        <text class="arr text-3">›</text>
+      </view>
+    </view>
+
+    <view class="menu-group">
+      <view class="menu-item" data-url="/pages/theme/theme" bindtap="goMenu">
+        <view class="mi-ico" style="background:linear-gradient(135deg,#a18cff,#ff8ad4)">🌌</view>
+        <view class="lbl flex-1">主题中心</view>
+        <text class="rt text-2">{{theme.name}}</text>
+        <text class="arr text-3">›</text>
+      </view>
+      <view class="menu-item">
+        <view class="mi-ico" style="background:linear-gradient(135deg,#a8c4ff,#7a9eff)">✅</view>
+        <view class="lbl flex-1">星证认证</view>
+        <text wx:if="{{store.isAuthed}}" class="rt text-success">已认证</text>
+        <text wx:else class="rt text-3">未认证</text>
+        <text class="arr text-3">›</text>
+      </view>
+      <view class="menu-item" data-url="/pages/settings/settings" bindtap="goMenu">
+        <view class="mi-ico" style="background:linear-gradient(135deg,#7a9eff,#ff8ab0)">⚙️</view>
+        <view class="lbl flex-1">设置</view>
+        <text class="arr text-3">›</text>
+      </view>
+      <view class="menu-item">
+        <view class="mi-ico" style="background:linear-gradient(135deg,#5eead4,#a8c4ff)">💬</view>
+        <view class="lbl flex-1">帮助与反馈</view>
+        <text class="arr text-3">›</text>
+      </view>
+    </view>
+
+    <view class="logout-btn" bindtap="doLogout">退出登录</view>
+    <view style="height:180rpx;"></view>
+  </scroll-view>
+
+  <sl-tabbar active="me"></sl-tabbar>
+</view>

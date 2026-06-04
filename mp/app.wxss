@@ -1,0 +1,214 @@
+/* ============================================================
+   ✨ Starluck · 全局基础样式
+   ============================================================ */
+page {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--sl-bgDeep, #080a18);
+  color: var(--sl-text1, #ffffff);
+  line-height: 1.5;
+  font-size: 28rpx;
+  -webkit-tap-highlight-color: transparent;
+}
+
+view, text, button, input, textarea, image, scroll-view, swiper {
+  box-sizing: border-box;
+}
+
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: inherit;
+  color: inherit;
+  line-height: inherit;
+}
+button::after {
+  border: none;
+}
+
+input, textarea {
+  background: none;
+  border: none;
+  outline: none;
+  color: inherit;
+}
+
+/* ============================================================
+   通用工具类（基于 8rpx 倍数）
+   ============================================================ */
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.flex-1 { flex: 1; min-width: 0; }
+.gap-8 { gap: 8rpx; }
+.gap-12 { gap: 12rpx; }
+.gap-16 { gap: 16rpx; }
+.gap-24 { gap: 24rpx; }
+.text-center { text-align: center; }
+.relative { position: relative; }
+.absolute { position: absolute; }
+.full { width: 100%; height: 100%; }
+.hidden { display: none; }
+
+/* ============================================================
+   通用容器：根 view 必须使用 .page 包裹，作为主题作用域
+   ============================================================ */
+.page {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--sl-bgDeep, #080a18);
+  color: var(--sl-text1, #ffffff);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.page-bg-radial {
+  background: var(--sl-bgRadial, radial-gradient(ellipse at 50% 0%, #23264c 0%, #15182f 50%, #080a18 100%));
+}
+
+.page-bg-gradient {
+  background: var(--sl-bgGradient, linear-gradient(180deg, #23264c 0%, #080a18 100%));
+}
+
+/* ============================================================
+   通用品牌组件 sl-*
+   ============================================================ */
+.sl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  padding: 0 40rpx;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  background: var(--sl-brandGrad, linear-gradient(135deg, #ff8ab0, #7a9eff));
+  color: #ffffff;
+  box-shadow: var(--sl-shadowBtn, 0 6rpx 18rpx rgba(255,138,176,0.4));
+  border: none;
+  transition: transform 0.15s ease;
+}
+.sl-btn.block { width: 100%; }
+.sl-btn.gold {
+  background: var(--sl-vipGrad, linear-gradient(135deg, #ffd966, #ff9a3c));
+  color: #3a2a00;
+  box-shadow: 0 6rpx 18rpx rgba(255,154,60,0.4);
+}
+.sl-btn.ghost {
+  background: transparent;
+  color: var(--sl-brand1, #ff8ab0);
+  border: 2rpx solid var(--sl-brand1, #ff8ab0);
+  box-shadow: none;
+}
+.sl-btn.small { height: 60rpx; padding: 0 24rpx; font-size: 24rpx; border-radius: 30rpx; }
+.sl-btn:active { transform: scale(0.96); }
+.sl-btn[disabled] { opacity: 0.5; box-shadow: none; }
+
+.sl-card {
+  background: var(--sl-bgCard, #23264c);
+  border: 1rpx solid var(--sl-border1, rgba(255,138,176,0.2));
+  border-radius: 24rpx;
+  padding: 24rpx;
+  box-shadow: var(--sl-shadowCard, 0 8rpx 24rpx rgba(8,10,24,0.5));
+}
+
+.sl-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  background: var(--sl-overlayCard, rgba(255,138,176,0.12));
+  color: var(--sl-brand1, #ff8ab0);
+}
+.sl-tag.vip {
+  background: var(--sl-vipGrad);
+  color: #3a2a00;
+  font-weight: 700;
+}
+
+.sl-input {
+  width: 100%;
+  height: 88rpx;
+  padding: 0 28rpx;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  color: var(--sl-text1);
+  background: var(--sl-overlayCard, rgba(255,138,176,0.08));
+  border: 1rpx solid var(--sl-border1, rgba(255,138,176,0.2));
+}
+.sl-input-placeholder {
+  color: var(--sl-text3, rgba(255,255,255,0.4));
+}
+
+.sl-divider {
+  height: 1rpx;
+  background: var(--sl-border1, rgba(255,138,176,0.15));
+  margin: 24rpx 0;
+}
+
+/* ============================================================
+   头像 8 色色板（主题无关）
+   ============================================================ */
+.av {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 30rpx;
+  flex-shrink: 0;
+}
+.av-1 { background: linear-gradient(135deg, #ff8ab0, #7a9eff); }
+.av-2 { background: linear-gradient(135deg, #a8c4ff, #5eead4); }
+.av-3 { background: linear-gradient(135deg, #ffd966, #ff9a3c); }
+.av-4 { background: linear-gradient(135deg, #ff5c8a, #ffd966); }
+.av-5 { background: linear-gradient(135deg, #5eead4, #a8c4ff); }
+.av-6 { background: linear-gradient(135deg, #ff8ad4, #a18cff); }
+.av-7 { background: linear-gradient(135deg, #ff9a3c, #ff5c8a); }
+.av-8 { background: linear-gradient(135deg, #7ab5ff, #ff8ad4); }
+.av-sm { width: 60rpx; height: 60rpx; font-size: 24rpx; }
+.av-lg { width: 128rpx; height: 128rpx; font-size: 44rpx; }
+.av-xl { width: 160rpx; height: 160rpx; font-size: 56rpx; }
+
+/* ============================================================
+   品牌文字（渐变 Logo）
+   ============================================================ */
+.brand-name {
+  font-weight: 800;
+  letter-spacing: 2rpx;
+  background: var(--sl-brandGrad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ============================================================
+   通用文字层级
+   ============================================================ */
+.text-1 { color: var(--sl-text1, #ffffff); }
+.text-2 { color: var(--sl-text2, rgba(255,255,255,0.7)); }
+.text-3 { color: var(--sl-text3, rgba(255,255,255,0.4)); }
+.text-brand { color: var(--sl-brand1, #ff8ab0); }
+.text-gold { color: var(--sl-vipGold, #ffd966); }
+.text-danger { color: var(--sl-danger, #ff5c8a); }
+.text-success { color: var(--sl-success, #5eead4); }
+
+.fs-sm { font-size: 22rpx; }
+.fs-md { font-size: 28rpx; }
+.fs-lg { font-size: 32rpx; }
+.fs-xl { font-size: 40rpx; }
+.fs-xxl { font-size: 56rpx; }
+.fw-7 { font-weight: 700; }
+.fw-8 { font-weight: 800; }
+
+/* ============================================================
+   Tab Bar 占位（自定义 TabBar 高度）
+   ============================================================ */
+.tabbar-placeholder { height: 130rpx; flex-shrink: 0; }

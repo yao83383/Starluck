@@ -1,0 +1,3 @@
+<view class="sl-card" style="padding:{{padding}};">
+  <slot></slot>
+</view>

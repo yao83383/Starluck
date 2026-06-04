@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<link rel="preload" href="./HarmonyOS_Sans_SC_Medium.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="./HarmonyOS_Sans_SC_Bold.woff2" as="font" type="font/woff2" crossorigin>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dataos-ontology-Relationship-Graph</title>
+<style>
+@font-face {
+  font-family: 'HarmonyOS Sans SC';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./HarmonyOS_Sans_SC_Medium.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'HarmonyOS Sans SC';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./HarmonyOS_Sans_SC_Bold.woff2') format('woff2');
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100vh; }
+body {
+  background: radial-gradient(ellipse at 50% 55%, #0c1e3a 0%, #04091a 55%, #020509 100%);
+  overflow:hidden;
+  font-family:'HarmonyOS Sans SC','PingFang SC','Helvetica Neue','Microsoft YaHei',sans-serif;
+  font-weight:700;
+}
+#ui { position:fixed; inset:0; pointer-events:none; }
+.topbar {
+  position:absolute; top:0; left:0; right:0; height:52px;
+  background:linear-gradient(to bottom,rgba(2,5,16,.95) 60%,transparent);
+  display:flex; align-items:center; padding:0 24px; gap:10px;
+  border-bottom:1px solid rgba(60,249,255,.08);
+}
+.logo { color:#3cf9ff; font-size:18px; font-weight:700; letter-spacing:1px; }
+.sep  { color:rgba(255,255,255,.12); margin:0 4px; }
+.sub  { color:rgba(255,255,255,.25); font-size:13px; }
+.badge-action {
+  margin-left:8px; background:rgba(255,200,80,.1); border:1px solid rgba(255,200,80,.22);
+  border-radius:5px; padding:2px 8px; color:rgba(255,200,100,.65); font-size:10px; letter-spacing:.5px;
+}
+.tb-stats { margin-left:auto; display:flex; gap:18px; }
+.tb-stat  { text-align:right; }
+.tb-n { color:rgba(60,249,255,.85); font-size:15px; font-weight:700; line-height:1; }
+.tb-n.action { color:rgba(255,200,80,.85); }
+.tb-l { color:rgba(255,255,255,.16); font-size:10px; margin-top:2px; }
+.layer-panel {
+  position:absolute; top:66px; left:18px; width:172px;
+  background:rgba(2,6,18,.82); border:1px solid rgba(60,249,255,.09);
+  border-radius:14px; padding:14px 12px; backdrop-filter:blur(20px);
+  pointer-events:all; max-height:calc(100vh - 110px); overflow-y:auto;
+}
+.layer-panel::-webkit-scrollbar { width:3px; }
+.layer-panel::-webkit-scrollbar-thumb { background:rgba(60,249,255,.18); border-radius:2px; }
+.panel-title { color:rgba(255,255,255,.5); font-size:12px; text-transform:uppercase; letter-spacing:2px; margin-bottom:11px; }
+.layer-row { display:flex; align-items:center; gap:9px; padding:5px 8px; border-radius:8px; margin-bottom:1px; cursor:pointer; transition:background .18s; }
+.layer-row:hover { background:rgba(60,249,255,.05); }
+.layer-row.lit   { background:rgba(60,249,255,.08); }
+.l-dot  { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.l-name { color:rgba(255,255,255,.5); font-size:12px; }
+.l-cnt  { margin-left:auto; color:rgba(255,255,255,.5); font-size:12px; }
+.detail-panel {
+  position:absolute; top:66px; right:18px; width:264px;
+  background:rgba(2,6,18,.92); border:1px solid rgba(60,249,255,.13);
+  border-radius:16px; padding:20px; backdrop-filter:blur(24px); pointer-events:all;
+  animation:panIn .2s cubic-bezier(.4,0,.2,1);
+}
+@keyframes panIn { from{opacity:0;transform:translateX(16px)} to{opacity:1;transform:none} }
+.d-close { position:absolute; top:14px; right:14px; color:rgba(255,255,255,.16); cursor:pointer; font-size:18px; }
+.d-close:hover { color:rgba(255,255,255,.55); }
+.d-group { font-size:10px; letter-spacing:1.8px; text-transform:uppercase; font-weight:700; margin-bottom:5px; }
+.d-name  { color:#fff; font-size:16px; font-weight:700; margin-bottom:3px; }
+.d-code  { color:rgba(255,255,255,.3); font-size:11px; font-family:'SF Mono','Fira Code',monospace; margin-bottom:10px; }
+.d-desc  { color:rgba(255,255,255,.35); font-size:12px; line-height:1.8; }
+.d-sec   { margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,.05); }
+.d-sec-t { color:rgba(255,255,255,.5); font-size:10px; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px; }
+.chip {
+  display:inline-block; padding:3px 9px; margin:0 4px 5px 0;
+  border-radius:6px; font-size:11px; border:1px solid; cursor:pointer; transition:opacity .15s;
+}
+.chip:hover { opacity:.7; }
+.ctrls { position:absolute; bottom:24px; left:18px; display:flex; gap:8px; pointer-events:all; }
+.cbtn {
+  background:rgba(2,6,18,.82); border:1px solid rgba(60,249,255,.12);
+  border-radius:8px; padding:7px 14px; color:rgba(255,255,255,.3);
+  font-size:11px; cursor:pointer; transition:all .2s; font-family:inherit;
+}
+.cbtn:hover { border-color:rgba(60,249,255,.35); color:rgba(255,255,255,.65); }
+.cbtn.on    { border-color:rgba(60,249,255,.45); color:#3cf9ff; }
+.hint { position:absolute; bottom:24px; right:18px; color:rgba(255,255,255,.5); font-size:11px; text-align:right; line-height:2.1; }
+.action-legend { display:flex; align-items:center; justify-content:flex-end; gap:6px; margin-top:6px; padding-top:6px; border-top:1px solid rgba(255,200,80,.08); }
+.al-dot { width:6px; height:6px; border-radius:50%; background:#ffe080; box-shadow:0 0 5px #ffcc50; animation:alpulse 2s ease-in-out infinite; }
+@keyframes alpulse { 0%,100%{opacity:.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.3)} }
+.al-label { color:rgba(255,200,80,.4); font-size:10px; }
+
+/* ══════ Loading Screen ══════ */
+#loading-overlay {
+  position:fixed; inset:0; z-index:9999;
+  background: radial-gradient(ellipse at 50% 50%, #0a1628 0%, #040a14 60%, #020408 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  transition: opacity .8s cubic-bezier(.4,0,.2,1), visibility .8s;
+  overflow:hidden;
+}
+#loading-overlay.fade-out { opacity:0; visibility:hidden; pointer-events:none; }
+
+/* Hex grid background */
+.lo-grid {
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(60,200,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(60,200,255,.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: gridPulse 4s ease-in-out infinite;
+}
+@keyframes gridPulse {
+  0%,100% { opacity:.4; }
+  50% { opacity:.8; }
+}
+
+/* Scan line */
+.lo-scanline {
+  position:absolute; left:0; right:0; height:2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(60,200,255,.0) 20%, rgba(60,200,255,.25) 50%, rgba(60,200,255,.0) 80%, transparent 100%);
+  animation: scanMove 3s linear infinite;
+}
+@keyframes scanMove { 0% { top:-2px; } 100% { top:100%; } }
+
+/* Floating particles */
+.lo-particles { position:absolute; inset:0; overflow:hidden; }
+.lo-particle {
+  position:absolute; border-radius:50%;
+  background: radial-gradient(circle, rgba(60,180,255,.6) 0%, transparent 70%);
+  animation: particleFloat 6s ease-in-out infinite;
+}
+@keyframes particleFloat {
+  0%,100% { transform: translateY(0) scale(1); opacity:.3; }
+  50% { transform: translateY(-30px) scale(1.3); opacity:.7; }
+}
+
+/* Center content container */
+.lo-center {
+  position:relative; z-index:2;
+  display:flex; flex-direction:column; align-items:center; gap:0;
+}
+
+/* Corner brackets */
+.lo-bracket {
+  position:absolute; width:28px; height:28px;
+  border-color: rgba(60,200,255,.25);
+  border-style:solid; border-width:0;
+}
+.lo-bracket.tl { top:-40px; left:-60px; border-top-width:2px; border-left-width:2px; }
+.lo-bracket.tr { top:-40px; right:-60px; border-top-width:2px; border-right-width:2px; }
+.lo-bracket.bl { bottom:-40px; left:-60px; border-bottom-width:2px; border-left-width:2px; }
+.lo-bracket.br { bottom:-40px; right:-60px; border-bottom-width:2px; border-right-width:2px; }
+
+/* DataOS Logo mark */
+.lo-logo {
+  width:48px; height:48px; margin-bottom:18px;
+  position:relative;
+}
+.lo-logo-ring {
+  position:absolute; inset:0; border-radius:50%;
+  border: 1.5px solid rgba(60,200,255,.2);
+  animation: ringRotate 8s linear infinite;
+}
+.lo-logo-ring::before {
+  content:''; position:absolute; top:-3px; left:50%; transform:translateX(-50%);
+  width:6px; height:6px; border-radius:50%;
+  background:#3cc8ff; box-shadow: 0 0 8px #3cc8ff, 0 0 20px rgba(60,200,255,.4);
+}
+.lo-logo-ring:nth-child(2) {
+  inset:6px; border-color:rgba(60,200,255,.12);
+  animation-direction:reverse; animation-duration:12s;
+}
+.lo-logo-ring:nth-child(2)::before { width:4px; height:4px; background:#2a9fd6; box-shadow: 0 0 6px #2a9fd6; }
+.lo-logo-core {
+  position:absolute; inset:14px; border-radius:50%;
+  background: radial-gradient(circle, rgba(60,200,255,.15) 0%, transparent 70%);
+  border: 1px solid rgba(60,200,255,.08);
+}
+@keyframes ringRotate { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+
+/* Title */
+.lo-title {
+  font-family:'HarmonyOS Sans SC','PingFang SC','Helvetica Neue',sans-serif;
+  font-size:36px; font-weight:700; letter-spacing:6px;
+  color:#fff;
+  text-shadow: 0 0 20px rgba(60,200,255,.4), 0 0 60px rgba(60,200,255,.15);
+  margin-bottom:18px;
+  animation: titleGlow 3s ease-in-out infinite;
+}
+@keyframes titleGlow {
+  0%,100% { text-shadow: 0 0 20px rgba(60,200,255,.4), 0 0 60px rgba(60,200,255,.15); }
+  50% { text-shadow: 0 0 30px rgba(60,200,255,.6), 0 0 80px rgba(60,200,255,.25); }
+}
+
+/* Subtitle */
+.lo-sub {
+  font-size:11px; letter-spacing:5px; text-transform:uppercase;
+  color: rgba(60,200,255,.45);
+  margin-bottom:36px;
+}
+
+/* Progress bar container */
+.lo-bar-wrap {
+  width:280px; height:3px; position:relative;
+  background: rgba(60,200,255,.06);
+  border-radius:2px; overflow:hidden;
+  margin-bottom:16px;
+}
+.lo-bar-wrap::before, .lo-bar-wrap::after {
+  content:''; position:absolute; top:0; width:6px; height:100%;
+}
+.lo-bar-wrap::before { left:0; background:linear-gradient(90deg, rgba(60,200,255,.2), transparent); }
+.lo-bar-wrap::after { right:0; background:linear-gradient(-90deg, rgba(60,200,255,.2), transparent); }
+
+/* Progress bar fill */
+.lo-bar {
+  height:100%; width:0; border-radius:2px;
+  background: linear-gradient(90deg, #1a6b99 0%, #3cc8ff 50%, #1a6b99 100%);
+  background-size: 200% 100%;
+  animation: barShimmer 1s linear infinite, barProgress 1s cubic-bezier(.25,.1,.25,1) forwards;
+  position:relative;
+}
+.lo-bar::after {
+  content:''; position:absolute; right:0; top:-3px; width:2px; height:9px;
+  background:#3cc8ff; border-radius:1px;
+  box-shadow: 0 0 6px #3cc8ff, 0 0 14px rgba(60,200,255,.5);
+}
+@keyframes barShimmer { 0% { background-position:200% 0; } 100% { background-position:-200% 0; } }
+@keyframes barProgress {
+  0%   { width:0%; }
+  15%  { width:12%; }
+  35%  { width:38%; }
+  55%  { width:58%; }
+  75%  { width:78%; }
+  90%  { width:92%; }
+  100% { width:100%; }
+}
+
+/* Status text */
+.lo-status {
+  font-size:11px; color:rgba(255,255,255,.25); letter-spacing:2px;
+  font-family:'SF Mono','Fira Code',monospace;
+}
+.lo-status .blink {
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* Bottom decoration */
+.lo-bottom-line {
+  position:absolute; bottom:32px; left:50%; transform:translateX(-50%);
+  display:flex; align-items:center; gap:8px;
+}
+.lo-bottom-line .dot { width:3px; height:3px; border-radius:50%; background:rgba(60,200,255,.2); }
+.lo-bottom-line .line { width:40px; height:1px; background:rgba(60,200,255,.08); }
+.lo-bottom-line .ver { font-size:9px; color:rgba(60,200,255,.18); letter-spacing:3px; }
+
+/* Error state */
+#loading-overlay.error .lo-bar { background: linear-gradient(90deg, #991a1a, #ff4d4f, #991a1a); }
+#loading-overlay.error .lo-status { color:rgba(255,80,80,.6); }
+#loading-overlay.error .lo-title { text-shadow: 0 0 20px rgba(255,80,80,.4); }
+</style>
+</head>
+<body>
+<!-- Loading overlay -->
+<div id="loading-overlay">
+  <div class="lo-grid"></div>
+  <div class="lo-scanline"></div>
+  <div class="lo-particles" id="lo-particles"></div>
+  <div class="lo-center">
+    <div class="lo-bracket tl"></div>
+    <div class="lo-bracket tr"></div>
+    <div class="lo-bracket bl"></div>
+    <div class="lo-bracket br"></div>
+    <div class="lo-logo">
+      <div class="lo-logo-ring"></div>
+      <div class="lo-logo-ring"></div>
+      <div class="lo-logo-core"></div>
+    </div>
+    <div class="lo-title">侨银本体建模语义引擎</div>
+    <div class="lo-sub">Ontology Knowledge Graph</div>
+    <div class="lo-bar-wrap"><div class="lo-bar" id="lo-bar"></div></div>
+    <div class="lo-status" id="lo-status">LOADING MODULES<span class="blink">_</span></div>
+  </div>
+  <div class="lo-bottom-line">
+    <div class="dot"></div><div class="line"></div>
+    <div class="ver">v5</div>
+    <div class="line"></div><div class="dot"></div>
+  </div>
+</div>
+<div id="status" style="display:none"></div>
+<script>
+// Loading screen: scene-ready gate + bar animation
+window._loSceneReady = false;
+window._loBarDone = false;
+function dismissOverlay() {
+  if (window._loSceneReady && window._loBarDone) {
+    var ov = document.getElementById('loading-overlay');
+    if (ov) ov.classList.add('fade-out');
+  }
+}
+(function() {
+  // particles
+  var pc = document.getElementById('lo-particles');
+  if (pc) {
+    for (var i = 0; i < 18; i++) {
+      var p = document.createElement('div');
+      p.className = 'lo-particle';
+      var s = 2 + Math.random() * 4;
+      p.style.cssText = 'width:'+s+'px;height:'+s+'px;left:'+(Math.random()*100)+'%;top:'+(Math.random()*100)+'%;animation-delay:'+(Math.random()*6)+'s;animation-duration:'+(4+Math.random()*4)+'s;';
+      pc.appendChild(p);
+    }
+  }
+  // status text cycling
+  var msgs = ['LOADING MODULES', 'INITIALIZING SCENE', 'BUILDING GRAPH', 'READY'];
+  var si = 0, stEl = document.getElementById('lo-status');
+  if (stEl) {
+    var iv = setInterval(function() {
+      si++;
+      if (si >= msgs.length) { clearInterval(iv); return; }
+      stEl.innerHTML = msgs[si] + '<span class="blink">_</span>';
+    }, 250);
+  }
+  // bar done after 1s animation
+  setTimeout(function() { window._loBarDone = true; dismissOverlay(); }, 3200);
+})();
+</script>
+<div id="root"></div>
+<script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
+<script>
+window.onerror = function(msg, src, line) {
+  var ov = document.getElementById('loading-overlay');
+  if (ov) { ov.classList.add('error'); var s = document.getElementById('lo-status'); if(s) s.textContent = 'ERROR: ' + msg + ' (line ' + line + ')'; }
+};
+if (typeof Babel === 'undefined') {
+  var ov = document.getElementById('loading-overlay');
+  if (ov) { ov.classList.add('error'); var s = document.getElementById('lo-status'); if(s) s.textContent = 'ERROR: Babel CDN not loaded'; }
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const NODE_R = 10;
+const sharedSphereGeo = new THREE.SphereGeometry(NODE_R, 48, 36);
+const EDGE_DEFAULT_OPACITY = 0.30;
+const EDGE_ACTIVE_OPACITY  = 1.00;
+const FOV = 52;
+const FOV_TAN = Math.tan((FOV * Math.PI / 180) / 2);
+
+const G = {
+  '空间域':{hex:'#4ECDC4',c3:0x4ECDC4},'组织域':{hex:'#4A90D9',c3:0x4A90D9},
+  '人员域':{hex:'#6496ED',c3:0x6496ED},'排班域':{hex:'#F0A040',c3:0xF0A040},
+  '管理域':{hex:'#52C574',c3:0x52C574},
+};
+const GROUP_KEYS = Object.keys(G);
+
+const NODES_DEF = [
+  { id:'WorkGrid',label:'工作网格',group:'空间域',desc:'环卫作业网格单元，子类of SpatialThing，承载边界坐标点和作业面积。' },
+  { id:'GridPoint',label:'网格坐标点',group:'空间域',desc:'工作网格的边界坐标点，子类of Point，含经纬度和序号。' },
+  { id:'Project',label:'项目',group:'组织域',desc:'环卫服务项目，含项目编码和全称。' },
+  { id:'Person',label:'人员',group:'人员域',desc:'环卫工作人员，含姓名和手机号。' },
+  { id:'Position',label:'岗位',group:'人员域',desc:'工作岗位定义，含岗位编码和名称。' },
+  { id:'Section',label:'片区',group:'管理域',desc:'环卫作业责任片区，含片区ID、名称、类型和面积。' },
+  { id:'SectionRailRel',label:'片区网格关联',group:'管理域',desc:'片区与网格的关联关系，通过sectionIdRef和railIdRef连接。' },
+  { id:'BaseOrganize',label:'组织机构',group:'组织域',desc:'组织机构信息，含层级、分类、上级关系和关联项目。' },
+  { id:'ArrangeSchedual',label:'排班记录',group:'排班域',desc:'排班记录，关联人员、班次和项目组织。' },
+  { id:'MemberBase',label:'人员基础信息',group:'人员域',desc:'qyzhhw_member.member_base，人员基础信息和岗位。' },
+  { id:'SchedualConfig',label:'班次配置',group:'排班域',desc:'班次配置，含班次主键和名称。' },
+  { id:'SchedualTimeConfig',label:'班次时段配置',group:'排班域',desc:'班次时段配置，含上下班时刻，关联班次。' },
+  { id:'MemberEmployment',label:'人员任职',group:'人员域',desc:'人员任职记录，关联人员和岗位名称。' },
+];
+
+const PLANET_R = 200;
+const GOLDEN_ANG = Math.PI * (3 - Math.sqrt(5));
+const NODES = NODES_DEF.map((n, i) => {
+  const total = NODES_DEF.length;
+  const y = 1 - (i / (total - 1)) * 2;
+  const r = Math.sqrt(Math.max(0, 1 - y * y));
+  const theta = GOLDEN_ANG * i;
+  return { ...n, pos: [
+    Math.cos(theta) * r * PLANET_R,
+    y * PLANET_R,
+    Math.sin(theta) * r * PLANET_R
+  ]};
+});
+const NID = NODES.reduce((m, n) => { m[n.id] = n; return m; }, {});
+
+// ═══════════════════════════════════════════════
+//  EDGES — OWL 本体属性推导的关联关系
+// ═══════════════════════════════════════════════
+const EDGES_DEF = [
+  // OWL 对象属性
+  { s:'WorkGrid',t:'GridPoint',act:'包含坐标点' },
+  // 数据属性域推导的关联（语义化）
+  { s:'WorkGrid',t:'BaseOrganize',act:'归属组织' },
+  { s:'WorkGrid',t:'Section',act:'归属片区' },
+  { s:'SectionRailRel',t:'Section',act:'关联片区' },
+  { s:'SectionRailRel',t:'WorkGrid',act:'关联网格' },
+  { s:'BaseOrganize',t:'Project',act:'承载项目' },
+  // BaseOrganize 自身层级 (organizeParentId) 为自环，不生成边
+  // Person ↔ MemberBase 为同一实体双向映射，保留 MemberBase→Person
+  { s:'MemberBase',t:'MemberEmployment',act:'任职记录' },
+  { s:'MemberEmployment',t:'Position',act:'担任岗位',bi:true },
+  { s:'MemberBase',t:'ArrangeSchedual',act:'排班' },
+  { s:'ArrangeSchedual',t:'SchedualConfig',act:'使用班次' },
+  { s:'ArrangeSchedual',t:'BaseOrganize',act:'归属组织' },
+  { s:'SchedualConfig',t:'SchedualTimeConfig',act:'配置时段',bi:true },
+  { s:'MemberBase',t:'Person',act:'对应人员' },
+];
+const EDGES = EDGES_DEF.map(e => ({ s:e.s, t:e.t, act:e.act, isAction:true, bi:!!e.bi }));
+const ACTION_COUNT = EDGES.length;
+
+const NBRS = {};
+NODES.forEach(n => { NBRS[n.id] = new Set(); });
+EDGES.forEach(({ s, t }) => { NBRS[s].add(t); NBRS[t].add(s); });
+
+// ═══════════════════════════════════════════════
+//  TEXTURES
+// ═══════════════════════════════════════════════
+const TC = {};
+function circleTex() {
+  if (TC._c) return TC._c;
+  const cv = document.createElement('canvas'); cv.width = cv.height = 128;
+  const ctx = cv.getContext('2d');
+  const gr = ctx.createRadialGradient(64,64,50, 64,64,64);
+  gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(0.8,'rgba(255,255,255,1)');gr.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle = gr; ctx.fillRect(0,0,128,128);
+  return TC._c = new THREE.CanvasTexture(cv);
+}
+function labelTex(text, hex) {
+  const k = '_lbl_' + text + '_' + hex; if (TC[k]) return TC[k];
+  const cv = document.createElement('canvas'); cv.width = 768; cv.height = 96;
+  const ctx = cv.getContext('2d'); ctx.clearRect(0,0,768,96);
+  ctx.font = '700 52px "HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  // Black outline for contrast on dark background
+  ctx.strokeStyle = 'rgba(0,0,0,0.85)'; ctx.lineWidth = 3; ctx.lineJoin = 'round';
+  ctx.strokeText(text, 384, 72);
+  ctx.fillStyle = hex;
+  ctx.fillText(text, 384, 72);
+  return TC[k] = new THREE.CanvasTexture(cv);
+}
+function edgeLabelTex(text, hex) {
+  const k = '_elbl_' + text + '_' + hex; if (TC[k]) return TC[k];
+  const cv = document.createElement('canvas'), px=14, py=8, fs=36;
+  const ctx = cv.getContext('2d'); ctx.font = '700 '+fs+'px "HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",sans-serif';
+  const tw = Math.ceil(ctx.measureText(text).width);
+  const w = tw+px*2, h = fs+py*2; cv.width = w; cv.height = h;
+  ctx.fillStyle = hex+'30'; ctx.globalAlpha = 0.82; const r = 6;
+  ctx.beginPath(); ctx.moveTo(r,0); ctx.lineTo(w-r,0); ctx.quadraticCurveTo(w,0,w,r);
+  ctx.lineTo(w,h-r); ctx.quadraticCurveTo(w,h,w-r,h); ctx.lineTo(r,h);
+  ctx.quadraticCurveTo(0,h,0,h-r); ctx.lineTo(0,r); ctx.quadraticCurveTo(0,0,r,0);
+  ctx.closePath(); ctx.fill(); ctx.globalAlpha = 1;
+  ctx.strokeStyle = 'rgba(255,255,255,0.30)'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.font = '700 '+fs+'px "HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",sans-serif';
+  ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(text, w/2, h/2);
+  const tex = new THREE.CanvasTexture(cv); tex._aspect = w/h;
+  return TC[k] = tex;
+}
+function arrowTex() {
+  if (TC._arrow) return TC._arrow;
+  const cv = document.createElement('canvas'); cv.width = cv.height = 64;
+  const ctx = cv.getContext('2d'); ctx.clearRect(0,0,64,64);
+  const cx = 32, cy = 32, s = 48;
+  ctx.beginPath();
+  ctx.moveTo(cx + s*0.45, cy);
+  ctx.lineTo(cx - s*0.15, cy - s*0.35);
+  ctx.lineTo(cx - s*0.02, cy - s*0.25);
+  ctx.lineTo(cx + s*0.22, cy);
+  ctx.lineTo(cx - s*0.02, cy + s*0.25);
+  ctx.lineTo(cx - s*0.15, cy + s*0.35);
+  ctx.closePath();
+  const gr = ctx.createLinearGradient(cx - s*0.2, cy, cx + s*0.45, cy);
+  gr.addColorStop(0, 'rgba(255,200,80,0.3)');
+  gr.addColorStop(0.5, 'rgba(255,220,120,0.85)');
+  gr.addColorStop(1, 'rgba(255,240,180,1)');
+  ctx.fillStyle = gr; ctx.fill();
+  return TC._arrow = new THREE.CanvasTexture(cv);
+}
+function solidCircleTex() {
+  if (TC._solid) return TC._solid;
+  const cv = document.createElement('canvas'); cv.width = cv.height = 32;
+  const ctx = cv.getContext('2d'); ctx.beginPath(); ctx.arc(16,16,13,0,Math.PI*2);
+  ctx.fillStyle = '#ffffff'; ctx.fill(); return TC._solid = new THREE.CanvasTexture(cv);
+}
+function glowTex() {
+  if (TC._glow) return TC._glow;
+  const cv = document.createElement('canvas'); cv.width = 256; cv.height = 256;
+  const ctx = cv.getContext('2d');
+  // Vertical gradient: bright at bottom (stage light), fading upward
+  const gr = ctx.createLinearGradient(128, 256, 128, 0);
+  gr.addColorStop(0.00, 'rgba(255,255,255,1)');
+  gr.addColorStop(0.08, 'rgba(255,255,255,0.90)');
+  gr.addColorStop(0.18, 'rgba(255,255,255,0.60)');
+  gr.addColorStop(0.35, 'rgba(255,255,255,0.25)');
+  gr.addColorStop(0.55, 'rgba(255,255,255,0.08)');
+  gr.addColorStop(1.00, 'rgba(255,255,255,0)');
+  ctx.fillStyle = gr; ctx.fillRect(0, 0, 256, 256);
+  return TC._glow = new THREE.CanvasTexture(cv);
+}
+function particleTex() {
+  if (TC._p) return TC._p;
+  const cv = document.createElement('canvas'); cv.width = cv.height = 32;
+  const ctx = cv.getContext('2d');
+  const gr = ctx.createRadialGradient(16,16,0, 16,16,16);
+  gr.addColorStop(0,    'rgba(255,240,180,1)');
+  gr.addColorStop(0.35, 'rgba(255,210,100,0.7)');
+  gr.addColorStop(0.7,  'rgba(255,170,50,0.2)');
+  gr.addColorStop(1,    'rgba(255,140,30,0)');
+  ctx.fillStyle = gr; ctx.fillRect(0,0,32,32);
+  return TC._p = new THREE.CanvasTexture(cv);
+}
+
+// ═══════════════════════════════════════════════
+//  REACT COMPONENTS
+// ═══════════════════════════════════════════════
+const TopBar = () => (
+  <div className="topbar">
+    <span className="logo">AHS DataOS</span><span className="sep">·</span>
+    <span className="badge-action">全动作关系图谱</span>
+    <div className="tb-stats">
+      <div className="tb-stat"><div className="tb-n">30</div><div className="tb-l">实体</div></div>
+      <div className="tb-stat"><div className="tb-n">{ACTION_COUNT}</div><div className="tb-l">关系</div></div>
+      <div className="tb-stat"><div className="tb-n action">{ACTION_COUNT}</div><div className="tb-l">动作</div></div>
+      <div className="tb-stat"><div className="tb-n">13</div><div className="tb-l">分组</div></div>
+    </div>
+  </div>
+);
+const GroupPanel = ({ lit, onGroup }) => (
+  <div className="layer-panel">
+    <div className="panel-title">业务分组</div>
+    {GROUP_KEYS.map(g => {
+      const cnt = NODES.filter(n => n.group === g).length;
+      return (
+        <div key={g} className={'layer-row'+(lit===g?' lit':'')} onClick={() => onGroup(g)}>
+          <div className="l-dot" style={{background:G[g].hex}}/><div className="l-name">{g}</div><div className="l-cnt">{cnt}</div>
+        </div>
+      );
+    })}
+    <div className="layer-row" style={{marginTop:6}} onClick={() => onGroup(null)}>
+      <div className="l-dot" style={{background:'rgba(255,255,255,.18)'}}/>
+      <div className="l-name" style={{color:'rgba(255,255,255,.25)'}}>显示全部</div>
+    </div>
+  </div>
+);
+const DetailPanel = ({ node, onClose, onChipClick }) => {
+  if (!node) return null;
+  const grp = G[node.group], nbrs = Array.from(NBRS[node.id]||[]).map(id => NID[id]).filter(Boolean);
+  return (
+    <div className="detail-panel">
+      <span className="d-close" onClick={onClose}>×</span>
+      <div className="d-group" style={{color:grp.hex}}>{node.group}</div>
+      <div className="d-name">{node.label}</div><div className="d-code">{node.id}</div>
+      <div className="d-desc">{node.desc}</div>
+      {nbrs.length > 0 && (
+        <div className="d-sec"><div className="d-sec-t">直接关联 ({nbrs.length})</div>
+          {nbrs.map(nb => (
+            <span key={nb.id} className="chip" style={{color:G[nb.group].hex,borderColor:G[nb.group].hex+'44',background:G[nb.group].hex+'12'}} onClick={() => onChipClick(nb)}>{nb.label}</span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════
+//  MAIN APP
+// ═══════════════════════════════════════════════
+const App = () => {
+  const mountRef = useRef(null), threeRef = useRef({}), selRef = useRef(null), litGrpRef = useRef(null);
+  const [sel, setSel] = useState(null), [litGrp, setLitGrp] = useState(null), [rotate, setRotate] = useState(true);
+  useEffect(() => { selRef.current = sel?.id || null; }, [sel]);
+  useEffect(() => { litGrpRef.current = litGrp; }, [litGrp]);
+
+  useEffect(() => {
+    async function init() {
+      const el = mountRef.current;
+      const W = window.innerWidth, H = window.innerHeight;
+      if (document.fonts) {
+        try { await Promise.all([
+          document.fonts.load('500 1em "HarmonyOS Sans SC"'),
+          document.fonts.load('700 1em "HarmonyOS Sans SC"')
+        ]); } catch(e) {}
+      }
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(FOV, W/H, 1, 20000);
+      camera.position.set(0, 60, 880);
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(W, H); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setClearColor(0x000000, 0); el.appendChild(renderer.domElement);
+      const ctrl = new THREE.OrbitControls(camera, renderer.domElement);
+      ctrl.enableDamping = true; ctrl.dampingFactor = 0.055;
+      ctrl.minDistance = 120; ctrl.maxDistance = 3000;
+      ctrl.autoRotate = true; ctrl.autoRotateSpeed = 0.11;
+      ctrl.target.set(0, 0, 0); ctrl.mouseButtons.LEFT = THREE.MOUSE.ROTATE;
+      ctrl.mouseButtons.MIDDLE = THREE.MOUSE.PAN; ctrl.mouseButtons.RIGHT = -1;
+
+      scene.add(new THREE.AmbientLight(0x1a2a40, 1.5));
+      const key = new THREE.DirectionalLight(0xfff6e8, 1.8);
+      key.position.set(400, 600, 300); scene.add(key);
+      const fill = new THREE.DirectionalLight(0x88aacc, 0.6);
+      fill.position.set(-300, -200, -400); scene.add(fill);
+
+      function makeStars(count, minR, maxR, size, opacity, colorFn) {
+        const pos = new Float32Array(count * 3), col = new Float32Array(count * 3);
+        for (let i = 0; i < count; i++) {
+          const theta = Math.random()*Math.PI*2, phi = Math.acos(2*Math.random()-1), r = minR + Math.random()*(maxR-minR);
+          pos[i*3]=r*Math.sin(phi)*Math.cos(theta);pos[i*3+1]=r*Math.sin(phi)*Math.sin(theta);pos[i*3+2]=r*Math.cos(phi);
+          const c = colorFn ? colorFn(i) : {r:1,g:1,b:1};
+          col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;
+        }
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+        scene.add(new THREE.Points(geo, new THREE.PointsMaterial({
+          size, vertexColors: true, transparent: true, opacity, sizeAttenuation: false, depthWrite: false,
+        })));
+      }
+      makeStars(4000, 4000, 12000, 1.0, 0.55, i => {
+        const r = Math.random();
+        if (r < 0.08) return {r:0.75,g:0.82,b:1.0};
+        else if (r < 0.14) return {r:1.0,g:0.92,b:0.72};
+        else if (r < 0.17) return {r:1.0,g:0.75,b:0.65};
+        return {r:1,g:1,b:1};
+      });
+      makeStars(800, 3000, 8000, 1.5, 0.72, null);
+      makeStars(120, 2000, 6000, 2.5, 0.88, null);
+      makeStars(30, 1500, 4000, 3.5, 1.00, null);
+
+      const sphMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(280, 22, 14),
+        new THREE.MeshBasicMaterial({ color:0x3cf9ff, wireframe:true, transparent:true, opacity:0.07, depthWrite:false })
+      ); scene.add(sphMesh);
+
+
+      // ── Edges — Line + flowing particles + static arrow heads ──
+      const EDGE_PX = 1, N_PARTICLES = 3, FLOW_SPEED = 0.09;
+      const staticArrowGeo = new THREE.ConeGeometry(2.5, 6, 8);
+      staticArrowGeo.translate(0, 3, 0);  // point toward +Y
+      const eObjs = [];
+      EDGES.forEach(({ s, t, act, bi }) => {
+        const sn = NID[s], tn = NID[t]; if (!sn || !tn) return;
+        const sp = new THREE.Vector3(...sn.pos), tp = new THREE.Vector3(...tn.pos);
+        const dir = new THREE.Vector3().subVectors(tp, sp); const len = dir.length(); dir.normalize();
+        const srcC = G[sn.group].hex, srcC3 = G[sn.group].c3;
+
+        // Line — stops at sphere surface (updated in tick)
+        const pts = new Float32Array([sp.x, sp.y, sp.z, tp.x, tp.y, tp.z]);
+        const lineGeo = new THREE.BufferGeometry();
+        lineGeo.setAttribute('position', new THREE.BufferAttribute(pts, 3));
+        const lineMat = new THREE.LineBasicMaterial({
+          color: srcC3, transparent: true, opacity: EDGE_DEFAULT_OPACITY,
+          blending: THREE.AdditiveBlending, depthWrite: false,
+        });
+        const line = new THREE.Line(lineGeo, lineMat); scene.add(line);
+
+        // Flowing particles — v3 style dots on action edges
+        let particles = null, pAttr = null;
+        const pPos = new Float32Array(N_PARTICLES * 3);
+        for (let i = 0; i < N_PARTICLES; i++) {
+          pPos[i*3] = sp.x; pPos[i*3+1] = sp.y; pPos[i*3+2] = sp.z;
+        }
+        const pGeo = new THREE.BufferGeometry();
+        pAttr = new THREE.BufferAttribute(pPos, 3);
+        pGeo.setAttribute('position', pAttr);
+        particles = new THREE.Points(pGeo, new THREE.PointsMaterial({
+          map: particleTex(), size: 10, transparent: true, opacity: 0.70,
+          blending: THREE.AdditiveBlending, depthWrite: false,
+          sizeAttenuation: true, alphaTest: 0.01,
+        }));
+        scene.add(particles);
+
+        // Reverse flowing particles for bidirectional (many-to-many) edges
+        let revParticles = null, revPAttr = null;
+        if (bi) {
+          const rPos = new Float32Array(N_PARTICLES * 3);
+          for (let i = 0; i < N_PARTICLES; i++) {
+            rPos[i*3] = tp.x; rPos[i*3+1] = tp.y; rPos[i*3+2] = tp.z;
+          }
+          const rGeo = new THREE.BufferGeometry();
+          revPAttr = new THREE.BufferAttribute(rPos, 3);
+          rGeo.setAttribute('position', revPAttr);
+          revParticles = new THREE.Points(rGeo, new THREE.PointsMaterial({
+            map: particleTex(), size: 10, transparent: true, opacity: 0.70,
+            blending: THREE.AdditiveBlending, depthWrite: false,
+            sizeAttenuation: true, alphaTest: 0.01,
+          }));
+          scene.add(revParticles);
+        }
+
+        // 3D arrow heads at line ends — direction indicators, same color as line
+        const arrMat = new THREE.MeshPhongMaterial({
+          color: srcC3, emissive: srcC3, emissiveIntensity: 0.25,
+          transparent: true, opacity: 0,
+          shininess: 40, depthWrite: false, depthTest: true,
+        });
+        // Arrow at target end (always present)
+        const arrT = new THREE.Mesh(staticArrowGeo, arrMat.clone());
+        arrT.position.copy(tp);
+        arrT.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+        scene.add(arrT);
+        // Arrow at source end (only for bidirectional / many-to-many)
+        let arrS = null;
+        if (bi) {
+          arrS = new THREE.Mesh(staticArrowGeo, arrMat.clone());
+          arrS.position.copy(sp);
+          arrS.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().negate());
+          scene.add(arrS);
+        }
+
+        // Edge action label
+        const mid = new THREE.Vector3().addVectors(sp, tp).multiplyScalar(0.5);
+        const eLblTex = edgeLabelTex(act, srcC);
+        const eLblMat = new THREE.SpriteMaterial({ map:eLblTex, transparent:true, opacity:0, depthTest:false, depthWrite:false });
+        const eLbl = new THREE.Sprite(eLblMat); eLbl.position.copy(mid); scene.add(eLbl);
+
+        eObjs.push({ line, lineGeo, s, t, act, bi, particles, pAttr, revParticles, revPAttr, arrT, arrS, sp, tp, len, dir, eLblMat, eLbl, srcGroup:sn.group });
+      });
+
+      // ── Nodes — 3D PBR spheres (Apple style) ──
+      const hlStates = {}; NODES.forEach(n => { hlStates[n.id] = 'default'; });
+      const nObjs = {};
+      NODES.forEach(n => {
+        const grp = G[n.group], [x, y, z] = n.pos;
+        const grpColor = new THREE.Color(grp.c3);
+        const sphereMat = new THREE.MeshPhysicalMaterial({
+          color: grpColor, metalness: 0.0, roughness: 0.55,
+          clearcoat: 0.2, clearcoatRoughness: 0.15,
+          emissive: grpColor, emissiveIntensity: 0.12,
+          transparent: true, opacity: 0.75, depthWrite: false,
+        });
+        const sphere = new THREE.Mesh(sharedSphereGeo, sphereMat);
+        sphere.position.set(x, y, z);
+        scene.add(sphere);
+        // Ring halo — torus below sphere, 8px gap from bottom
+        const ringGeo = new THREE.TorusGeometry(NODE_R * 3.3, NODE_R * 0.17, 16, 64);
+        const ringMat = new THREE.MeshBasicMaterial({
+          color: grpColor, transparent: true, opacity: 0,
+          depthWrite: false, depthTest: true, blending: THREE.AdditiveBlending,
+        });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.position.set(x, y - NODE_R * 1.17, z);
+        ring.rotation.x = -Math.PI / 2;
+        ring.rotation.order = 'YXZ';  // ensure Y-rotation is always flat
+        ring.renderOrder = 1;
+        scene.add(ring);
+        const lblMat = new THREE.SpriteMaterial({ map:labelTex(n.label, grp.hex), transparent:true, opacity:0.85, depthWrite:false, depthTest:false });
+        const lblWhiteTex = labelTex(n.label, '#ffffff');
+        const lbl = new THREE.Sprite(lblMat); lbl.position.set(x, y + NODE_R * 1.45, z); scene.add(lbl);
+        nObjs[n.id] = { disc: sphere, sphereMat, ring, ringMat, lbl, lblMat, lblWhiteTex, grpHex:grp.hex, baseEmissive: 0.12 };
+      });
+
+      // Starfield
+      const starfieldGroup = new THREE.Group(), STAR_COUNT = 4260;
+      function starfieldPos() {
+        const t = Math.random(); let r;
+        if (t < 0.70) r = 240 + Math.random()*100;
+        else if (t < 0.85) r = 30 + Math.pow(Math.random(),0.5)*210;
+        else if (t < 0.95) r = 340 + Math.random()*120;
+        else r = 460 + Math.random()*200;
+        const phi = Math.acos(2*Math.random()-1), theta = Math.random()*Math.PI*2;
+        let ox=0,oy=0,oz=0;
+        if (Math.random()<0.4) { const cr=Math.random()*25,cphi=Math.acos(2*Math.random()-1),cth=Math.random()*Math.PI*2; ox=cr*Math.sin(cphi)*Math.cos(cth);oy=cr*Math.cos(cphi);oz=cr*Math.sin(cphi)*Math.sin(cth); }
+        return [r*Math.sin(phi)*Math.cos(theta)+ox,r*Math.cos(phi)+oy,r*Math.sin(phi)*Math.sin(theta)+oz];
+      }
+      {
+        const count = STAR_COUNT>>1, pos = new Float32Array(count*3);
+        for (let i=0;i<count;i++){const p=starfieldPos();pos[i*3]=p[0];pos[i*3+1]=p[1];pos[i*3+2]=p[2];}
+        const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+        starfieldGroup.add(new THREE.Points(geo,new THREE.PointsMaterial({map:solidCircleTex(),color:0x3cf9ff,size:3,sizeAttenuation:false,transparent:true,opacity:0.20,depthWrite:false,alphaTest:0.01})));
+      }
+      {
+        const count=STAR_COUNT-(STAR_COUNT>>1),pos=new Float32Array(count*3);
+        for(let i=0;i<count;i++){const p=starfieldPos();pos[i*3]=p[0];pos[i*3+1]=p[1];pos[i*3+2]=p[2];}
+        const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+        starfieldGroup.add(new THREE.Points(geo,new THREE.PointsMaterial({map:solidCircleTex(),color:0x3cf9ff,size:3,sizeAttenuation:false,transparent:true,opacity:0.30,depthWrite:false,alphaTest:0.01})));
+      }
+      scene.add(starfieldGroup);
+
+      // ── Apply / Clear HL ──
+      function applyHL(selId, hlSet, showLabels) {
+        NODES.forEach(n => {
+          const o = nObjs[n.id]; if (!o) return;
+          const selected = n.id === selId, inHL = hlSet.has(n.id);
+          if (selected || inHL) {
+            o.sphereMat.emissiveIntensity = selected ? 0.50 : 0.30;
+            o.sphereMat.opacity = selected ? 0.85 : 0.85;
+            o.ringMat.opacity = 0.3;
+            o.lblMat.map = o.lblWhiteTex; o.lblMat.needsUpdate = true; o.lbl.material.opacity = 1.00;
+            hlStates[n.id] = selected ? 'selected' : 'related';
+          } else {
+            o.sphereMat.emissiveIntensity = 0.03;
+            o.sphereMat.opacity = 0.35;
+            o.ringMat.opacity = 0;
+            o.lblMat.map = labelTex(n.label, G[n.group].hex); o.lblMat.needsUpdate = true;
+            o.lbl.material.opacity = camDistOpacity * 0.5;
+            hlStates[n.id] = 'dimmed';
+          }
+        });
+        eObjs.forEach(e => {
+          const fs = new Set(selId ? [selId, ...hlSet] : hlSet);
+          const on = fs.has(e.s) && fs.has(e.t);
+          const sc = G[e.srcGroup]?.c3 || 0xffffff;
+          e.line.material.color.set(on ? sc : sc);
+          e.line.material.opacity = on ? EDGE_ACTIVE_OPACITY : 0.05;
+          if (e.particles) e.particles.material.opacity = on ? 0.90 : 0.04;
+          if (e.revParticles) e.revParticles.material.opacity = on ? 0.90 : 0.04;
+          e.arrT.material.opacity = on ? 0.85 : 0;
+          if (e.arrS) e.arrS.material.opacity = on ? 0.85 : 0;
+          if (e.eLblMat) e.eLblMat.opacity = (on && showLabels) ? 0.95 : 0;
+        });
+      }
+      function clearHL() {
+        labelsOn = false;
+        NODES.forEach(n => {
+          const o = nObjs[n.id]; if (!o) return;
+          o.sphereMat.emissiveIntensity = o.baseEmissive;
+          o.sphereMat.opacity = 0.75;
+          o.ringMat.opacity = 0;
+          o.lblMat.map = labelTex(n.label, G[n.group].hex); o.lblMat.needsUpdate = true;
+          o.lbl.material.opacity = camDistOpacity; hlStates[n.id] = 'default';
+        });
+        eObjs.forEach(e => {
+          const sc = G[e.srcGroup]?.c3 || 0xffffff;
+          e.line.material.color.set(sc); e.line.material.opacity = EDGE_DEFAULT_OPACITY;
+          if (e.particles) e.particles.material.opacity = 0.70;
+          if (e.revParticles) e.revParticles.material.opacity = 0.70;
+          e.arrT.material.opacity = 0;
+          if (e.arrS) e.arrS.material.opacity = 0;
+          if (e.eLblMat) e.eLblMat.opacity = 0;
+        });
+      }
+
+      // ── Hover: highlight related/dim unrelated, labels unchanged ──
+      function hoverHL(nodeId) {
+        const hlSet = new Set([nodeId, ...(NBRS[nodeId]||[])]);
+        NODES.forEach(n => {
+          const o = nObjs[n.id]; if (!o) return;
+          if (hlSet.has(n.id)) {
+            o.sphereMat.emissiveIntensity = 0.35;
+            o.sphereMat.opacity = 0.85;
+            o.ringMat.opacity = 0.3;
+            o.lblMat.map = o.lblWhiteTex; o.lblMat.needsUpdate = true;
+            o.lbl.material.opacity = 1.00;
+            hlStates[n.id] = 'related';
+          } else {
+            o.sphereMat.emissiveIntensity = 0.03;
+            o.sphereMat.opacity = 0.35;
+            o.ringMat.opacity = 0;
+            o.lblMat.map = labelTex(n.label, G[n.group].hex); o.lblMat.needsUpdate = true;
+            o.lbl.material.opacity = camDistOpacity * 0.5;
+            hlStates[n.id] = 'dimmed';
+          }
+        });
+        eObjs.forEach(e => {
+          const on = hlSet.has(e.s) && hlSet.has(e.t);
+          e.line.material.opacity = on ? EDGE_ACTIVE_OPACITY : 0.05;
+          if (e.particles) e.particles.material.opacity = on ? 0.90 : 0.04;
+          if (e.revParticles) e.revParticles.material.opacity = on ? 0.90 : 0.04;
+          e.arrT.material.opacity = on ? 0.85 : 0;
+          if (e.arrS) e.arrS.material.opacity = on ? 0.85 : 0;
+        });
+      }
+      function hoverClear() {
+        NODES.forEach(n => {
+          const o = nObjs[n.id]; if (!o) return;
+          o.sphereMat.emissiveIntensity = o.baseEmissive;
+          o.sphereMat.opacity = 0.75;
+          o.ringMat.opacity = 0;
+          o.lblMat.map = labelTex(n.label, G[n.group].hex); o.lblMat.needsUpdate = true;
+          o.lbl.material.opacity = camDistOpacity;
+          hlStates[n.id] = 'default';
+        });
+        eObjs.forEach(e => {
+          e.line.material.opacity = EDGE_DEFAULT_OPACITY;
+          if (e.particles) e.particles.material.opacity = 0.70;
+          if (e.revParticles) e.revParticles.material.opacity = 0.70;
+          e.arrT.material.opacity = 0;
+          if (e.arrS) e.arrS.material.opacity = 0;
+        });
+      }
+      let hovId = null, labelsOn = false;
+      renderer.domElement.addEventListener('mousemove', e => {
+        if (e.buttons !== 0) return;
+        const newId = nodeAtScreen(e.clientX, e.clientY);
+        if (newId === hovId) return;
+        const selId = selRef.current;
+        const grpLit = litGrpRef.current;
+        if (!selId && !grpLit) {
+          if (newId) hoverHL(newId);
+          else hoverClear();
+        } else if (grpLit && !selId) {
+          // Group selected: merge hovered node + its neighbors into group highlight
+          const gNodes = NODES.filter(n => n.group === grpLit);
+          const gSet = new Set(gNodes.map(n => n.id));
+          const hovSet = newId ? new Set([newId, ...(NBRS[newId]||[])]) : new Set();
+          applyHL(null, new Set([...gSet, ...hovSet]), true);
+        } else if (selId && newId && newId !== selId) {
+          const selSet = new Set([selId, ...(NBRS[selId]||[])]);
+          const hovSet = new Set([newId, ...(NBRS[newId]||[])]);
+          const merged = new Set([...selSet, ...hovSet]);
+          applyHL(selId, merged, labelsOn);
+          // Suppress labels on hover-only edges
+          eObjs.forEach(e => {
+            const inHov = hovSet.has(e.s) && hovSet.has(e.t);
+            const inSel = selSet.has(e.s) && selSet.has(e.t);
+            if (inHov && !inSel) e.eLblMat.opacity = 0;
+          });
+        } else if (selId) {
+          applyHL(selId, new Set([selId, ...(NBRS[selId]||[])]), labelsOn);
+        }
+        // grpLit without selId → do nothing, preserve group highlight
+        hovId = newId;
+        document.body.style.cursor = newId ? 'pointer' : 'default';
+      });
+      renderer.domElement.addEventListener('mouseleave', () => {
+        const selId = selRef.current;
+        const grpLit = litGrpRef.current;
+        if (!selId && !grpLit) hoverClear();
+        else if (grpLit && !selId) {
+          const gNodes = NODES.filter(n => n.group === grpLit);
+          applyHL(null, new Set(gNodes.map(n => n.id)), true);
+        } else if (selId) applyHL(selId, new Set([selId, ...(NBRS[selId]||[])]), labelsOn);
+        hovId = null; document.body.style.cursor = 'default';
+      });
+
+      // Screen-space node detection
+      const _v3 = new THREE.Vector3();
+      function nodeAtScreen(sx, sy, threshold = 13) {
+        const vW = window.innerWidth, vH = window.innerHeight;
+        let bestD = threshold, bestId = null;
+        NODES.forEach(n => {
+          _v3.set(...n.pos).project(camera);
+          if (_v3.z > 1) return;
+          const dx = (_v3.x+1)/2*vW - sx, dy = sy - (1-_v3.y)/2*vH;
+          const d = Math.sqrt(dx*dx + dy*dy);
+          if (d < bestD) { bestD = d; bestId = n.id; }
+        });
+        return bestId;
+      }
+
+      // Camera fly
+      const HOME_CAM = new THREE.Vector3(0, 60, 880), HOME_TGT = new THREE.Vector3(0, 0, 0);
+      let flyAnim = null;
+      const _startFly = (camTo, tgtTo, dur = 1100) => {
+        const sd = ctrl.dampingFactor; ctrl.dampingFactor = 1.0; ctrl.update(); ctrl.dampingFactor = sd;
+        flyAnim = { t0:performance.now(), dur, camFrom:camera.position.clone(), camTo, tgtFrom:ctrl.target.clone(), tgtTo };
+      };
+      const flyToGroup = ids => {
+        if (!ids?.length) return;
+        const pts = ids.map(id => nObjs[id]?.disc?.position).filter(Boolean);
+        if (!pts.length) return;
+        const c = new THREE.Vector3(); pts.forEach(p => c.add(p)); c.divideScalar(pts.length);
+        let maxR = 0; pts.forEach(p => { maxR = Math.max(maxR, c.distanceTo(p)); });
+        maxR = Math.max(maxR, 80); const dist = Math.max(maxR*2.1, 200);
+        _startFly(new THREE.Vector3(c.x+40, c.y+dist*0.44, c.z+dist), c.clone(), 1200);
+        ctrl.autoRotate = false;
+      };
+      const flyToHome = () => _startFly(HOME_CAM.clone(), HOME_TGT.clone(), 1400);
+
+      function isNodeInView(nid) {
+        const n = NID[nid]; if (!n) return false;
+        const v = new THREE.Vector3(...n.pos).project(camera);
+        const sx = (v.x+1)/2*W, sy = (-v.y+1)/2*H;
+        return sx >= 0 && sx <= W && sy >= 0 && sy <= H;
+      }
+
+      // Input handlers
+      let totalDrag = 0;
+      window.addEventListener('pointermove', e => { if (e.buttons > 0) totalDrag += Math.abs(e.movementX) + Math.abs(e.movementY); });
+      renderer.domElement.addEventListener('click', e => {
+        if (totalDrag > 8) return;
+        const nid = nodeAtScreen(e.clientX, e.clientY);
+        if (nid) {
+          selRef.current = nid; setSel(NID[nid]); setLitGrp(NID[nid].group);
+          labelsOn = true;
+          applyHL(nid, new Set([nid, ...(NBRS[nid]||[])]), true);
+          flyToGroup([nid, ...Array.from(NBRS[nid]||[])]);
+        } else {
+          selRef.current = null; setSel(null); setLitGrp(null); clearHL();
+        }
+      });
+      renderer.domElement.addEventListener('contextmenu', e => e.preventDefault());
+      renderer.domElement.addEventListener('pointerdown', () => { totalDrag = 0; });
+
+      // Tick
+      const clock = new THREE.Clock(); let raf;
+      const LABEL_FAR = 950, LABEL_NEAR = 450; let camDistOpacity = 0;
+      const tick = () => {
+        raf = requestAnimationFrame(tick); const T = clock.getElapsedTime();
+        if (flyAnim) {
+          const raw = Math.min((performance.now()-flyAnim.t0)/flyAnim.dur, 1);
+          const ease = raw < 0.5 ? 4*raw*raw*raw : 1-Math.pow(-2*raw+2,3)/2;
+          camera.position.lerpVectors(flyAnim.camFrom, flyAnim.camTo, ease);
+          ctrl.target.lerpVectors(flyAnim.tgtFrom, flyAnim.tgtTo, ease);
+          if (raw >= 1) flyAnim = null;
+        }
+        const camDist = camera.position.length();
+        camDistOpacity = Math.max(0, Math.min(1, (LABEL_FAR-camDist)/(LABEL_FAR-LABEL_NEAR)));
+        let sphOp;
+        if (camDist <= 300) sphOp = 0.023;
+        else if (camDist >= 1200) sphOp = 0.07;
+        else sphOp = 0.023 + (camDist-300)/(1200-300)*(0.07-0.023);
+        sphMesh.material.opacity = sphOp;
+
+        NODES.forEach(n => {
+          const o = nObjs[n.id]; if (!o) return;
+          const dist = camera.position.distanceTo(o.disc.position);
+          const wpp = (2*dist*FOV_TAN)/window.innerHeight;
+          const nodeScale = Math.min(1.2 * wpp, 1.2);    // keep sphere ~24px on screen
+          o.disc.scale.setScalar(nodeScale);
+          o.ring.scale.setScalar(nodeScale);
+          // Ring stays 2px below sphere bottom in screen space
+          o.ring.position.y = n.pos[1] - NODE_R * nodeScale - 10 * wpp;
+          const lblH = 32*wpp; o.lbl.scale.set(lblH*8.0, lblH, 1);
+          const scaledR = NODE_R * nodeScale;
+          o.lbl.position.set(n.pos[0], n.pos[1]+scaledR*1.45+lblH*0.65, n.pos[2]);
+          if (hlStates[n.id] === 'default' && n.id !== hovId) o.lbl.material.opacity = camDistOpacity;
+          if (hlStates[n.id] === 'dimmed') o.lbl.material.opacity = camDistOpacity * 0.5;
+        });
+
+        // Particle flow + line endpoints to sphere surface + arrow scaling
+        eObjs.forEach(e => {
+          const sp = nObjs[e.s]?.disc?.position, tp = nObjs[e.t]?.disc?.position;
+          if (!sp || !tp) return;
+
+          // Compute nodeScale for each end
+          const sDist = camera.position.distanceTo(sp), tDist = camera.position.distanceTo(tp);
+          const sWpp = (2*sDist*FOV_TAN)/window.innerHeight, tWpp = (2*tDist*FOV_TAN)/window.innerHeight;
+          const sNS = Math.min(1.2*sWpp, 1.2), tNS = Math.min(1.2*tWpp, 1.2);
+          const sR = NODE_R * sNS, tR = NODE_R * tNS;
+
+          // Update line endpoints to sphere surface
+          const posAttr = e.line.geometry.attributes.position;
+          posAttr.setXYZ(0, sp.x + e.dir.x * sR, sp.y + e.dir.y * sR, sp.z + e.dir.z * sR);
+          posAttr.setXYZ(1, tp.x - e.dir.x * tR, tp.y - e.dir.y * tR, tp.z - e.dir.z * tR);
+          posAttr.needsUpdate = true;
+
+          // Arrow at target end: root outside sphere, tip touches surface
+          const midD = camera.position.distanceTo(new THREE.Vector3().addVectors(sp, tp).multiplyScalar(0.5));
+          const midWpp = (2*midD*FOV_TAN)/window.innerHeight;
+          const arrScale = 2.25 * midWpp;
+          const arrowLen = 6 * arrScale;  // ConeGeometry height=6
+          e.arrT.position.set(tp.x - e.dir.x * (tR + arrowLen), tp.y - e.dir.y * (tR + arrowLen), tp.z - e.dir.z * (tR + arrowLen));
+          e.arrT.scale.setScalar(arrScale);
+          if (e.arrS) {
+            e.arrS.position.set(sp.x + e.dir.x * (sR + arrowLen), sp.y + e.dir.y * (sR + arrowLen), sp.z + e.dir.z * (sR + arrowLen));
+            e.arrS.scale.setScalar(arrScale);
+          }
+
+          // Edge label
+          const mid = new THREE.Vector3().addVectors(sp, tp).multiplyScalar(0.5);
+          if (e.eLblMat && e.eLblMat.opacity > 0.01) {
+            const lh = 22*midWpp, asp = e.eLblMat.map?._aspect||3;
+            e.eLbl.scale.set(lh*asp, lh, 1);
+          }
+
+          // Flowing particles
+          if (e.particles && e.pAttr) {
+            for (let i = 0; i < N_PARTICLES; i++) {
+              const ph = ((T * FLOW_SPEED + i / N_PARTICLES) % 1);
+              e.pAttr.setXYZ(i,
+                sp.x + (tp.x - sp.x) * ph,
+                sp.y + (tp.y - sp.y) * ph,
+                sp.z + (tp.z - sp.z) * ph
+              );
+            }
+            e.pAttr.needsUpdate = true;
+          }
+          // Reverse particles for bidirectional edges
+          if (e.revParticles && e.revPAttr) {
+            for (let i = 0; i < N_PARTICLES; i++) {
+              const ph = ((T * FLOW_SPEED + i / N_PARTICLES) % 1);
+              e.revPAttr.setXYZ(i,
+                tp.x + (sp.x - tp.x) * ph,
+                tp.y + (sp.y - tp.y) * ph,
+                tp.z + (sp.z - tp.z) * ph
+              );
+            }
+            e.revPAttr.needsUpdate = true;
+          }
+        });
+        if (window._starfield) window._starfield.rotation.y += 0.00012;
+        ctrl.update(); renderer.render(scene, camera);
+      };
+      tick();
+
+      const onResize = () => { camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); };
+      window.addEventListener('resize', onResize);
+      threeRef.current = { ctrl, nObjs, eObjs, applyHL, clearHL, flyToGroup, flyToHome, hlStates };
+      window._loSceneReady = true; dismissOverlay();
+      return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', onResize); renderer.dispose(); if (el.contains(renderer.domElement)) el.removeChild(renderer.domElement); };
+    }; init(); }, []);
+
+  useEffect(() => { const { ctrl } = threeRef.current; if (ctrl) ctrl.autoRotate = rotate; }, [rotate]);
+
+  const handleGroup = group => {
+    const { applyHL, clearHL, flyToGroup, flyToHome } = threeRef.current;
+    if (!applyHL) return; setSel(null); selRef.current = null;
+    if (!group) { clearHL(); setLitGrp(null); flyToHome?.(); return; }
+    setLitGrp(group); const gNodes = NODES.filter(n => n.group === group);
+    applyHL(null, new Set(gNodes.map(n => n.id)), true); flyToGroup?.(gNodes.map(n => n.id));
+  };
+  const handleChip = node => {
+    const { applyHL, flyToGroup } = threeRef.current;
+    if (!applyHL) return; selRef.current = node.id; setSel(node); setLitGrp(node.group);
+    applyHL(node.id, new Set([node.id, ...(NBRS[node.id]||[])]), true);
+    flyToGroup?.([node.id, ...Array.from(NBRS[node.id]||[])]);
+  };
+  const handleClose = () => {
+    const { clearHL, ctrl, flyToHome } = threeRef.current;
+    selRef.current = null; setSel(null); setLitGrp(null); clearHL?.();
+    if (ctrl) ctrl.autoRotate = rotate; flyToHome?.();
+  };
+
+  return (
+    <div style={{position:'fixed',inset:0}}>
+      <div ref={mountRef} style={{position:'fixed',inset:0}}/>
+      <div id="ui">
+        <TopBar/>
+        <GroupPanel lit={litGrp} onGroup={handleGroup}/>
+        <DetailPanel node={sel} onClose={handleClose} onChipClick={handleChip}/>
+        <div className="ctrls">
+          <button className={'cbtn'+(rotate?' on':'')} onClick={() => setRotate(r=>!r)}>⟳ 自动旋转</button>
+          <button className="cbtn" onClick={handleClose}>↺ 重置</button>
+        </div>
+        <div className="hint">
+          悬浮高亮关联 · 点击节点查看关系 · 左键旋转 · 中键拖拽 · 滚轮缩放<br/>
+          左侧可按业务分组过滤
+          <div className="action-legend">
+            <div className="al-dot"/><span className="al-label">箭头方向=动作方向 · 单向箭头=1对多 · 双向箭头=多对多</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

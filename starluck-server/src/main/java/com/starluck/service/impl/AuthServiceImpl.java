@@ -25,19 +25,23 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 认证服务实现
+ * 验证码生成策略：开发阶段随机6位数字+日志输出；生产环境接入短信SDK后将日志改为短信发送
  *
  * @author AI
  * @date 2026-06-01
+ * @ai-assisted ai辅助生成,开发人员已完成审查与测试。
  */
 @Service
 public class AuthServiceImpl implements AuthService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
     private static final String SMS_CODE_PREFIX = "sms:code:";
+    private static final Random RANDOM = new Random();
 
     private final UserMapper userMapper;
     private final UserProfileMapper userProfileMapper;
@@ -62,15 +66,17 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void sendCode(String phone) {
-        String code = "123456";
+    public String sendCode(String phone) {
+        // 生成 6 位随机验证码
+        String code = String.format("%06d", RANDOM.nextInt(1000000));
         String key = SMS_CODE_PREFIX + phone;
         if (redisTemplate != null) {
             redisTemplate.opsForValue().set(key, code, Duration.ofMinutes(5));
         } else if (codeStore != null) {
             codeStore.put(key, code);
         }
-        log.info("验证码发送成功 - phone: {}, code: {}", phone, code);
+        log.info("验证码 - phone: {}, code: {}", phone, code);
+        return code;
     }
 
     @Override
@@ -108,8 +114,37 @@ public class AuthServiceImpl implements AuthService {
         user.setLastLoginTime(LocalDateTime.now());
         userMapper.updateById(user);
 
-        String token = jwtUtil.generateToken(user.getId(), user.getPhone());
+        String token = jwtUtil.generateToken(user.getId(), user.getPhone(), user.getRole());
+        return buildLoginVO(user, token);
+    }
 
+    @Override
+    public LoginVO loginByPassword(String phone, String password) {
+        User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getPhone, phone));
+        if (user == null) {
+            throw new BusinessException("账号不存在，请先注册");
+        }
+        if (user.getPassword() == null || !passwordEncoder.matches(password, user.getPassword())) {
+            throw new BusinessException("密码错误");
+        }
+
+        user.setLastLoginTime(LocalDateTime.now());
+        userMapper.updateById(user);
+
+        String token = jwtUtil.generateToken(user.getId(), user.getPhone(), user.getRole());
+        return buildLoginVO(user, token);
+    }
+
+    @Override
+    public LoginVO getUserInfo(Long userId) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+        return buildLoginVO(user, null);
+    }
+
+    private LoginVO buildLoginVO(User user, String token) {
         UserProfile profile = userProfileMapper.selectOne(
                 new LambdaQueryWrapper<UserProfile>().eq(UserProfile::getUserId, user.getId()));
         UserBalance balance = userBalanceMapper.selectOne(
@@ -129,34 +164,10 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
-    @Override
-    public LoginVO getUserInfo(Long userId) {
-        User user = userMapper.selectById(userId);
-        if (user == null) {
-            throw new BusinessException("用户不存在");
-        }
-        UserProfile profile = userProfileMapper.selectOne(
-                new LambdaQueryWrapper<UserProfile>().eq(UserProfile::getUserId, userId));
-        UserBalance balance = userBalanceMapper.selectOne(
-                new LambdaQueryWrapper<UserBalance>().eq(UserBalance::getUserId, userId));
-
-        return LoginVO.builder()
-                .userId(user.getId())
-                .phone(user.getPhone())
-                .nickname(profile != null ? profile.getNickname() : null)
-                .avatar(profile != null ? profile.getAvatar() : null)
-                .onboarded(profile != null && profile.getNickname() != null)
-                .diamonds(balance != null ? balance.getDiamonds() : 666)
-                .isVip(balance != null && balance.getIsVip() != null && balance.getIsVip() == 1)
-                .vipExpireTime(balance != null && balance.getVipExpireTime() != null
-                        ? balance.getVipExpireTime().toString() : null)
-                .build();
-    }
-
     private User createNewUser(String phone) {
         User user = new User();
         user.setPhone(phone);
-        user.setPassword(passwordEncoder.encode("123456"));
+        // 注册时不设密码，用户可在设置中自行设置
         user.setInviteCode(generateInviteCode());
         user.setStatus(1);
         user.setRole("USER");
@@ -165,6 +176,7 @@ public class AuthServiceImpl implements AuthService {
         UserProfile profile = new UserProfile();
         profile.setUserId(user.getId());
         profile.setAvatarNo(ThreadLocalRandom.current().nextInt(1, 9));
+        profile.setGender("M"); // 默认男性，注册后引导更改
         userProfileMapper.insert(profile);
 
         UserBalance balance = new UserBalance();

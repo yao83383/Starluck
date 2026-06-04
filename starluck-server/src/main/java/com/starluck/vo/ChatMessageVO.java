@@ -8,6 +8,7 @@ public class ChatMessageVO {
     private String senderRole;
     private String msgType;
     private String content;
+    private Integer isRead;
     private String giftEmoji;
     private String giftName;
     private Integer costDiamond;
@@ -23,6 +24,7 @@ public class ChatMessageVO {
         public Builder senderRole(String v) { vo.senderRole = v; return this; }
         public Builder msgType(String v) { vo.msgType = v; return this; }
         public Builder content(String v) { vo.content = v; return this; }
+        public Builder isRead(Integer v) { vo.isRead = v; return this; }
         public Builder giftEmoji(String v) { vo.giftEmoji = v; return this; }
         public Builder giftName(String v) { vo.giftName = v; return this; }
         public Builder costDiamond(Integer v) { vo.costDiamond = v; return this; }
@@ -42,6 +44,8 @@ public class ChatMessageVO {
     public void setMsgType(String msgType) { this.msgType = msgType; }
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
+    public Integer getIsRead() { return isRead; }
+    public void setIsRead(Integer isRead) { this.isRead = isRead; }
     public String getGiftEmoji() { return giftEmoji; }
     public void setGiftEmoji(String giftEmoji) { this.giftEmoji = giftEmoji; }
     public String getGiftName() { return giftName; }

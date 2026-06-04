@@ -122,6 +122,11 @@ public class ChatServiceImpl implements ChatService {
             throw new BusinessException("会话不存在");
         }
 
+        // 将对方发给我的未读消息标记为已读
+        Long otherUserId = session.getMaleUserId().equals(userId) ? session.getFemaleUserId() : session.getMaleUserId();
+        messageMapper.markAsRead(sessionId, otherUserId);
+
+        // 更新当前用户未读数为0
         if (session.getMaleUserId().equals(userId)) {
             session.setMaleUnread(0);
         } else {
@@ -141,6 +146,7 @@ public class ChatServiceImpl implements ChatService {
                 .senderRole(m.getSenderRole())
                 .msgType(m.getMsgType())
                 .content(m.getContent())
+                .isRead(m.getIsRead() != null ? m.getIsRead() : 0)
                 .giftEmoji(m.getGiftEmoji())
                 .giftName(m.getGiftName())
                 .costDiamond(m.getCostDiamond())
@@ -197,6 +203,7 @@ public class ChatServiceImpl implements ChatService {
         msg.setContent(request.getContent());
         msg.setCostDiamond(costDiamond);
         msg.setMsgTime(now);
+        msg.setIsRead(0);
         messageMapper.insert(msg);
 
         session.setLastMsg(request.getContent());
@@ -229,16 +236,34 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ChatSessionVO getOrCreateSession(Long maleUserId, Long femaleUserId, boolean isFake) {
-        ChatSession session = sessionMapper.selectOne(
-                new LambdaQueryWrapper<ChatSession>()
-                        .eq(ChatSession::getMaleUserId, maleUserId)
-                        .eq(ChatSession::getFemaleUserId, femaleUserId));
+    public ChatSessionVO getOrCreateSession(Long currentUserId, Long peerUserId, boolean isFake) {
+        ChatSession session;
+        Long maleId, femaleId;
+
+        if (isFake) {
+            // 假用户场景：当前用户固定为 male，假用户固定为 female，需用 is_fake 区分
+            maleId = currentUserId;
+            femaleId = peerUserId;
+            session = sessionMapper.selectOne(
+                    new LambdaQueryWrapper<ChatSession>()
+                            .eq(ChatSession::getMaleUserId, maleId)
+                            .eq(ChatSession::getFemaleUserId, femaleId)
+                            .eq(ChatSession::getIsFake, true));
+        } else {
+            // 真实用户场景：小ID放male，大ID放female，is_fake=false
+            maleId = currentUserId < peerUserId ? currentUserId : peerUserId;
+            femaleId = currentUserId < peerUserId ? peerUserId : currentUserId;
+            session = sessionMapper.selectOne(
+                    new LambdaQueryWrapper<ChatSession>()
+                            .eq(ChatSession::getMaleUserId, maleId)
+                            .eq(ChatSession::getFemaleUserId, femaleId)
+                            .eq(ChatSession::getIsFake, false));
+        }
 
         if (session == null) {
             session = new ChatSession();
-            session.setMaleUserId(maleUserId);
-            session.setFemaleUserId(femaleUserId);
+            session.setMaleUserId(maleId);
+            session.setFemaleUserId(femaleId);
             session.setIsFake(isFake);
             session.setType("chat");
             session.setMaleUnread(0);
@@ -248,7 +273,7 @@ public class ChatServiceImpl implements ChatService {
 
         return ChatSessionVO.builder()
                 .sessionId(session.getId())
-                .peerUserId(femaleUserId)
+                .peerUserId(peerUserId)
                 .isFake(isFake)
                 .build();
     }

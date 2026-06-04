@@ -1,0 +1,155 @@
+.page { display: flex; flex-direction: column; }
+
+.status-bar { flex-shrink: 0; position: relative; z-index: 5; }
+.nav-bar {
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  padding: 0 16rpx;
+  position: relative;
+  z-index: 5;
+}
+.nav-bar .back {
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  color: var(--sl-text1);
+}
+.nav-bar .title {
+  flex: 1;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--sl-text1);
+}
+.nav-bar .right { width: 64rpx; }
+
+.progress {
+  padding: 16rpx 32rpx 0;
+  position: relative;
+  z-index: 2;
+}
+.progress .bar {
+  height: 8rpx;
+  background: rgba(255,255,255,0.1);
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+.progress .fill {
+  height: 100%;
+  background: var(--sl-brandGrad);
+  border-radius: 4rpx;
+  transition: width 0.3s;
+}
+.progress .text {
+  font-size: 22rpx;
+  text-align: right;
+  margin-top: 8rpx;
+}
+
+.body { flex: 1; position: relative; z-index: 2; }
+.step { padding: 40rpx 40rpx 80rpx; }
+
+.title-lg { font-size: 48rpx; font-weight: 800; color: var(--sl-text1); }
+.sub { font-size: 24rpx; margin-top: 12rpx; }
+
+/* 头像 */
+.avatar-upload {
+  width: 240rpx;
+  height: 240rpx;
+  margin: 80rpx auto 32rpx;
+  border-radius: 50%;
+  border: 4rpx dashed var(--sl-brand1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.avatar-upload .emoji { font-size: 80rpx; color: #fff; }
+.tip {
+  text-align: center;
+  font-size: 22rpx;
+  margin-top: 16rpx;
+}
+
+/* 性别 */
+.gender-pick {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 60rpx;
+}
+.gender-pick .g {
+  flex: 1;
+  padding: 48rpx 0;
+  background: var(--sl-bgCard);
+  border: 2rpx solid var(--sl-border1);
+  border-radius: 24rpx;
+  text-align: center;
+}
+.gender-pick .g.on {
+  border-color: var(--sl-brand1);
+  background: var(--sl-overlayCard);
+}
+.gender-pick .g .emoji { font-size: 88rpx; }
+.gender-pick .g .lbl { font-size: 28rpx; font-weight: 600; margin-top: 12rpx; color: var(--sl-text1); }
+
+/* 表单 */
+.field {
+  margin-top: 24rpx;
+  padding: 20rpx 28rpx;
+  background: var(--sl-bgCard);
+  border: 1rpx solid var(--sl-border1);
+  border-radius: 20rpx;
+}
+.field .lbl { font-size: 20rpx; color: var(--sl-text3); }
+.field .ipt {
+  font-size: 30rpx;
+  color: var(--sl-text1);
+  margin-top: 6rpx;
+  width: 100%;
+}
+.ph { color: var(--sl-text3); }
+
+/* 兴趣 */
+.interest-pick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-top: 32rpx;
+}
+.interest-pick .ic {
+  padding: 14rpx 28rpx;
+  background: var(--sl-bgCard);
+  border: 2rpx solid var(--sl-border1);
+  border-radius: 32rpx;
+  font-size: 26rpx;
+  color: var(--sl-text2);
+}
+.interest-pick .ic.on {
+  border-color: var(--sl-brand1);
+  background: var(--sl-overlayCard);
+  color: var(--sl-brand1);
+  font-weight: 700;
+}
+.count {
+  text-align: center;
+  margin-top: 24rpx;
+  font-size: 22rpx;
+}
+
+/* 底部 */
+.actions {
+  padding: 24rpx 32rpx calc(24rpx + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  flex-shrink: 0;
+  background: var(--sl-bgDeep);
+  border-top: 1rpx solid var(--sl-border1);
+}
+.actions .skip {
+  padding: 24rpx 28rpx;
+  font-size: 26rpx;
+}

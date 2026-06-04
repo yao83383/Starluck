@@ -1,0 +1,66 @@
+<view class="page page-bg-radial" style="{{themeStyle}}">
+  <starfield density="normal"></starfield>
+
+  <view class="status-bar" style="height:{{statusBarHeight}}px;"></view>
+
+  <view class="nav-bar">
+    <view class="back" bindtap="back">‹</view>
+    <view class="title">星耀会员</view>
+    <view class="right"></view>
+  </view>
+
+  <scroll-view class="body" scroll-y="true" enhanced="true" show-scrollbar="false">
+
+    <view class="hero">
+      <view class="crown">👑</view>
+      <view class="hero-title">开通星耀会员</view>
+      <view class="hero-sub text-2">解锁 8 大专属特权 · 让你的光更闪耀</view>
+    </view>
+
+    <view class="status-card">
+      <view class="sc-icon">⭐</view>
+      <view class="sc-info flex-1">
+        <view class="t1 text-gold">{{store.user.vip?'已开通':'当前：普通用户'}}</view>
+        <view class="t2 text-2">{{store.user.vip?'到期：'+store.user.vipExpire:'升级 VIP 享受更多权益'}}</view>
+      </view>
+    </view>
+
+    <view class="plans">
+      <view
+        class="plan {{selected===item.id?'on':''}} {{item.hot?'hot':''}}"
+        wx:for="{{plans}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="pickPlan"
+      >
+        <view wx:if="{{item.hot}}" class="hot-tag">{{item.extra}}</view>
+        <view class="pn">{{item.name}}</view>
+        <view class="pp">¥{{item.price}}</view>
+        <view wx:if="{{item.origin}}" class="po text-3">{{item.origin}}</view>
+        <view wx:else class="pd text-success">{{item.extra}}</view>
+      </view>
+    </view>
+
+    <view class="rights-card">
+      <view class="rc-title">VIP 专属特权</view>
+      <view class="rights-grid">
+        <view class="vr" wx:for="{{rights}}" wx:key="nm">
+          <view class="ic">{{item.ic}}</view>
+          <view class="nm text-2">{{item.nm}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="agree text-3">
+      开通即同意《VIP 服务协议》· 到期自动续费，可随时取消
+    </view>
+
+    <view style="height:200rpx;"></view>
+  </scroll-view>
+
+  <view class="bottom-bar">
+    <sl-button type="gold" block bindtap="doPay">
+      ¥{{selectedPlan.price}} 立即开通{{selectedPlan.name}}
+    </sl-button>
+  </view>
+</view>

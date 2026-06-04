@@ -1,0 +1,68 @@
+<view class="page" style="{{themeStyle}}">
+  <view class="status-bar" style="height:{{statusBarHeight}}px;"></view>
+
+  <view class="nav-bar">
+    <view class="back" bindtap="back">‹</view>
+    <view class="title">我的钱包</view>
+    <view class="right text-2">明细</view>
+  </view>
+
+  <view class="top">
+    <view class="lbl">可提现余额（元）</view>
+    <view class="amt">¥{{store.cash}}</view>
+  </view>
+
+  <view class="quick">
+    <view class="qi" bindtap="doWithdraw">
+      <view class="qic c1">💸</view>
+      <view class="ql text-2">提现</view>
+    </view>
+    <view class="qi" bindtap="doRecharge">
+      <view class="qic c2">✨</view>
+      <view class="ql text-2">充值</view>
+    </view>
+    <view class="qi">
+      <view class="qic c3">🏦</view>
+      <view class="ql text-2">银行卡</view>
+    </view>
+    <view class="qi">
+      <view class="qic c4">📋</view>
+      <view class="ql text-2">明细</view>
+    </view>
+  </view>
+
+  <scroll-view class="body" scroll-y="true" enhanced="true" show-scrollbar="false">
+
+    <view class="month">
+      <view class="mt-top">
+        <text class="mt-l">本月收益</text>
+        <text class="mt-r">¥286.00</text>
+      </view>
+      <view class="mt-grid">
+        <view class="md"><view class="ln text-3">星愿收益</view><view class="lv">¥180.00</view></view>
+        <view class="md"><view class="ln text-3">星语收益</view><view class="lv">¥76.00</view></view>
+        <view class="md"><view class="ln text-3">同频收益</view><view class="lv">¥30.00</view></view>
+      </view>
+    </view>
+
+    <view class="bills">
+      <view class="bills-title">最近账单</view>
+      <view
+        class="bill-item"
+        wx:for="{{bills}}"
+        wx:key="id"
+      >
+        <view class="bi {{item.type==='in'?'in':'out'}}">{{item.icon}}</view>
+        <view class="bn flex-1">
+          <view class="t1">{{item.t1}}</view>
+          <view class="t2 text-3">{{item.t2}}</view>
+        </view>
+        <view class="ba {{item.type==='in'?'in':'out'}}">
+          {{item.type==='in'?'+':'-'}}¥{{item.amt}}
+        </view>
+      </view>
+    </view>
+
+    <view style="height:80rpx;"></view>
+  </scroll-view>
+</view>

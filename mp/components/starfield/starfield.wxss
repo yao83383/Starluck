@@ -1,0 +1,31 @@
+/* === ✨ 星光粒子层 === */
+.starfield {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(3rpx 3rpx at 12% 18%, #ffffff, transparent),
+    radial-gradient(2rpx 2rpx at 28% 42%, #e0c8ff, transparent),
+    radial-gradient(4rpx 4rpx at 47% 76%, #ffffff, transparent),
+    radial-gradient(2rpx 2rpx at 63% 23%, #ffd6f5, transparent),
+    radial-gradient(3rpx 3rpx at 78% 57%, #ffffff, transparent),
+    radial-gradient(2rpx 2rpx at 88% 88%, #e0c8ff, transparent),
+    radial-gradient(2rpx 2rpx at 92% 14%, #ffffff, transparent),
+    radial-gradient(3rpx 3rpx at 35% 64%, #ffd6f5, transparent),
+    radial-gradient(2rpx 2rpx at 56% 91%, #ffffff, transparent);
+  background-size: 760rpx 760rpx;
+  opacity: 0.65;
+  animation: slTwinkle 6s ease-in-out infinite;
+}
+
+.starfield.light { opacity: 0.4; background-size: 1000rpx 1000rpx; }
+.starfield.heavy { opacity: 0.85; background-size: 540rpx 540rpx; }
+
+@keyframes slTwinkle {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.8; }
+}

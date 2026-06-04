@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Starluck · 三套色彩方案对比</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#0a0a14;color:#e8e8f0;line-height:1.5;font-size:14px;min-height:100vh;}
+.page-hd{padding:32px 24px 20px;text-align:center;border-bottom:1px solid rgba(255,255,255,.08);}
+.page-hd h1{font-size:24px;font-weight:800;background:linear-gradient(135deg,#ffd966,#a18cff,#5a8aff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.page-hd .sub{font-size:13px;color:#8a8aa0;margin-top:6px;}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;padding:24px;max-width:1500px;margin:0 auto;}
+@media(max-width:1100px){.grid{grid-template-columns:1fr;}}
+
+.option{border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:#12121e;}
+.option-hd{padding:16px;border-bottom:1px solid rgba(255,255,255,.06);}
+.option-hd h2{font-size:18px;font-weight:800;margin-bottom:4px;}
+.option-hd .desc{font-size:12px;color:#8a8aa0;}
+.option-hd .badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:8px;font-weight:700;margin-left:6px;vertical-align:middle;}
+.badge-rec{background:linear-gradient(135deg,#ffd966,#ff9a3c);color:#3a2a00;}
+
+/* 色卡区 */
+.swatches{display:flex;padding:12px 16px;gap:8px;flex-wrap:wrap;}
+.swatch{flex:1;min-width:60px;height:60px;border-radius:8px;display:flex;flex-direction:column;justify-content:flex-end;padding:6px;font-size:9px;font-family:monospace;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6);}
+
+/* 预览区 */
+.preview{padding:0;position:relative;height:520px;overflow:hidden;}
+
+/* ===== 方案 A：深空蓝 + 星光金 ===== */
+.opt-a .preview{background:radial-gradient(ellipse at 20% 0%,#1a2960 0%,#0a0e2a 50%,#050817 100%);}
+.opt-a .preview::before{content:"";position:absolute;inset:0;background-image:radial-gradient(1px 1px at 20% 30%,#fff,transparent),radial-gradient(1px 1px at 60% 70%,#ffd966,transparent),radial-gradient(2px 2px at 80% 20%,#fff,transparent),radial-gradient(1px 1px at 40% 80%,#a8c4ff,transparent),radial-gradient(1px 1px at 90% 60%,#fff,transparent),radial-gradient(2px 2px at 30% 50%,#ffd966,transparent),radial-gradient(1px 1px at 70% 90%,#fff,transparent),radial-gradient(1px 1px at 10% 60%,#a8c4ff,transparent),radial-gradient(2px 2px at 50% 10%,#ffd966,transparent);background-size:300px 300px;opacity:.8;animation:twinkle 4s ease-in-out infinite;}
+
+/* ===== 方案 B：深紫 + 银河渐变 ===== */
+.opt-b .preview{background:radial-gradient(ellipse at 70% 30%,#3a1a52 0%,#1a0a2e 50%,#0a0418 100%);}
+.opt-b .preview::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 30% 70%,rgba(180,140,255,.15),transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(255,160,220,.1),transparent 50%);}
+.opt-b .preview::after{content:"";position:absolute;inset:0;background-image:radial-gradient(1px 1px at 25% 35%,#fff,transparent),radial-gradient(2px 2px at 65% 75%,#e0c8ff,transparent),radial-gradient(1px 1px at 85% 25%,#fff,transparent),radial-gradient(1px 1px at 45% 85%,#ffd6f5,transparent),radial-gradient(2px 2px at 15% 55%,#fff,transparent),radial-gradient(1px 1px at 75% 15%,#e0c8ff,transparent),radial-gradient(1px 1px at 35% 25%,#fff,transparent),radial-gradient(2px 2px at 55% 65%,#ffd6f5,transparent);background-size:280px 280px;opacity:.85;animation:twinkle 5s ease-in-out infinite reverse;}
+
+/* ===== 方案 C：暖夜蓝 + 流光粉 ===== */
+.opt-c .preview{background:radial-gradient(ellipse at 50% 0%,#23264c 0%,#15182f 50%,#080a18 100%);}
+.opt-c .preview::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 30% 60%,rgba(255,120,170,.1),transparent 50%),radial-gradient(ellipse at 70% 30%,rgba(180,200,255,.1),transparent 50%);}
+.opt-c .preview::after{content:"";position:absolute;inset:0;background-image:radial-gradient(1px 1px at 20% 40%,#fff,transparent),radial-gradient(2px 2px at 70% 60%,#ffaad4,transparent),radial-gradient(1px 1px at 50% 20%,#fff,transparent),radial-gradient(1px 1px at 80% 80%,#a8c4ff,transparent),radial-gradient(2px 2px at 30% 70%,#fff,transparent),radial-gradient(1px 1px at 60% 30%,#ffaad4,transparent),radial-gradient(1px 1px at 10% 80%,#fff,transparent);background-size:260px 260px;opacity:.85;animation:twinkle 4.5s ease-in-out infinite;}
+
+@keyframes twinkle{0%,100%{opacity:.6;}50%{opacity:1;}}
+
+/* 预览内容（仿手机壳） */
+.phone-mini{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:240px;height:480px;border-radius:30px;background:#000;padding:6px;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.08);overflow:hidden;}
+.phone-screen{width:100%;height:100%;border-radius:24px;overflow:hidden;display:flex;flex-direction:column;position:relative;}
+
+/* 方案 A 手机内容 */
+.opt-a .phone-screen{background:linear-gradient(180deg,#0e1638 0%,#070b1f 100%);}
+.opt-a .ph-top{padding:24px 18px 12px;text-align:center;}
+.opt-a .ph-logo{font-size:36px;}
+.opt-a .ph-brand{font-size:22px;font-weight:800;margin-top:6px;background:linear-gradient(135deg,#ffd966,#ffeba8);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.opt-a .ph-slogan{font-size:10px;color:rgba(255,255,255,.5);margin-top:4px;font-style:italic;}
+.opt-a .ph-card{margin:10px 14px;padding:12px;background:linear-gradient(135deg,rgba(255,217,102,.08),rgba(90,138,255,.05));border:1px solid rgba(255,217,102,.2);border-radius:12px;backdrop-filter:blur(8px);}
+.opt-a .ph-card .t{font-size:11px;color:#ffd966;font-weight:700;}
+.opt-a .ph-card .d{font-size:9px;color:rgba(255,255,255,.6);margin-top:2px;}
+.opt-a .ph-btn{margin:10px 14px;padding:10px;background:linear-gradient(135deg,#ffd966,#ff9a3c);color:#3a2a00;text-align:center;border-radius:20px;font-size:12px;font-weight:700;box-shadow:0 4px 14px rgba(255,217,102,.3);}
+.opt-a .ph-btn-2{margin:0 14px 10px;padding:9px;background:rgba(90,138,255,.15);color:#a8c4ff;text-align:center;border-radius:18px;font-size:11px;font-weight:600;border:1px solid rgba(90,138,255,.3);}
+.opt-a .ph-tags{display:flex;gap:6px;padding:0 14px;flex-wrap:wrap;}
+.opt-a .ph-tag{font-size:9px;padding:3px 8px;background:rgba(255,217,102,.15);color:#ffd966;border-radius:10px;}
+.opt-a .ph-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 14px;}
+.opt-a .ph-user{background:linear-gradient(135deg,#1a2960,#0e1638);border-radius:10px;padding:10px 8px;border:1px solid rgba(255,255,255,.06);}
+.opt-a .ph-user .av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#ffd966,#a8c4ff);margin-bottom:6px;}
+.opt-a .ph-user .nm{font-size:10px;font-weight:700;color:#fff;}
+.opt-a .ph-user .mt{font-size:8px;color:rgba(255,255,255,.5);margin-top:2px;}
+
+/* 方案 B 手机内容 */
+.opt-b .phone-screen{background:linear-gradient(180deg,#1f0d3a 0%,#0a0418 100%);}
+.opt-b .ph-top{padding:24px 18px 12px;text-align:center;}
+.opt-b .ph-logo{font-size:36px;}
+.opt-b .ph-brand{font-size:22px;font-weight:800;margin-top:6px;background:linear-gradient(135deg,#e0c8ff,#ffd6f5,#a18cff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.opt-b .ph-slogan{font-size:10px;color:rgba(224,200,255,.6);margin-top:4px;font-style:italic;}
+.opt-b .ph-card{margin:10px 14px;padding:12px;background:linear-gradient(135deg,rgba(180,140,255,.12),rgba(255,160,220,.06));border:1px solid rgba(180,140,255,.25);border-radius:12px;backdrop-filter:blur(8px);}
+.opt-b .ph-card .t{font-size:11px;color:#e0c8ff;font-weight:700;}
+.opt-b .ph-card .d{font-size:9px;color:rgba(255,255,255,.6);margin-top:2px;}
+.opt-b .ph-btn{margin:10px 14px;padding:10px;background:linear-gradient(135deg,#a18cff,#ff8ad4);color:#fff;text-align:center;border-radius:20px;font-size:12px;font-weight:700;box-shadow:0 4px 14px rgba(180,140,255,.4);}
+.opt-b .ph-btn-2{margin:0 14px 10px;padding:9px;background:rgba(180,140,255,.15);color:#e0c8ff;text-align:center;border-radius:18px;font-size:11px;font-weight:600;border:1px solid rgba(180,140,255,.3);}
+.opt-b .ph-tags{display:flex;gap:6px;padding:0 14px;flex-wrap:wrap;}
+.opt-b .ph-tag{font-size:9px;padding:3px 8px;background:rgba(255,160,220,.15);color:#ffd6f5;border-radius:10px;}
+.opt-b .ph-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 14px;}
+.opt-b .ph-user{background:linear-gradient(135deg,#3a1a52,#1f0d3a);border-radius:10px;padding:10px 8px;border:1px solid rgba(255,255,255,.06);}
+.opt-b .ph-user .av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#a18cff,#ff8ad4);margin-bottom:6px;}
+.opt-b .ph-user .nm{font-size:10px;font-weight:700;color:#fff;}
+.opt-b .ph-user .mt{font-size:8px;color:rgba(255,255,255,.5);margin-top:2px;}
+
+/* 方案 C 手机内容 */
+.opt-c .phone-screen{background:linear-gradient(180deg,#23264c 0%,#080a18 100%);}
+.opt-c .ph-top{padding:24px 18px 12px;text-align:center;}
+.opt-c .ph-logo{font-size:36px;}
+.opt-c .ph-brand{font-size:22px;font-weight:800;margin-top:6px;background:linear-gradient(135deg,#ffaad4,#a8c4ff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.opt-c .ph-slogan{font-size:10px;color:rgba(168,196,255,.6);margin-top:4px;font-style:italic;}
+.opt-c .ph-card{margin:10px 14px;padding:12px;background:linear-gradient(135deg,rgba(255,120,170,.1),rgba(120,160,255,.06));border:1px solid rgba(255,170,212,.2);border-radius:12px;backdrop-filter:blur(8px);}
+.opt-c .ph-card .t{font-size:11px;color:#ffaad4;font-weight:700;}
+.opt-c .ph-card .d{font-size:9px;color:rgba(255,255,255,.6);margin-top:2px;}
+.opt-c .ph-btn{margin:10px 14px;padding:10px;background:linear-gradient(135deg,#ff8ab0,#7a9eff);color:#fff;text-align:center;border-radius:20px;font-size:12px;font-weight:700;box-shadow:0 4px 14px rgba(255,138,176,.35);}
+.opt-c .ph-btn-2{margin:0 14px 10px;padding:9px;background:rgba(168,196,255,.15);color:#a8c4ff;text-align:center;border-radius:18px;font-size:11px;font-weight:600;border:1px solid rgba(168,196,255,.3);}
+.opt-c .ph-tags{display:flex;gap:6px;padding:0 14px;flex-wrap:wrap;}
+.opt-c .ph-tag{font-size:9px;padding:3px 8px;background:rgba(255,170,212,.15);color:#ffaad4;border-radius:10px;}
+.opt-c .ph-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 14px;}
+.opt-c .ph-user{background:linear-gradient(135deg,#2a2d52,#15182f);border-radius:10px;padding:10px 8px;border:1px solid rgba(255,255,255,.06);}
+.opt-c .ph-user .av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#ffaad4,#a8c4ff);margin-bottom:6px;}
+.opt-c .ph-user .nm{font-size:10px;font-weight:700;color:#fff;}
+.opt-c .ph-user .mt{font-size:8px;color:rgba(255,255,255,.5);margin-top:2px;}
+
+/* 应用场景说明 */
+.option-ft{padding:14px 16px;border-top:1px solid rgba(255,255,255,.06);font-size:11px;color:#a0a0b8;line-height:1.7;}
+.option-ft .row{display:flex;justify-content:space-between;padding:3px 0;}
+.option-ft .k{color:#666680;}
+.option-ft .v{color:#d0d0e0;}
+
+.summary{max-width:1500px;margin:20px auto;padding:20px 24px;background:linear-gradient(135deg,rgba(255,217,102,.05),rgba(161,140,255,.05));border:1px solid rgba(255,255,255,.08);border-radius:14px;}
+.summary h3{font-size:15px;font-weight:700;color:#ffd966;margin-bottom:10px;}
+.summary p{font-size:13px;color:#c0c0d0;line-height:1.7;}
+.summary b{color:#ffd966;}
+.footer{text-align:center;padding:20px;font-size:11px;color:#666680;}
+</style>
+</head>
+<body>
+
+<div class="page-hd">
+  <h1>Starluck · 三套色彩方案对比</h1>
+  <div class="sub">每颗星星都曾独自闪耀，直到遇见另一颗星 · Every star shines alone, until it finds another</div>
+</div>
+
+<div class="grid">
+
+  <!-- ===== 方案 A ===== -->
+  <div class="option opt-a">
+    <div class="option-hd">
+      <h2>方案 A · 深空蓝 + 星光金 <span class="badge badge-rec">推荐</span></h2>
+      <div class="desc">最贴合"宇宙星辰"叙事 · 冷静理性中带温暖光点</div>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="background:#070b1f">背景<br/>#070b1f</div>
+      <div class="swatch" style="background:#1a2960">卡片<br/>#1a2960</div>
+      <div class="swatch" style="background:linear-gradient(135deg,#ffd966,#ff9a3c);color:#3a2a00;text-shadow:none">星金<br/>#ffd966</div>
+      <div class="swatch" style="background:#a8c4ff;color:#0a0e2a;text-shadow:none">星蓝<br/>#a8c4ff</div>
+    </div>
+    <div class="preview">
+      <div class="phone-mini"><div class="phone-screen">
+        <div class="ph-top">
+          <div class="ph-logo">✨</div>
+          <div class="ph-brand">Starluck</div>
+          <div class="ph-slogan">每颗星，都在等另一颗</div>
+        </div>
+        <div class="ph-card">
+          <div class="t">⭐ 今夜与你同轨</div>
+          <div class="d">3 颗星正在向你靠近</div>
+        </div>
+        <div class="ph-tags">
+          <div class="ph-tag">#星座</div><div class="ph-tag">#夜话</div><div class="ph-tag">#诗</div>
+        </div>
+        <div class="ph-grid">
+          <div class="ph-user"><div class="av"></div><div class="nm">小星</div><div class="mt">23 · 上海</div></div>
+          <div class="ph-user"><div class="av"></div><div class="nm">月白</div><div class="mt">25 · 北京</div></div>
+        </div>
+        <div class="ph-btn">✨ 寻找你的星</div>
+        <div class="ph-btn-2">查看星轨</div>
+      </div></div>
+    </div>
+    <div class="option-ft">
+      <div class="row"><span class="k">主背景</span><span class="v">深空蓝 #070b1f → #0e1638</span></div>
+      <div class="row"><span class="k">品牌主色</span><span class="v">星光金 #ffd966</span></div>
+      <div class="row"><span class="k">辅助色</span><span class="v">星河蓝 #a8c4ff</span></div>
+      <div class="row"><span class="k">气质</span><span class="v">永恒 · 神秘 · 高级</span></div>
+      <div class="row"><span class="k">适合</span><span class="v">高净值/婚恋向/品牌感强</span></div>
+    </div>
+  </div>
+
+  <!-- ===== 方案 B ===== -->
+  <div class="option opt-b">
+    <div class="option-hd">
+      <h2>方案 B · 深紫 + 银河渐变</h2>
+      <div class="desc">梦幻浪漫的银河调 · 强情绪渲染力</div>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="background:#0a0418">背景<br/>#0a0418</div>
+      <div class="swatch" style="background:#3a1a52">卡片<br/>#3a1a52</div>
+      <div class="swatch" style="background:linear-gradient(135deg,#a18cff,#ff8ad4);text-shadow:none">银河紫<br/>#a18cff</div>
+      <div class="swatch" style="background:#ffd6f5;color:#3a1a52;text-shadow:none">星云粉<br/>#ffd6f5</div>
+    </div>
+    <div class="preview">
+      <div class="phone-mini"><div class="phone-screen">
+        <div class="ph-top">
+          <div class="ph-logo">🌌</div>
+          <div class="ph-brand">Starluck</div>
+          <div class="ph-slogan">在银河尽头，等你转身</div>
+        </div>
+        <div class="ph-card">
+          <div class="t">💫 命定相遇</div>
+          <div class="d">银河深处，3 颗星已发出信号</div>
+        </div>
+        <div class="ph-tags">
+          <div class="ph-tag">#浪漫</div><div class="ph-tag">#诗意</div><div class="ph-tag">#梦</div>
+        </div>
+        <div class="ph-grid">
+          <div class="ph-user"><div class="av"></div><div class="nm">星河</div><div class="mt">23 · 上海</div></div>
+          <div class="ph-user"><div class="av"></div><div class="nm">月光</div><div class="mt">25 · 北京</div></div>
+        </div>
+        <div class="ph-btn">💫 寻找你的命星</div>
+        <div class="ph-btn-2">查看星轨</div>
+      </div></div>
+    </div>
+    <div class="option-ft">
+      <div class="row"><span class="k">主背景</span><span class="v">星云紫 #0a0418 → #1f0d3a</span></div>
+      <div class="row"><span class="k">品牌主色</span><span class="v">银河紫 #a18cff → #ff8ad4</span></div>
+      <div class="row"><span class="k">辅助色</span><span class="v">星云粉 #ffd6f5</span></div>
+      <div class="row"><span class="k">气质</span><span class="v">梦幻 · 浪漫 · 情绪</span></div>
+      <div class="row"><span class="k">适合</span><span class="v">情感向/Z世代/夜间向</span></div>
+    </div>
+  </div>
+
+  <!-- ===== 方案 C ===== -->
+  <div class="option opt-c">
+    <div class="option-hd">
+      <h2>方案 C · 暖夜蓝 + 流光粉</h2>
+      <div class="desc">保留原粉色基因 · 升级为深色宇宙感</div>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="background:#080a18">背景<br/>#080a18</div>
+      <div class="swatch" style="background:#23264c">卡片<br/>#23264c</div>
+      <div class="swatch" style="background:linear-gradient(135deg,#ff8ab0,#7a9eff);text-shadow:none">流光<br/>#ff8ab0</div>
+      <div class="swatch" style="background:#a8c4ff;color:#080a18;text-shadow:none">夜蓝<br/>#a8c4ff</div>
+    </div>
+    <div class="preview">
+      <div class="phone-mini"><div class="phone-screen">
+        <div class="ph-top">
+          <div class="ph-logo">💫</div>
+          <div class="ph-brand">Starluck</div>
+          <div class="ph-slogan">两颗孤独的星，一片共享的夜空</div>
+        </div>
+        <div class="ph-card">
+          <div class="t">🌟 今日同频</div>
+          <div class="d">3 颗与你共振的星</div>
+        </div>
+        <div class="ph-tags">
+          <div class="ph-tag">#心动</div><div class="ph-tag">#暖夜</div><div class="ph-tag">#光</div>
+        </div>
+        <div class="ph-grid">
+          <div class="ph-user"><div class="av"></div><div class="nm">琉光</div><div class="mt">23 · 上海</div></div>
+          <div class="ph-user"><div class="av"></div><div class="nm">夜白</div><div class="mt">25 · 北京</div></div>
+        </div>
+        <div class="ph-btn">🌟 遇见你的星</div>
+        <div class="ph-btn-2">查看星轨</div>
+      </div></div>
+    </div>
+    <div class="option-ft">
+      <div class="row"><span class="k">主背景</span><span class="v">暖夜蓝 #080a18 → #23264c</span></div>
+      <div class="row"><span class="k">品牌主色</span><span class="v">流光粉 #ff8ab0 → #7a9eff</span></div>
+      <div class="row"><span class="k">辅助色</span><span class="v">夜空蓝 #a8c4ff</span></div>
+      <div class="row"><span class="k">气质</span><span class="v">温柔 · 心动 · 易用</span></div>
+      <div class="row"><span class="k">适合</span><span class="v">原粉色用户/大众市场</span></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="summary">
+  <h3>📌 选择建议</h3>
+  <p>
+    • <b>方案 A（深空蓝 + 星光金）</b>：最契合 Starluck "亿万颗星辰中的一次相遇" 叙事，高级感最强。金色稀缺、克制，适合做高净值定位。<br/>
+    • <b>方案 B（深紫 + 银河渐变）</b>：情绪张力最强，浪漫氛围拉满，适合做"梦幻邂逅"叙事。但深紫调过暗时可能压抑。<br/>
+    • <b>方案 C（暖夜蓝 + 流光粉）</b>：保留了原粉色用户记忆，但升级到深色宇宙感。最稳妥的过渡方案。<br/><br/>
+    根据 Starluck 名称来源中"两颗孤独的星偶然相遇"的核心叙事，<b>推荐方案 A</b>——星光金的"稀缺感"恰好对应"命中注定的相遇"，而非廉价的粉色"心动"。
+  </p>
+</div>
+
+<div class="footer">
+  Starluck · Two lonely stars. One shared sky. · 选定方案后，我会用其重构整个产品 UI 与文档
+</div>
+
+</body>
+</html>

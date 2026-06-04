@@ -1,0 +1,138 @@
+const slPage = require('../../utils/sl-page.js')
+const store = require('../../utils/store.js')
+const API = require('../../utils/api.js')
+
+slPage({
+  data: {
+    sessionId: '',
+    peerId: 0,
+    isFake: false,
+    peer: { name:'...', av:1, vip:false, online:true },
+    text: '',
+    msgs: [],
+    statusBarHeight: 20,
+    scrollIntoView: ''
+  },
+
+  onLoad(q) {
+    const app = getApp()
+    const rawQ = q && q.id ? q.id : ''
+    const isFake = /^f/i.test(rawQ)
+    const peerId = parseInt(rawQ.replace(/[^0-9]/g, '')) || 0
+
+    this.setData({
+      peerId,
+      isFake,
+      statusBarHeight: app.globalData.statusBarHeight || 20
+    })
+
+    if (peerId > 0) {
+      // 1. 对方资料：真实用户调 API；假用户从 globalData 缓存里取
+      if (isFake) {
+        const list = (getApp().lastDiscoverList || [])
+        const found = list.find(u => u.isFake && u.rawId === peerId)
+        if (found) {
+          this.setData({
+            peer: { name: found.name, av: found.av, vip: found.vip, online: true }
+          })
+        }
+      } else {
+        API.user.getOther(peerId).then(profile => {
+          this.setData({
+            peer: {
+              name: profile.nickname || '神秘星人',
+              av: profile.avatarNo || 1,
+              vip: profile.isVip || false,
+              online: true
+            }
+          })
+        }).catch(() => {})
+      }
+
+      // 2. 创建/获取会话 → 加载历史
+      API.chat.createSession(peerId, isFake).then(session => {
+        const sid = session.sessionId
+        if (!sid) { this.toast('会话创建失败'); return }
+        this.setData({ sessionId: sid })
+        return API.chat.getMessages(sid)
+      }).then(msgs => {
+        if (msgs && msgs.length > 0) {
+          this.setData({
+            msgs: msgs.map(m => ({
+              type: m.senderId === this.data.peerId ? 'in' : 'out',
+              text: m.content,
+              cost: m.cost || 0,
+              isRead: m.isRead === 1
+            })),
+            scrollIntoView: 'msg-end'
+          })
+        }
+      }).catch(err => {
+        this.toast('加载消息失败：' + (err.message || ''))
+      })
+    }
+
+    // 3. WebSocket 实时推送监听
+    this._wsHandler = (data) => this.onWsMessage(data)
+    API.ws.on(this._wsHandler)
+    if (!API.ws.connected) API.ws.connect()
+  },
+
+  onUnload() {
+    if (this._wsHandler) API.ws.off(this._wsHandler)
+  },
+
+  onWsMessage(data) {
+    if (!data || data.type !== 'new_message') return
+    // 只处理当前会话的消息
+    if (String(data.sessionId) !== String(this.data.sessionId)) return
+    // 自己发的不重复添加（已在 send 时乐观更新）
+    const meId = store.get().user && store.get().user.dbId
+    if (meId && String(data.senderId) === String(meId)) return
+
+    const msgs = this.data.msgs.slice()
+    msgs.push({ type:'in', text: data.content, cost: 0, isRead: true })
+    this.setData({ msgs, scrollIntoView: 'msg-end' })
+  },
+
+  onInput(e) { this.setData({ text: e.detail.value }) },
+
+  send() {
+    const t = this.data.text.trim()
+    if (!t) return
+    if (!this.data.sessionId) {
+      this.toast('会话未建立')
+      return
+    }
+
+    const s = store.get()
+    let cost = 1
+    if (s.user.vip && s.chatFreeRemain > 0) {
+      cost = 0
+      store.update({ chatFreeRemain: s.chatFreeRemain - 1 })
+    } else if (s.diamonds < 1) {
+      this.toast('你的星屑不够照亮这条消息')
+      setTimeout(() => this.go('/pages/recharge/recharge'), 800)
+      return
+    } else {
+      store.update({ diamonds: s.diamonds - 1 })
+    }
+
+    // 乐观更新 UI
+    const msgs = this.data.msgs.slice()
+    msgs.push({ type:'out', text:t, cost, isRead: false })
+    this.setData({ msgs, text:'', scrollIntoView: 'msg-end' })
+
+    // 发送到后端
+    API.chat.send(this.data.sessionId, t).catch(err => {
+      const idx = msgs.findIndex(m => m.text === t && m.type === 'out')
+      if (idx > -1) msgs.splice(idx, 1)
+      this.setData({ msgs })
+      this.toast(err.message || '发送失败')
+      if (cost > 0) store.update({ diamonds: s.diamonds + cost })
+    })
+  },
+
+  goRecharge() { this.go('/pages/recharge/recharge') },
+  openGift() { this.toast('待实现：星愿礼物面板') }
+})

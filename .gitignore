@@ -1,0 +1,23 @@
+# Starluck 项目 gitignore
+
+# 大型二进制文件不提交（单独传输）
+opencode-backup/opencode.db
+opencode-backup/opencode-db.zip
+
+# 主题备份
+_backup_pinkversion/
+
+# 临时文件
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+
+# Node / Java
+node_modules/
+starluck-server/target/
+
+# IDE
+.idea/
+*.iml
+.vscode/

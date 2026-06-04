@@ -19,6 +19,7 @@ public class ChatMessage {
     private String senderRole;
     private String msgType;
     private String content;
+    private Integer isRead;
     private String giftEmoji;
     private String giftName;
     private Integer costDiamond;
@@ -39,6 +40,8 @@ public class ChatMessage {
     public void setMsgType(String msgType) { this.msgType = msgType; }
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
+    public Integer getIsRead() { return isRead; }
+    public void setIsRead(Integer isRead) { this.isRead = isRead; }
     public String getGiftEmoji() { return giftEmoji; }
     public void setGiftEmoji(String giftEmoji) { this.giftEmoji = giftEmoji; }
     public String getGiftName() { return giftName; }

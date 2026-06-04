@@ -1,0 +1,62 @@
+<view class="page" style="{{themeStyle}}">
+  <view class="status-bar" style="height:{{statusBarHeight}}px;background:var(--sl-bgCard);"></view>
+
+  <view class="nav-bar">
+    <view class="back" bindtap="back">‹</view>
+    <view class="peer flex-1">
+      <view class="av av-{{peer.av}} av-sm">{{peer.name[0]}}</view>
+      <view class="ns">
+        <view class="n">
+          <text>{{peer.name}}</text>
+          <text wx:if="{{peer.vip}}" class="sl-tag vip" style="margin-left:6rpx;font-size:16rpx">VIP</text>
+        </view>
+        <view class="st text-success">● 闪耀中</view>
+      </view>
+    </view>
+    <view class="more">⋯</view>
+  </view>
+
+  <view class="balance-bar" bindtap="goRecharge">
+    <text class="bl text-2">余额 <text class="text-gold">✨{{store.diamonds}}</text> · 普通用户 1✨/条</text>
+    <text class="br text-brand">充值 ›</text>
+  </view>
+
+  <scroll-view class="msg-flow" scroll-y="true" scroll-into-view="{{scrollIntoView}}" scroll-with-animation="true" enhanced="true" show-scrollbar="false">
+    <block wx:for="{{msgs}}" wx:key="index">
+      <view wx:if="{{item.type==='sys'}}" class="sys-tip">{{item.text}}</view>
+      <view wx:elif="{{item.type==='in'}}" class="bubble-row">
+        <view class="av av-{{peer.av}} av-sm">{{peer.name[0]}}</view>
+        <view class="bubble in">{{item.text}}</view>
+      </view>
+      <view wx:elif="{{item.type==='out'}}" class="bubble-row me">
+        <view class="av av-{{store.user.av}} av-sm">{{store.user.name[0]}}</view>
+        <view class="bubble out">{{item.text}}</view>
+        <view wx:if="{{item.cost>0}}" class="cost-tip text-3">- 1✨</view>
+        <view wx:if="{{item.isRead}}" class="read-tip">已读</view>
+      </view>
+    </block>
+    <view id="msg-end" style="height:20rpx;"></view>
+  </scroll-view>
+
+  <view class="input-bar">
+    <view class="input-row">
+      <input
+        class="ipt"
+        value="{{text}}"
+        placeholder="说点什么..."
+        placeholder-class="ph"
+        bindinput="onInput"
+        confirm-type="send"
+        bindconfirm="send"
+      />
+      <view class="sb" bindtap="send">发送</view>
+    </view>
+    <view class="tools">
+      <view class="tl" bindtap="openGift"><view class="ti">🎁</view><text>星愿</text></view>
+      <view class="tl"><view class="ti">📷</view><text>照片</text></view>
+      <view class="tl"><view class="ti">📞</view><text>同频</text></view>
+      <view class="tl"><view class="ti">📍</view><text>位置</text></view>
+      <view class="tl"><view class="ti">🧧</view><text>红包</text></view>
+    </view>
+  </view>
+</view>

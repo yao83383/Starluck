@@ -1,0 +1,40 @@
+.sl-tabbar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: var(--sl-bgCard, #0b0e22);
+  border-top: 1rpx solid var(--sl-border1, rgba(255,138,176,0.15));
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.sl-tabbar .ti {
+  flex: 1;
+  height: 110rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--sl-text3, rgba(255,255,255,0.5));
+}
+
+.sl-tabbar .ti .ico {
+  display: block;
+  font-size: 40rpx;
+  line-height: 40rpx;
+  height: 40rpx;
+  text-align: center;
+}
+
+.sl-tabbar .ti .lbl {
+  display: block;
+  font-size: 20rpx;
+  line-height: 20rpx;
+  height: 20rpx;
+  margin-top: 8rpx;
+  text-align: center;
+}
+
+.sl-tabbar .ti.on { color: var(--sl-brand1, #ff8ab0); font-weight: 700; }

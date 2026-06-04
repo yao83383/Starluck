@@ -1,0 +1,74 @@
+<view class="page page-bg-radial" style="{{themeStyle}}">
+  <starfield density="light"></starfield>
+
+  <view class="status-bar" style="height:{{statusBarHeight}}px;"></view>
+
+  <view class="page-top">
+    <text class="brand-name fs-xl">Starluck</text>
+    <text class="sub text-3">每颗星，都在等另一颗</text>
+  </view>
+
+  <scroll-view class="tabs" scroll-x="true" enhanced="true" show-scrollbar="false">
+    <view
+      class="tab {{tabKey===item.key?'on':''}}"
+      wx:for="{{tabs}}"
+      wx:key="key"
+      data-key="{{item.key}}"
+      bindtap="switchTab"
+    >{{item.label}}</view>
+  </scroll-view>
+
+  <scroll-view class="filter" scroll-x="true" enhanced="true" show-scrollbar="false">
+    <view class="chip on">综合</view>
+    <view class="chip">年龄 ▾</view>
+    <view class="chip">同城</view>
+    <view class="chip">已星证</view>
+  </scroll-view>
+
+  <scroll-view
+    class="grid-wrap"
+    scroll-y="true"
+    enhanced="true"
+    show-scrollbar="false"
+    refresher-enabled="true"
+    refresher-triggered="{{refreshing}}"
+    refresher-background="transparent"
+    refresher-default-style="white"
+    bindrefresherrefresh="onRefresh"
+  >
+    <view class="user-grid">
+      <view
+        class="user-card"
+        wx:for="{{users}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="goUser"
+        hover-class="hover"
+      >
+        <view class="cover av-{{item.av}}">
+          <view class="flags">
+            <view wx:if="{{item.online}}" class="flag online">闪耀中</view>
+            <view wx:if="{{item.vip}}" class="flag vip">VIP</view>
+            <view wx:if="{{item.isFake}}" class="flag fake">运营</view>
+          </view>
+          <view class="cover-emoji">✨</view>
+        </view>
+        <view class="info">
+          <view class="name">
+            <text wx:if="{{item.gender==='M'}}" class="gender-tag male">♂</text>
+            <text wx:elif="{{item.gender==='F'}}" class="gender-tag female">♀</text>
+            <text>{{item.name}}</text>
+            <text wx:if="{{item.vip}}" class="sl-tag vip" style="margin-left:8rpx;font-size:18rpx">VIP</text>
+          </view>
+          <view class="meta text-3">{{item.age}}岁 · {{item.city}} · {{item.dist}}</view>
+          <view class="tags">
+            <text class="sl-tag" wx:for="{{item.tags}}" wx:for-item="t" wx:key="*this" style="margin-right:6rpx;font-size:18rpx;">{{t}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="tabbar-placeholder"></view>
+  </scroll-view>
+
+  <sl-tabbar active="discover"></sl-tabbar>
+</view>

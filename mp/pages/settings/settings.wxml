@@ -1,0 +1,133 @@
+<view class="page page-bg-radial" style="{{themeStyle}}">
+  <starfield density="light"></starfield>
+
+  <view class="status-bar" style="height:{{statusBarHeight}}px;"></view>
+
+  <view class="nav-bar">
+    <view class="back" bindtap="back">‹</view>
+    <view class="title">设置</view>
+    <view class="right"></view>
+  </view>
+
+  <scroll-view class="body" scroll-y="true" enhanced="true" show-scrollbar="false">
+
+    <!-- ========== 🌌 主题切换（核心入口） ========== -->
+    <view class="section-title">🌌 视觉主题</view>
+    <view class="settings-group">
+      <view class="theme-picker">
+        <view
+          class="theme-mini {{store.themeId===item.id?'active':''}}"
+          wx:for="{{themes}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="pickTheme"
+        >
+          <view class="tm-color" style="background:{{item.brandGrad}}"></view>
+          <view class="tm-color tm-bg" style="background:{{item.bgRadial}}"></view>
+          <view class="tm-name">{{item.name}}</view>
+          <view wx:if="{{store.themeId===item.id}}" class="tm-check">✓</view>
+        </view>
+      </view>
+      <view class="theme-more" bindtap="goTheme">
+        <text>查看完整主题中心</text>
+        <text class="arr">›</text>
+      </view>
+    </view>
+
+    <!-- ========== 账号安全 ========== -->
+    <view class="section-title">账号安全</view>
+    <view class="settings-group">
+      <view class="settings-item">
+        <text class="lbl flex-1">手机号</text>
+        <text class="val text-3">{{phone || '未绑定'}}</text>
+        <text class="arr text-3">›</text>
+      </view>
+      <view class="settings-item">
+        <text class="lbl flex-1">星证认证</text>
+        <text wx:if="{{store.isAuthed}}" class="val text-success">已认证</text>
+        <text wx:else class="val text-3">未认证</text>
+        <text class="arr text-3">›</text>
+      </view>
+      <view class="settings-item" bindtap="goPassword">
+        <text class="lbl flex-1">设置登录密码</text>
+        <text class="val text-3">密码登录</text>
+        <text class="arr text-3">›</text>
+      </view>
+      <view class="settings-item">
+        <text class="lbl flex-1">设备管理</text>
+        <text class="val text-3">微信</text>
+        <text class="arr text-3">›</text>
+      </view>
+    </view>
+
+    <!-- ========== 隐私设置 ========== -->
+    <view class="section-title">隐私设置</view>
+    <view class="settings-group">
+      <view class="settings-item">
+        <text class="lbl flex-1">隐身访问</text>
+        <view class="sw {{store.settings.invisible?'on':''}}" data-key="invisible" catchtap="toggle"></view>
+      </view>
+      <view class="settings-item">
+        <text class="lbl flex-1">隐藏位置</text>
+        <view class="sw {{store.settings.hideLoc?'on':''}}" data-key="hideLoc" catchtap="toggle"></view>
+      </view>
+      <view class="settings-item">
+        <text class="lbl flex-1">仅 VIP 可联系我</text>
+        <view class="sw {{store.settings.vipOnly?'on':''}}" data-key="vipOnly" catchtap="toggle"></view>
+      </view>
+      <view class="settings-item">
+        <text class="lbl flex-1">黑名单</text>
+        <text class="val text-3">0 人</text>
+        <text class="arr text-3">›</text>
+      </view>
+    </view>
+
+    <!-- ========== 消息通知 ========== -->
+    <view class="section-title">消息通知</view>
+    <view class="settings-group">
+      <view class="settings-item">
+        <text class="lbl flex-1">声音提醒</text>
+        <view class="sw {{store.settings.sound?'on':''}}" data-key="sound" catchtap="toggle"></view>
+      </view>
+      <view class="settings-item">
+        <text class="lbl flex-1">振动提醒</text>
+        <view class="sw {{store.settings.vibrate?'on':''}}" data-key="vibrate" catchtap="toggle"></view>
+      </view>
+    </view>
+
+    <!-- ========== 服务与帮助 ========== -->
+    <view class="section-title">服务与帮助</view>
+    <view class="settings-group">
+      <view class="settings-item">
+        <text class="lbl flex-1">联系客服</text>
+        <text class="arr text-3">›</text>
+      </view>
+      <view class="settings-item">
+        <text class="lbl flex-1">投诉举报</text>
+        <text class="arr text-3">›</text>
+      </view>
+      <view class="settings-item">
+        <text class="lbl flex-1">意见反馈</text>
+        <text class="arr text-3">›</text>
+      </view>
+      <view class="settings-item">
+        <text class="lbl flex-1">用户协议</text>
+        <text class="arr text-3">›</text>
+      </view>
+      <view class="settings-item">
+        <text class="lbl flex-1">隐私政策</text>
+        <text class="arr text-3">›</text>
+      </view>
+      <view class="settings-item">
+        <text class="lbl flex-1">关于 Starluck</text>
+        <text class="val text-3">v1.0</text>
+        <text class="arr text-3">›</text>
+      </view>
+    </view>
+
+    <view class="logout" bindtap="doLogout">暂时熄灭你的星光</view>
+    <view class="delete-acc text-3" bindtap="doDelete">永久离开星海</view>
+
+    <view style="height:80rpx;"></view>
+  </scroll-view>
+</view>

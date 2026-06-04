@@ -1,0 +1,49 @@
+{
+  "entryPagePath": "pages/login/login",
+  "pages": [
+    "pages/discover/discover",
+    "pages/feed/feed",
+    "pages/messages/messages",
+    "pages/me/me",
+    "pages/login/login",
+    "pages/onboard/onboard",
+    "pages/settings/settings",
+    "pages/password/password",
+    "pages/theme/theme",
+    "pages/profile/profile",
+    "pages/chat/chat",
+    "pages/recharge/recharge",
+    "pages/vip/vip",
+    "pages/wallet/wallet"
+  ],
+  "tabBar": {
+    "custom": true,
+    "color": "rgba(255,255,255,0.5)",
+    "selectedColor": "#ff8ab0",
+    "backgroundColor": "#0b0e22",
+    "borderStyle": "black",
+    "list": [
+      { "pagePath": "pages/discover/discover", "text": "发现" },
+      { "pagePath": "pages/feed/feed", "text": "动态" },
+      { "pagePath": "pages/messages/messages", "text": "消息" },
+      { "pagePath": "pages/me/me", "text": "我的" }
+    ]
+  },
+  "window": {
+    "navigationBarBackgroundColor": "#080a18",
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "Starluck",
+    "backgroundColor": "#080a18",
+    "backgroundTextStyle": "light",
+    "navigationStyle": "custom"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "usingComponents": {
+    "starfield": "/components/starfield/starfield",
+    "sl-button": "/components/sl-button/sl-button",
+    "sl-card": "/components/sl-card/sl-card",
+    "sl-tabbar": "/components/sl-tabbar/sl-tabbar"
+  }
+}

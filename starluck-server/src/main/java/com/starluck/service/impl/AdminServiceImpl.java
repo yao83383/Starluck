@@ -33,7 +33,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 public class AdminServiceImpl implements AdminService {
 
-    private static final String[] NAME_POOL = {"小诗","糖糖","梨花","若兮","茉莉","柚柚","安琪","可可","小鹿","月亮","晓雯","子萱","婉清","雨晴","南风","沐妍","栀子","清欢","一一","阿月"};
+    private static final String[] NAME_POOL = {"小雅","糖心","月瑶","星梦","若水","语嫣","柔柔","楚楚","暖暖","桃桃","露露","茉茉","依依","晴儿","雪儿","璃璃","芸芸","莲莲","琪琪","妮妮","小诗","糖糖","梨花","若兮","茉莉","柚柚","安琪","可可","小鹿","月亮","晓雯","子萱","婉清","雨晴","南风","沐妍","栀子","清欢","一一","阿月"};
     private static final String[] CITY_POOL = {"上海","北京","深圳","广州","杭州","成都","南京","武汉","重庆","西安"};
     private static final String[] SIGN_POOL = {"寻找一个温暖的人","生活不止眼前的苟且","喜欢摄影、咖啡和旅行","期待一场认真的恋爱","喜欢看星星和电影","愿和你共度春秋","一个人也要好好生活","努力做有趣的女生"};
     private static final String[] TAG_POOL = {"旅行","咖啡","摄影","美食","音乐","电影","健身","读书","宠物","瑜伽","汉服","烹饪","逛街","插画","烘焙"};
@@ -107,6 +107,13 @@ public class AdminServiceImpl implements AdminService {
             f.setSign(SIGN_POOL[rnd.nextInt(SIGN_POOL.length)]);
             f.setPersona("温柔、爱笑、喜欢分享日常");
             f.setStatus(1);
+            // 对齐真用户的新字段
+            f.setPhone("199" + String.format("%08d", 100000 + System.currentTimeMillis() % 900000));
+            f.setGender("F");
+            f.setIsAuthed(1);
+            f.setDiamonds(666);
+            f.setCash(java.math.BigDecimal.ZERO);
+            f.setUserType("FAKE");
 
             List<String> tags = new ArrayList<>();
             while (tags.size() < 3) {

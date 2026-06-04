@@ -1,0 +1,9 @@
+<view
+  class="sl-btn {{type}} {{size}} {{block?'block':''}}"
+  bindtap="onTap"
+  hover-class="hover"
+  hover-stay-time="60"
+>
+  <text wx:if="{{loading}}" class="loader">⏳</text>
+  <slot></slot>
+</view>

@@ -1,0 +1,7 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "starfield": "/components/starfield/starfield",
+    "sl-tabbar": "/components/sl-tabbar/sl-tabbar"
+  }
+}

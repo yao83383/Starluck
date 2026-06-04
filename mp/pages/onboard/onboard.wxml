@@ -1,0 +1,98 @@
+<view class="page page-bg-radial" style="{{themeStyle}}">
+  <starfield density="light"></starfield>
+
+  <view class="status-bar" style="height:{{statusBarHeight}}px;"></view>
+
+  <view class="nav-bar">
+    <view class="back" bindtap="back">‹</view>
+    <view class="title">完善资料</view>
+    <view class="right"></view>
+  </view>
+
+  <view class="progress">
+    <view class="bar"><view class="fill" style="width:{{step*20}}%;"></view></view>
+    <view class="text text-3">{{step}}/5</view>
+  </view>
+
+  <scroll-view class="body" scroll-y="true" enhanced="true" show-scrollbar="false">
+
+    <!-- 步骤 1：头像 -->
+    <view wx:if="{{step===1}}" class="step">
+      <view class="title-lg">为你的星选择光芒</view>
+      <view class="sub text-2">真实头像通过率提升 80%</view>
+      <view class="avatar-upload av av-{{avNo}}" bindtap="switchAv">
+        <text class="emoji">✨</text>
+      </view>
+      <view class="tip text-3">点击切换示例 · 上线后接入相册</view>
+    </view>
+
+    <!-- 步骤 2：性别 -->
+    <view wx:if="{{step===2}}" class="step">
+      <view class="title-lg">你的性别？</view>
+      <view class="sub text-2">性别决定推荐池，请如实选择</view>
+      <view class="gender-pick">
+        <view class="g {{gender==='male'?'on':''}}" data-g="male" bindtap="pickGender">
+          <view class="emoji">👦</view>
+          <view class="lbl">男生</view>
+        </view>
+        <view class="g {{gender==='female'?'on':''}}" data-g="female" bindtap="pickGender">
+          <view class="emoji">👧</view>
+          <view class="lbl">女生</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 步骤 3：基本信息 -->
+    <view wx:if="{{step===3}}" class="step">
+      <view class="title-lg">让宇宙认识你</view>
+      <view class="sub text-2">基本信息</view>
+      <view class="field">
+        <text class="lbl">昵称</text>
+        <input class="ipt" placeholder="给自己起个星名" placeholder-class="ph" value="{{name}}" bindinput="onName" />
+      </view>
+      <view class="field">
+        <text class="lbl">城市</text>
+        <input class="ipt" placeholder="所在城市" placeholder-class="ph" value="{{city}}" bindinput="onCity" />
+      </view>
+    </view>
+
+    <!-- 步骤 4：更多信息 -->
+    <view wx:if="{{step===4}}" class="step">
+      <view class="title-lg">更多信息</view>
+      <view class="sub text-2">提升匹配精准度（可选）</view>
+      <view class="field">
+        <text class="lbl">身高</text>
+        <input class="ipt" type="number" placeholder="cm" placeholder-class="ph" value="{{height}}" bindinput="onHeight" />
+      </view>
+      <view class="field">
+        <text class="lbl">职业</text>
+        <input class="ipt" placeholder="你的职业" placeholder-class="ph" value="{{job}}" bindinput="onJob" />
+      </view>
+    </view>
+
+    <!-- 步骤 5：兴趣 -->
+    <view wx:if="{{step===5}}" class="step">
+      <view class="title-lg">兴趣爱好</view>
+      <view class="sub text-2">选 3-8 个，匹配兴趣相投的 TA</view>
+      <view class="interest-pick">
+        <view
+          class="ic {{interests.indexOf(item)>-1?'on':''}}"
+          wx:for="{{allInterests}}"
+          wx:key="*this"
+          data-i="{{item}}"
+          bindtap="toggleInterest"
+        >{{item}}</view>
+      </view>
+      <view class="count text-3">已选 {{interests.length}}/8</view>
+    </view>
+
+  </scroll-view>
+
+  <view class="actions">
+    <view wx:if="{{step<5 && step!==2}}" class="skip text-3" bindtap="skip">跳过</view>
+    <view wx:if="{{step===2}}" class="skip text-3" style="opacity:0.3">性别必选</view>
+    <sl-button type="primary" block bindtap="next">
+      {{step===5?'完成 +88 ✨':'下一步'}}
+    </sl-button>
+  </view>
+</view>

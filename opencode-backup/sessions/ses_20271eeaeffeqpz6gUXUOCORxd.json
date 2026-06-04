@@ -1,0 +1,128 @@
+[
+  {
+    "file": "managed/EntityEngine.Demo.Lockstep/Program.cs",
+    "patch": "Index: managed/EntityEngine.Demo.Lockstep/Program.cs\n===================================================================\n--- managed/EntityEngine.Demo.Lockstep/Program.cs\t\n+++ managed/EntityEngine.Demo.Lockstep/Program.cs\t\n@@ -1,331 +1,335 @@\n // ============================================================\n // EntityEngine.Demo.Lockstep — 双进程 lockstep 验收 demo\n // ============================================================\n // 跑同样确定性模拟,通过 TcpChannel 同步命令,跑完打印 World hash。\n // 两个进程的 hash 完全一致 → lockstep 链路正确。\n //\n // 用法(在两个终端):\n //   终端 A:EntityEngineDemoLockstep --host    --port 17777 --frames 200\n //   终端 B:EntityEngineDemoLockstep --client  --host 127.0.0.1 --port 17777 --peer 1 --frames 200\n //\n // 模拟规则(完全 deterministic,只依赖 frame 编号 + peer 命令):\n //   - 8 实体 / peer,共 16 entity(2 peer)\n //   - 每帧每 peer 提交一个 byte 命令 = (frame & 0xFF) ^ peerIndex\n //   - 命令值 c 用作旋转 omega 的扰动:omega' = omega + Fp(c) / 1000\n //   - 用此扰动 omega 旋转 Vel,Pos += Vel * dt\n //\n // 退出码 0 = 跑完正常退出,hash 打印到 stdout。\n // ============================================================\n \n using System;\n using System.Diagnostics;\n using EntityEngine.Core;\n using EntityEngine.Net;\n using EntityEngine.Render;   // 仅 host --render 时用,可选模块\n \n namespace EntityEngine.Demo.Lockstep;\n \n internal static class Program\n {\n     static int Main(string[] args)\n     {\n         bool   isHost      = false;\n         string hostAddr    = \"127.0.0.1\";\n         int    port        = 17777;\n         int    peerIndex   = 0;     // host 默认 0\n         int    peerCount   = 2;     // PoC 阶段固定 2 peer\n         int    frames      = 200;\n         int    entitiesPerPeer = 8; // 6.1b 默认值;6.2 压测会传更大值\n         bool   render      = false; // 仅 host 有效,开窗显示 entity\n         bool   useUdp      = false; // PoC 3 模块 6.3:走 UdpChannel 而非 TcpChannel\n         int    dropPercent = 0;     // PoC 3 模块 6.4:UDP 注入丢包率(0-100)\n         int    exitAtFrame = -1;    // PoC 3 模块 6.5a:跑到 frame N 自杀,模拟掉线\n         bool   rejoin     = false;  // PoC 3 模块 6.5b:重连模式\n         int    lastFrame  = -1;     // PoC 3 模块 6.5b:重连时告诉 host 上次看到的帧号\n         int    hashInterval = 60;   // PoC 3 模块 6.6:每 N 帧上报 World hash\n         int    desyncFrame  = -1;   // PoC 3 模块 6.6:在 frame N 故意注入不一致\n         int    desyncPeer   = 1;    // PoC 3 模块 6.6:注入不一致的 peer(默认 peer 1)\n \n         for (int i = 0; i < args.Length; ++i)\n         {\n             switch (args[i])\n             {\n                 case \"--host\":   isHost = true; break;\n                 case \"--client\": isHost = false; break;\n                 case \"--port\":   port = int.Parse(args[++i]); break;\n                 case \"--peer\":   peerIndex = int.Parse(args[++i]); break;\n                 case \"--peers\":  peerCount = int.Parse(args[++i]); break;\n                 case \"--frames\":           frames          = int.Parse(args[++i]); break;\n                 case \"--entities-per-peer\":entitiesPerPeer = int.Parse(args[++i]); break;\n                 case \"--addr\":\n                 case \"--host-addr\":\n                     hostAddr = args[++i]; break;\n                 case \"--render\": render = true; break;\n                 case \"--udp\":    useUdp = true; break;\n                 case \"--drop\":   dropPercent = int.Parse(args[++i]); break;\n                 case \"--exit-at-frame\": exitAtFrame = int.Parse(args[++i]); break;\n                 case \"--rejoin\":    rejoin = true; break;\n                 case \"--last-frame\": lastFrame = int.Parse(args[++i]); break;\n                 case \"--hash-interval\": hashInterval = int.Parse(args[++i]); break;\n                 case \"--desync-frame\":  desyncFrame  = int.Parse(args[++i]); break;\n                 case \"--desync-peer\":   desyncPeer   = int.Parse(args[++i]); break;\n                 default:\n                     Console.Error.WriteLine($\"unknown arg: {args[i]}\");\n                     return 2;\n             }\n         }\n         if (isHost) peerIndex = 0;\n \n         string transport = useUdp ? \"udp\" : \"tcp\";\n         if (dropPercent > 0 && useUdp)\n             UdpFaultInjector.DropPercent = dropPercent;\n         Console.WriteLine(\"==========================================\");\n         Console.WriteLine($\"  Lockstep demo  role={(isHost?\"host\":\"client\")}  peer={peerIndex}/{peerCount}  frames={frames}  entities/peer={entitiesPerPeer}  transport={transport}  drop={dropPercent}%\");\n         Console.WriteLine(\"------------------------------------------\");\n \n         IChannel channel;\n         if (isHost)\n         {\n             if (useUdp)\n             {\n                 var host = new UdpChannelHost(port, peerCount);\n                 Console.WriteLine($\"  UDP listening on 127.0.0.1:{host.Port} ...\");\n                 host.WaitForPeers();\n                 Console.WriteLine($\"  all {peerCount} peers connected, starting lockstep\");\n                 channel = host;\n             }\n             else\n             {\n                 var host = new TcpChannelHost(port, peerCount);\n                 Console.WriteLine($\"  TCP listening on 127.0.0.1:{host.Port} ...\");\n                 host.WaitForPeers();\n                 Console.WriteLine($\"  all {peerCount} peers connected, starting lockstep\");\n                 channel = host;\n             }\n         }\n         else\n         {\n             Console.WriteLine($\"  {transport.ToUpper()} connecting to {hostAddr}:{port} as peer {peerIndex} ...\");\n             if (useUdp && rejoin)\n             {\n                 var rejoinClient = new UdpChannelClient(hostAddr, port, peerIndex, lastFrame);\n                 Console.WriteLine($\"  rejoin OK, replayed to frame {rejoinClient.ReplayedToFrame}\");\n                 channel = rejoinClient;\n             }\n             else\n             {\n                 channel = useUdp\n                     ? (IChannel)new UdpChannelClient(hostAddr, port, peerIndex)\n                     : new TcpChannelClient(hostAddr, port, peerIndex);\n             }\n             Console.WriteLine($\"  connected, starting lockstep\");\n         }\n \n         Renderer? renderer = null;\n         if (render && isHost)\n         {\n             renderer = new Renderer(1280, 720,\n                 $\"EntityEngine lockstep — host (peers={peerCount}, total={entitiesPerPeer*peerCount})\");\n         }\n \n         int catchUpToFrame = (channel is UdpChannelClient cc) ? cc.ReplayedToFrame : -1;\n         ulong hash = RunSimulation(channel, peerIndex, peerCount, frames, entitiesPerPeer, renderer, exitAtFrame, catchUpToFrame, hashInterval, desyncFrame, desyncPeer);\n \n         renderer?.Dispose();\n         if (channel is IDisposable d) d.Dispose();\n \n         Console.WriteLine($\"  state hash:  0x{hash:X16}\");\n         Console.WriteLine(\"==========================================\");\n         return 0;\n     }\n \n     static ulong RunSimulation(IChannel channel, int peerIndex, int peerCount, int frames, int entitiesPerPeer, Renderer? renderer, int exitAtFrame, int catchUpToFrame = -1, int hashInterval = 60, int desyncFrame = -1, int desyncPeer = 1)\n     {\n         var runner = new LockstepRunner(channel, peerIndex, peerCount);\n \n         using var world = new World();\n         var posId = world.RegisterComponent<FpVec3>(\"Pos\");\n         var velId = world.RegisterComponent<FpVec3>(\"Vel\");\n \n         int totalEntities = entitiesPerPeer * peerCount;\n         // 预分配 render buffer。每帧 collect 一次,避免 GC。\n         var renderBuf = renderer != null ? new FpVec3[totalEntities] : null;\n         // entity → owner peer 索引(用 entity raw id 做 key)。spawn 时建好。\n         var ownerPeer = new System.Collections.Generic.Dictionary<ulong, int>(totalEntities);\n         var entities = new Entity[totalEntities];\n         for (int i = 0; i < totalEntities; ++i)\n         {\n             var e = world.Spawn();\n             world.SetComponent(e, posId, new FpVec3(Fp.FromInt(i), Fp.Zero, Fp.Zero));\n             world.SetComponent(e, velId, new FpVec3(Fp.Zero, Fp.One, Fp.Zero));\n             entities[i] = e;\n             ownerPeer[e.Raw] = i / entitiesPerPeer;  // entity i 属于 peer i/N\n         }\n \n         Span<ComponentId> ids = stackalloc[] { posId, velId };\n         using var query = world.CreateQuery(ids);\n \n         Fp dt    = Fp.FromInt(1) / Fp.FromInt(60);\n         Fp omega = Fp.FromInt(1);\n         Fp thousand = Fp.FromInt(1000);\n \n         var sw = Stopwatch.StartNew();\n         long retries = 0;\n \n         // 6.5b:reconnect 追赶阶段 — 用 TryStepReplay 重放历史帧(不发自己的 cmd)\n         if (catchUpToFrame >= 0)\n         {\n             Console.WriteLine($\"  [rejoin] catching up frames 0..{catchUpToFrame} from replay data...\");\n             for (int f = 0; f <= catchUpToFrame; ++f)\n             {\n                 byte[][] allCmds;\n                 while (!runner.TryStepReplay(f, out allCmds))\n                 {\n                     retries++;\n                     System.Threading.Thread.Sleep(1);\n                 }\n                 SimulateFrame(f, peerIndex, allCmds, query, ownerPeer, dt, omega, thousand);\n             }\n             Console.WriteLine($\"  [rejoin] catch-up complete, joining normal lockstep at frame {catchUpToFrame + 1}\");\n         }\n \n         for (int f = catchUpToFrame + 1; f < frames; ++f)\n         {\n             // 6.5a:模拟掉线 — 跑到指定 frame 时硬退出(不优雅 dispose,\n             // 模仿真实掉线场景)。其它 peer 应该在 5s 后把这个 peer 标\n             // 记为 disconnected,继续推进 simulation。\n             if (exitAtFrame >= 0 && f >= exitAtFrame)\n             {\n                 Console.Error.WriteLine($\"  [peer {peerIndex}] simulating disconnect at frame {f}\");\n                 Environment.Exit(99);   // 不要 finally / dispose,模拟\"网线被拔\"\n             }\n \n             // 我的命令:byte = (frame ^ peer) & 0xff\n             byte myCmd = (byte)((f ^ peerIndex) & 0xFF);\n             byte[] myCmdArr = { myCmd };\n \n             byte[][] allCmds;\n             while (!runner.TryStep(f, myCmdArr, out allCmds))\n             {\n                 retries++;\n                 System.Threading.Thread.Sleep(1);\n             }\n \n             SimulateFrame(f, peerIndex, allCmds, query, ownerPeer, dt, omega, thousand);\n \n             // 6.6:desync 注入 — 在指定 frame 直接修改 simulation 状态,制造不一致\n             if (desyncFrame >= 0 && f == desyncFrame && peerIndex == desyncPeer)\n             {\n                 ref FpVec3 pos0 = ref world.GetComponent<FpVec3>(entities[0], posId);\n                 pos0 = new FpVec3(pos0.X + Fp.One, pos0.Y, pos0.Z);\n                 Console.Error.WriteLine($\"  [peer {peerIndex}] INJECTED DESYNC at frame {f} (entity[0].X += 1)\");\n             }\n \n             // 6.6:周期性 hash 上报 + desync 检查\n             if (f > 0 && hashInterval > 0 && f % hashInterval == 0)\n             {\n                 ulong currentHash = ComputeWorldHash(world, entities, posId, velId);\n                 if (channel is UdpChannelClient udpClient)\n                     udpClient.SendHashReport(f, currentHash);\n                 else if (channel is UdpChannelHost udpHost)\n+                {\n                     udpHost.ReportHash(f, currentHash);\n+                    for (int spin = 0; spin < 10 && !udpHost.DesyncDetected; spin++)\n+                        System.Threading.Thread.Sleep(2);\n+                }\n             }\n             // 每帧检查 desync 标志(不只在 hash check 点,因为 DESYNC_DETECTED\n             // 可能在任何时刻到达)\n             {\n                 bool d;\n                 int  df;\n                 if (channel is UdpChannelClient c)      { d = c.DesyncDetected; df = c.DesyncFrame; }\n                 else if (channel is UdpChannelHost host) { d = host.DesyncDetected; df = host.DesyncFrame; }\n                 else { d = false; df = 0; }\n                 if (d)\n                 {\n                     Console.Error.WriteLine($\"  *** DESYNC DETECTED at frame {df}, stopping simulation ***\");\n                     break;\n                 }\n             }\n \n             // 渲染:把所有 entity Pos collect 到 buffer 喂给 renderer\n             if (renderer != null && renderBuf != null)\n             {\n                 if (renderer.ShouldClose) break;\n                 int writeIdx = 0;\n                 var iter2 = query.Iter();\n                 while (iter2.Next())\n                 {\n                     var pos2 = iter2.GetField<FpVec3>(0);\n                     pos2.CopyTo(renderBuf.AsSpan(writeIdx));\n                     writeIdx += pos2.Length;\n                 }\n                 // worldRadius:实体最远初始位置约 totalEntities 单位(Pos.x = i)\n                 float worldRadius = Math.Max(8.0f, totalEntities * 0.6f);\n                 renderer.FrameBegin(worldRadius);\n                 renderer.DrawPoints(renderBuf.AsSpan(0, writeIdx));\n                 renderer.FrameEnd();\n             }\n         }\n         sw.Stop();\n \n         ulong hash = ComputeWorldHash(world, entities, posId, velId);\n \n         Console.WriteLine($\"  total time:  {sw.Elapsed.TotalMilliseconds:F1} ms ({frames} frames)\");\n         Console.WriteLine($\"  per frame:   {sw.Elapsed.TotalMilliseconds / frames:F2} ms\");\n         Console.WriteLine($\"  TryStep retries: {retries}\");\n         return hash;\n     }\n \n     /// <summary>6.6:全状态 FNV-1a hash(所有 entity 的 Pos + Vel)。</summary>\n     static ulong ComputeWorldHash(World world, Entity[] entities, ComponentId posId, ComponentId velId)\n     {\n         ulong hash = 14695981039346656037UL;\n         const ulong kFnvPrime = 1099511628211UL;\n         for (int i = 0; i < entities.Length; ++i)\n         {\n             ref FpVec3 p = ref world.GetComponent<FpVec3>(entities[i], posId);\n             ref FpVec3 v = ref world.GetComponent<FpVec3>(entities[i], velId);\n             unchecked\n             {\n                 hash ^= (ulong)p.X.Raw; hash *= kFnvPrime;\n                 hash ^= (ulong)p.Y.Raw; hash *= kFnvPrime;\n                 hash ^= (ulong)p.Z.Raw; hash *= kFnvPrime;\n                 hash ^= (ulong)v.X.Raw; hash *= kFnvPrime;\n                 hash ^= (ulong)v.Y.Raw; hash *= kFnvPrime;\n                 hash ^= (ulong)v.Z.Raw; hash *= kFnvPrime;\n             }\n         }\n         return hash;\n     }\n \n     /// <summary>6.5b:执行一帧 deterministic 模拟(从 TryStep 回调中提取,供 catch-up 复用)。</summary>\n     static void SimulateFrame(\n         int frame, int peerIndex, byte[][] allCmds,\n         Query query, System.Collections.Generic.Dictionary<ulong, int> ownerPeer,\n         Fp dt, Fp omega, Fp thousand)\n     {\n         var iter = query.Iter();\n         while (iter.Next())\n         {\n             var pos      = iter.GetField<FpVec3>(0);\n             var vel      = iter.GetField<FpVec3>(1);\n             var iterEnts = iter.Entities;\n             int chunkN = pos.Length;\n             for (int i = 0; i < chunkN; ++i)\n             {\n                 int owner = ownerPeer[iterEnts[i].Raw];\n                 byte cmdByte = allCmds[owner].Length > 0 ? allCmds[owner][0] : (byte)0;\n                 Fp pert   = Fp.FromInt(cmdByte) / thousand;\n                 Fp dTheta = (omega + pert) * dt;\n                 Fp cs = Fp.Cos(dTheta);\n                 Fp sn = Fp.Sin(dTheta);\n \n                 Fp vx = vel[i].X;\n                 Fp vy = vel[i].Y;\n                 vel[i] = new FpVec3(\n                     cs * vx - sn * vy,\n                     sn * vx + cs * vy,\n                     vel[i].Z);\n                 pos[i] = pos[i] + vel[i] * dt;\n             }\n         }\n     }\n }\n",
+    "additions": 4,
+    "deletions": 0,
+    "status": "modified"
+  },
+  {
+    "file": "tmp/host6.log",
+    "patch": "Index: tmp/host6.log\n===================================================================\n--- tmp/host6.log\t\n+++ tmp/host6.log\t\n@@ -0,0 +1,10 @@\n+==========================================\n+  Lockstep demo  role=host  peer=0/2  frames=100  entities/peer=100  transport=udp  drop=0%\n+------------------------------------------\n+  UDP listening on 127.0.0.1:20002 ...\n+  all 2 peers connected, starting lockstep\n+  total time:  66.5 ms (100 frames)\n+  per frame:   0.67 ms\n+  TryStep retries: 30\n+  state hash:  0x9F6638090F55FB35\n+==========================================\n",
+    "additions": 10,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "tmp/host6_err.log",
+    "patch": "Index: tmp/host6_err.log\n===================================================================\n--- tmp/host6_err.log\t\n+++ tmp/host6_err.log\t\n@@ -0,0 +1,2 @@\n+[host] DESYNC at frame 50: p0=0xBA322A9970CAE0ED p1=0x2B97867BF711E0ED\n+  *** DESYNC DETECTED at frame 50, stopping simulation ***\n",
+    "additions": 2,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "tmp/host7.log",
+    "patch": "Index: tmp/host7.log\n===================================================================\n--- tmp/host7.log\t\n+++ tmp/host7.log\t\n@@ -0,0 +1,10 @@\n+==========================================\n+  Lockstep demo  role=host  peer=0/2  frames=500  entities/peer=100  transport=udp  drop=0%\n+------------------------------------------\n+  UDP listening on 127.0.0.1:20005 ...\n+  all 2 peers connected, starting lockstep\n+  total time:  106.2 ms (500 frames)\n+  per frame:   0.21 ms\n+  TryStep retries: 50\n+  state hash:  0x3E54246BC6527325\n+==========================================\n",
+    "additions": 10,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "tmp/host7_err.log",
+    "patch": "Index: tmp/host7_err.log\n===================================================================\n--- tmp/host7_err.log\t\n+++ tmp/host7_err.log\t\n@@ -0,0 +1,2 @@\n+[host] DESYNC at frame 60: p0=0xE9E36921DD877D25 p1=0x66B31149479A7D25\n+  *** DESYNC DETECTED at frame 60, stopping simulation ***\n",
+    "additions": 2,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "tmp/host8.log",
+    "patch": "Index: tmp/host8.log\n===================================================================\n--- tmp/host8.log\t\n+++ tmp/host8.log\t\n@@ -0,0 +1,10 @@\n+==========================================\n+  Lockstep demo  role=host  peer=0/2  frames=200  entities/peer=100  transport=udp  drop=0%\n+------------------------------------------\n+  UDP listening on 127.0.0.1:20006 ...\n+  all 2 peers connected, starting lockstep\n+  total time:  105.0 ms (200 frames)\n+  per frame:   0.52 ms\n+  TryStep retries: 36\n+  state hash:  0xE9E36921DD877D25\n+==========================================\n",
+    "additions": 10,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "tmp/host8_err.log",
+    "patch": "Index: tmp/host8_err.log\n===================================================================\n--- tmp/host8_err.log\t\n+++ tmp/host8_err.log\t\n@@ -0,0 +1,2 @@\n+[host] DESYNC at frame 60: p0=0xE9E36921DD877D25 p1=0x66B31149479A7D25\n+  *** DESYNC DETECTED at frame 60, stopping simulation ***\n",
+    "additions": 2,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "tmp/peer0.log",
+    "patch": "Index: tmp/peer0.log\n===================================================================\n--- tmp/peer0.log\t\n+++ tmp/peer0.log\t\n@@ -0,0 +1,10 @@\n+==========================================\n+  Lockstep demo  role=host  peer=0/2  frames=10  entities/peer=100  transport=tcp  drop=0%\n+------------------------------------------\n+  TCP listening on 127.0.0.1:20001 ...\n+  all 2 peers connected, starting lockstep\n+  total time:  22.3 ms (10 frames)\n+  per frame:   2.23 ms\n+  TryStep retries: 8\n+  state hash:  0x7703669F17B077AD\n+==========================================\n",
+    "additions": 10,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "tmp/peer0_err.log",
+    "patch": "Index: tmp/peer0_err.log\n===================================================================\n--- tmp/peer0_err.log\t\n+++ tmp/peer0_err.log\t\n",
+    "additions": 0,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "tmp/peer1.log",
+    "patch": "Index: tmp/peer1.log\n===================================================================\n--- tmp/peer1.log\t\n+++ tmp/peer1.log\t\n@@ -0,0 +1,10 @@\n+==========================================\n+  Lockstep demo  role=client  peer=1/2  frames=10  entities/peer=100  transport=tcp  drop=0%\n+------------------------------------------\n+  TCP connecting to 127.0.0.1:20001 as peer 1 ...\n+  connected, starting lockstep\n+  total time:  24.2 ms (10 frames)\n+  per frame:   2.42 ms\n+  TryStep retries: 10\n+  state hash:  0x7703669F17B077AD\n+==========================================\n",
+    "additions": 10,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "tmp/peer1_6.log",
+    "patch": "Index: tmp/peer1_6.log\n===================================================================\n--- tmp/peer1_6.log\t\n+++ tmp/peer1_6.log\t\n@@ -0,0 +1,5 @@\n+==========================================\n+  Lockstep demo  role=client  peer=1/2  frames=100  entities/peer=100  transport=udp  drop=0%\n+------------------------------------------\n+  UDP connecting to 127.0.0.1:20002 as peer 1 ...\n+  connected, starting lockstep\n",
+    "additions": 5,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "tmp/peer1_6_err.log",
+    "patch": "Index: tmp/peer1_6_err.log\n===================================================================\n--- tmp/peer1_6_err.log\t\n+++ tmp/peer1_6_err.log\t\n@@ -0,0 +1,2 @@\n+  [peer 1] INJECTED DESYNC at frame 50 (entity[0].X += 1)\n+[peer 1] DESYNC DETECTED at frame 50\n",
+    "additions": 2,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "tmp/peer1_7.log",
+    "patch": "Index: tmp/peer1_7.log\n===================================================================\n--- tmp/peer1_7.log\t\n+++ tmp/peer1_7.log\t\n@@ -0,0 +1,5 @@\n+==========================================\n+  Lockstep demo  role=client  peer=1/2  frames=500  entities/peer=100  transport=udp  drop=0%\n+------------------------------------------\n+  UDP connecting to 127.0.0.1:20005 as peer 1 ...\n+  connected, starting lockstep\n",
+    "additions": 5,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "tmp/peer1_7_err.log",
+    "patch": "Index: tmp/peer1_7_err.log\n===================================================================\n--- tmp/peer1_7_err.log\t\n+++ tmp/peer1_7_err.log\t\n@@ -0,0 +1,2 @@\n+  [peer 1] INJECTED DESYNC at frame 60 (entity[0].X += 1)\n+[peer 1] DESYNC DETECTED at frame 60\n",
+    "additions": 2,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "tmp/peer1_8.log",
+    "patch": "Index: tmp/peer1_8.log\n===================================================================\n--- tmp/peer1_8.log\t\n+++ tmp/peer1_8.log\t\n@@ -0,0 +1,5 @@\n+==========================================\n+  Lockstep demo  role=client  peer=1/2  frames=200  entities/peer=100  transport=udp  drop=0%\n+------------------------------------------\n+  UDP connecting to 127.0.0.1:20006 as peer 1 ...\n+  connected, starting lockstep\n",
+    "additions": 5,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "tmp/peer1_8_err.log",
+    "patch": "Index: tmp/peer1_8_err.log\n===================================================================\n--- tmp/peer1_8_err.log\t\n+++ tmp/peer1_8_err.log\t\n@@ -0,0 +1,2 @@\n+  [peer 1] INJECTED DESYNC at frame 50 (entity[0].X += 1)\n+[peer 1] DESYNC DETECTED at frame 60\n",
+    "additions": 2,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "tmp/peer1_err.log",
+    "patch": "Index: tmp/peer1_err.log\n===================================================================\n--- tmp/peer1_err.log\t\n+++ tmp/peer1_err.log\t\n",
+    "additions": 0,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "tmp/wsltest.txt",
+    "patch": "Index: tmp/wsltest.txt\n===================================================================\n--- tmp/wsltest.txt\t\n+++ tmp/wsltest.txt\t\n@@ -0,0 +1,9 @@\n+==========================================  \n+  lockstep stress: peers=4 entities/peer=10000 frames=50 transport=tcp\n+------------------------------------------\n+  host (peer 0) pid=376\n+  client (peer 1) pid=378\n+  client (peer 2) pid=379\n+  client (peer 3) pid=380\n+  all peers exited in 0s\n+------------------------------------------\n",
+    "additions": 9,
+    "deletions": 0,
+    "status": "added"
+  }
+]

@@ -28,12 +28,13 @@ public class JwtUtil {
         this.expiration = expiration;
     }
 
-    public String generateToken(Long userId, String phone) {
+    public String generateToken(Long userId, String phone, String role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);
         return Jwts.builder()
                 .subject(String.valueOf(userId))
                 .claim("phone", phone)
+                .claim("role", role != null ? role : "USER")
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(key)
