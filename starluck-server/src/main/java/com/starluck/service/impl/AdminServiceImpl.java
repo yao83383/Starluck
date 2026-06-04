@@ -8,6 +8,7 @@ import com.starluck.entity.ChatSession;
 import com.starluck.entity.FakeUser;
 import com.starluck.entity.PushLog;
 import com.starluck.entity.PushRule;
+import com.starluck.entity.User;
 import com.starluck.mapper.ChatMessageMapper;
 import com.starluck.mapper.ChatSessionMapper;
 import com.starluck.mapper.FakeUserMapper;
@@ -59,10 +60,14 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<FakeUser> getFakeUsers(String keyword) {
+    public List<FakeUser> getFakeUsers(String keyword, Long csUserId) {
         LambdaQueryWrapper<FakeUser> wrapper = new LambdaQueryWrapper<>();
         if (keyword != null && !keyword.isEmpty()) {
             wrapper.and(w -> w.like(FakeUser::getName, keyword).or().like(FakeUser::getCity, keyword));
+        }
+        // CS 角色只看到分配给自己的假用户
+        if (csUserId != null) {
+            wrapper.eq(FakeUser::getCsOwner, String.valueOf(csUserId));
         }
         wrapper.orderByDesc(FakeUser::getCreatedAt);
         return fakeUserMapper.selectList(wrapper);
@@ -206,5 +211,24 @@ public class AdminServiceImpl implements AdminService {
     public String getAiSuggestion(Long sessionId) {
         // TODO: 对接GLM-4-Flash API
         return "（AI建议功能需配置GLM API Key）";
+    }
+
+    @Override
+    public List<User> getCsList() {
+        return userMapper.selectList(
+                new LambdaQueryWrapper<User>()
+                        .eq(User::getRole, "CS")
+                        .eq(User::getStatus, 1)
+                        .orderByAsc(User::getId));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void assignFakeToCs(Long fakeId, Long csUserId, String csName) {
+        FakeUser fake = fakeUserMapper.selectById(fakeId);
+        if (fake == null) throw new BusinessException("假用户不存在");
+        // csOwner 存客服ID以便 CS 过滤查询
+        fake.setCsOwner(csUserId != null ? String.valueOf(csUserId) : null);
+        fakeUserMapper.updateById(fake);
     }
 }

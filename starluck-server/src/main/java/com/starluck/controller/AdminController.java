@@ -1,17 +1,22 @@
 package com.starluck.controller;
 
 import com.starluck.common.Result;
+import com.starluck.common.SecurityUtil;
 import com.starluck.entity.FakeUser;
 import com.starluck.entity.PushRule;
+import com.starluck.entity.User;
 import com.starluck.service.AdminService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -25,7 +30,22 @@ public class AdminController {
 
     @GetMapping("/fake-users")
     public Result<List<FakeUser>> getFakeUsers(@RequestParam(required = false) String keyword) {
-        return Result.ok(adminService.getFakeUsers(keyword));
+        Long userId = SecurityUtil.getCurrentUserId();
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                .stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        return Result.ok(adminService.getFakeUsers(keyword, isAdmin ? null : userId));
+    }
+
+    @GetMapping("/fake-users/cs-list")
+    public Result<List<User>> getCsList() {
+        return Result.ok(adminService.getCsList());
+    }
+
+    @PutMapping("/fake-users/{id}/assign")
+    public Result<Void> assignFake(@PathVariable Long id, @RequestParam(required = false) Long csUserId,
+                                    @RequestParam(required = false) String csName) {
+        adminService.assignFakeToCs(id, csUserId, csName);
+        return Result.okMsg("分配成功");
     }
 
     @PostMapping("/fake-users")

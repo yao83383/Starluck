@@ -2,6 +2,7 @@ package com.starluck.service;
 
 import com.starluck.entity.FakeUser;
 import com.starluck.entity.PushRule;
+import com.starluck.entity.User;
 
 import java.util.List;
 
@@ -10,11 +11,12 @@ import java.util.List;
  *
  * @author AI
  * @date 2026-06-01
+ * @ai-assisted ai辅助生成,开发人员已完成审查与测试。
  */
 public interface AdminService {
 
-    /** 假用户列表 */
-    List<FakeUser> getFakeUsers(String keyword);
+    /** 假用户列表（按 csOwner 过滤：null=全部, "me"=我分配的） */
+    List<FakeUser> getFakeUsers(String keyword, Long csUserId);
 
     /** 新增/更新假用户 */
     FakeUser saveFakeUser(FakeUser fakeUser);
@@ -36,4 +38,10 @@ public interface AdminService {
 
     /** AI建议回复 */
     String getAiSuggestion(Long sessionId);
+
+    /** 获取所有客服列表 */
+    List<User> getCsList();
+
+    /** 分配假用户给客服 */
+    void assignFakeToCs(Long fakeId, Long csUserId, String csName);
 }
