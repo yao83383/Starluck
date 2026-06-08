@@ -16,6 +16,7 @@ import com.starluck.mapper.WithdrawOrderMapper;
 import com.starluck.service.PaymentService;
 import com.starluck.vo.TransactionVO;
 import com.starluck.vo.WalletVO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +43,9 @@ public class PaymentServiceImpl implements PaymentService {
     private final WithdrawOrderMapper withdrawOrderMapper;
     private final DiamondRecordMapper diamondRecordMapper;
     private final TransactionMapper transactionMapper;
+
+    @Value("${app.withdraw-rate:0.06}")
+    private double withdrawRate;
 
     public PaymentServiceImpl(UserBalanceMapper balanceMapper, RechargeOrderMapper rechargeOrderMapper,
                               WithdrawOrderMapper withdrawOrderMapper, DiamondRecordMapper diamondRecordMapper,
@@ -78,6 +82,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         return WalletVO.builder()
                 .diamonds(balance.getDiamonds())
+                .pinkDiamonds(balance.getPinkDiamonds() != null ? balance.getPinkDiamonds() : 0)
                 .cash(balance.getCash())
                 .monthGiftIncome(BigDecimal.ZERO)
                 .monthChatIncome(BigDecimal.ZERO)
@@ -90,14 +95,16 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional(rollbackFor = Exception.class)
     public String createRechargeOrder(Long userId, Long packageId, String payMethod) {
         int[][] packages = {
-            {60, 600}, {300, 3000}, {680, 6800}, {1280, 12800}, {3280, 32800}, {6480, 64800}
+            {6, 600}, {30, 3000}, {68, 6800}, {128, 12800}, {328, 32800}, {648, 64800}
         };
+        int[] bonuses = {0, 300, 980, 2000, 5000, 10000};
         int idx = packageId.intValue() - 1;
         if (idx < 0 || idx >= packages.length) {
             throw new BusinessException("套餐不存在");
         }
 
         int diamondCount = packages[idx][1];
+        int bonusDiamonds = bonuses[idx];
         BigDecimal amount = BigDecimal.valueOf(packages[idx][0]);
 
         String orderNo = "RC" + IdUtil.fastSimpleUUID().substring(0, 24).toUpperCase();
@@ -107,7 +114,7 @@ public class PaymentServiceImpl implements PaymentService {
         order.setPackageId(packageId);
         order.setAmount(amount);
         order.setDiamonds(diamondCount);
-        order.setBonusDiamonds(0);
+        order.setBonusDiamonds(bonusDiamonds);
         order.setPayMethod(payMethod);
         order.setStatus("pending");
         rechargeOrderMapper.insert(order);
@@ -150,7 +157,7 @@ public class PaymentServiceImpl implements PaymentService {
         dr.setBalanceAfter(balance.getDiamonds());
         dr.setBizType("recharge");
         dr.setRefId(order.getId());
-        dr.setRemark("充值" + order.getAmount() + "元，获得" + order.getDiamonds() + "钻石");
+        dr.setRemark("充值" + order.getAmount() + "元，获得" + order.getDiamonds() + "星光");
         diamondRecordMapper.insert(dr);
 
         Transaction tx = new Transaction();
@@ -213,5 +220,43 @@ public class PaymentServiceImpl implements PaymentService {
         tx.setDescription("提现" + amount + "元，手续费" + fee + "元");
         tx.setBalanceAfter(balance.getCash());
         transactionMapper.insert(tx);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public BigDecimal exchangePinkDiamonds(Long userId, Integer amount) {
+        if (amount == null || amount <= 0) {
+            throw new BusinessException("兑换数量必须大于0");
+        }
+
+        UserBalance balance = balanceMapper.selectOne(
+                new LambdaQueryWrapper<UserBalance>().eq(UserBalance::getUserId, userId));
+        if (balance == null) {
+            throw new BusinessException("用户余额不存在");
+        }
+
+        int pinkCurrent = balance.getPinkDiamonds() != null ? balance.getPinkDiamonds() : 0;
+        if (pinkCurrent < amount) {
+            throw new BusinessException("星尘余额不足");
+        }
+
+        BigDecimal cashIncome = BigDecimal.valueOf(amount).multiply(BigDecimal.valueOf(withdrawRate))
+                .setScale(2, RoundingMode.HALF_UP);
+
+        balance.setPinkDiamonds(pinkCurrent - amount);
+        BigDecimal currentCash = balance.getCash() != null ? balance.getCash() : BigDecimal.ZERO;
+        balance.setCash(currentCash.add(cashIncome));
+        balanceMapper.updateById(balance);
+
+        DiamondRecord dr = new DiamondRecord();
+        dr.setUserId(userId);
+        dr.setType("out");
+        dr.setAmount(-amount);
+        dr.setBalanceAfter(balance.getPinkDiamonds());
+        dr.setBizType("pink_exchange");
+        dr.setRemark("兑换星尘 +" + cashIncome + "元现金");
+        diamondRecordMapper.insert(dr);
+
+        return balance.getCash();
     }
 }

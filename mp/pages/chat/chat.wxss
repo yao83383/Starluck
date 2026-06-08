@@ -46,6 +46,7 @@
 
 .msg-flow {
   flex: 1;
+  height: 0;
   padding: 24rpx;
 }
 
@@ -121,6 +122,34 @@
   font-weight: 600;
 }
 .ph { color: var(--sl-text3); }
+
+.failed-msg {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 16rpx 20rpx;
+  margin: 12rpx 0;
+  background: rgba(255,90,138,0.1);
+  border: 2rpx dashed rgba(255,90,138,0.4);
+  border-radius: 16rpx;
+  align-self: flex-end;
+  max-width: 80%;
+}
+.failed-msg .fm-icon { font-size: 28rpx; flex-shrink: 0; }
+.failed-msg .fm-text {
+  flex: 1;
+  color: var(--sl-text2);
+  font-size: 26rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.failed-msg .fm-tag {
+  font-size: 20rpx;
+  color: var(--sl-danger, #ff5c8a);
+  font-weight: 600;
+  flex-shrink: 0;
+}
 
 .tools {
   display: flex;

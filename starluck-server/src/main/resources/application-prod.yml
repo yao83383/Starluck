@@ -38,5 +38,16 @@ jwt:
 
 app:
   upload-path: /data/uploads
-  diamond-rate: 10
+  diamond-rate: 100
   withdraw-rate: 0.06
+  chat-price: 30
+  vip-daily-free-chat: 100
+  withdraw-fee-rate: 0.006
+
+# 智谱 GLM AI 配置（生产环境通过 docker-compose 注入 GLM_API_KEY）
+glm:
+  api-key: ${GLM_API_KEY:}
+  model: glm-4-flash
+  api-url: https://open.bigmodel.cn/api/paas/v4/chat/completions
+  max-tokens: 100
+  temperature: 0.9

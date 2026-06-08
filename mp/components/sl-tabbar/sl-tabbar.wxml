@@ -8,7 +8,10 @@
     <text class="lbl">动态</text>
   </view>
   <view class="ti {{active==='messages'?'on':''}}" bindtap="toMessages">
-    <text class="ico">💬</text>
+    <view style="position:relative;display:inline-block;">
+      <text class="ico">💬</text>
+      <view wx:if="{{unread>0}}" class="badge">{{unread > 99 ? '99+' : unread}}</view>
+    </view>
     <text class="lbl">消息</text>
   </view>
   <view class="ti {{active==='me'?'on':''}}" bindtap="toMe">

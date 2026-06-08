@@ -24,6 +24,7 @@ public class ChatMessage {
     private String giftName;
     private Integer costDiamond;
     private String msgTime;
+    private Integer replied;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
@@ -50,6 +51,8 @@ public class ChatMessage {
     public void setCostDiamond(Integer costDiamond) { this.costDiamond = costDiamond; }
     public String getMsgTime() { return msgTime; }
     public void setMsgTime(String msgTime) { this.msgTime = msgTime; }
+    public Integer getReplied() { return replied; }
+    public void setReplied(Integer replied) { this.replied = replied; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

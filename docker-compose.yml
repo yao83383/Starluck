@@ -85,6 +85,8 @@ services:
       REDIS_PASSWORD: ""
       # 应用配置
       TZ: Asia/Shanghai
+      # GLM AI 配置（部署时替换为实际 Key）
+      GLM_API_KEY: ${GLM_API_KEY:-}
     volumes:
       - uploads:/data/uploads
     depends_on:

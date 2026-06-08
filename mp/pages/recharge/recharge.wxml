@@ -5,18 +5,18 @@
 
   <view class="nav-bar">
     <view class="back" bindtap="back">‹</view>
-    <view class="title">星屑充值</view>
+    <view class="title">星光充值</view>
     <view class="right text-2">明细</view>
   </view>
 
   <scroll-view class="body" scroll-y="true" enhanced="true" show-scrollbar="false">
 
     <view class="balance">
-      <view class="lbl text-3">我的星屑</view>
+      <view class="lbl text-3">我的星光</view>
       <view class="num text-gold">✨ {{store.diamonds}}</view>
     </view>
 
-    <view class="bonus-banner">🎉 首充翻倍！首次充值赠送双倍星屑</view>
+    <view class="bonus-banner">🎉 首次充值赠送额外星光</view>
 
     <view class="pkg-grid">
       <view
@@ -28,7 +28,7 @@
       >
         <view wx:if="{{item.hot}}" class="hot-tag">超值热销</view>
         <view class="d">✨ {{item.diamond}}</view>
-        <view wx:if="{{item.bonus}}" class="bn text-success">{{item.bonus}}</view>
+        <view wx:if="{{item.bonus}}" class="bn text-success">+{{item.bonus}}</view>
         <view class="p">¥{{item.price}}</view>
       </view>
     </view>
@@ -49,7 +49,7 @@
     </view>
 
     <view class="tip text-3">
-      * 1元 = 10星屑 · 星屑不支持提现和转赠 · 充值成功后即时到账
+      * 1元 = 100星光 · 星光不支持提现和转赠 · 充值成功后即时到账
     </view>
 
     <view style="height:200rpx;"></view>

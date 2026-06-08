@@ -48,8 +48,8 @@
     "disableSWC": true
   },
   "compileType": "miniprogram",
-  "libVersion": "3.4.5",
-  "appid": "wx03c91956ee68f581",
+  "libVersion": "3.16.1",
+  "appid": "touristappid",
   "projectname": "starluck-mp",
   "condition": {},
   "editorSetting": {

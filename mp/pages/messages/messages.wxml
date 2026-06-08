@@ -29,8 +29,11 @@
       class="chat-item"
       wx:for="{{chats}}"
       wx:key="id"
-      data-id="{{item.id}}"
+      data-uid="{{item.uid}}"
+      data-name="{{item.name}}"
+      data-av="{{item.av}}"
       bindtap="goChat"
+      bindlongpress="onLongPress"
       hover-class="hover"
     >
       <view class="av-wrap">
@@ -39,6 +42,7 @@
       </view>
       <view class="ci-info flex-1">
         <view class="row1">
+          <text wx:if="{{item.pinned}}" class="pin-tag">置顶</text>
           <text class="name">{{item.name}}</text>
           <text wx:if="{{item.vip}}" class="sl-tag vip" style="margin-left:6rpx;font-size:18rpx">VIP</text>
           <text class="time text-3">{{item.time}}</text>

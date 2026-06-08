@@ -38,4 +38,10 @@ public class PaymentController {
         paymentService.applyWithdraw(userId, request.getAmount(), request.getMethod(), request.getAccount());
         return Result.okMsg("提现申请已提交");
     }
+
+    @PostMapping("/exchange-pink")
+    public Result<java.math.BigDecimal> exchangePink(@RequestParam Integer amount) {
+        Long userId = SecurityUtil.getCurrentUserId();
+        return Result.ok("兑换成功", paymentService.exchangePinkDiamonds(userId, amount));
+    }
 }

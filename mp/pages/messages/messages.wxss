@@ -89,6 +89,15 @@
   font-weight: 600;
   color: var(--sl-text1);
 }
+.chat-item .ci-info .pin-tag {
+  font-size: 18rpx;
+  padding: 2rpx 8rpx;
+  background: rgba(255,217,102,0.2);
+  color: var(--sl-vipGold, #ffd966);
+  border-radius: 6rpx;
+  margin-right: 8rpx;
+  font-weight: 600;
+}
 .chat-item .ci-info .time { font-size: 22rpx; margin-left: auto; }
 .chat-item .ci-info .last {
   font-size: 24rpx;

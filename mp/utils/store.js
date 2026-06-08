@@ -21,13 +21,19 @@ const DEFAULT_STATE = {
     vipExpire: ''
   },
   // 资产
-  diamonds: 666,        // 星屑
+    diamonds: 666,        // 星光
   cash: 88.50,
   isAuthed: false,
   chatFreeRemain: 5,
 
   // 当前主题
   themeId: 'warm-night',
+
+  // 消息未读总数
+  totalUnread: 0,
+
+  // 置顶会话
+  pinnedSessions: [],
 
   // 设置
   settings: {

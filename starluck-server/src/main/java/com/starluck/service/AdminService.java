@@ -44,4 +44,10 @@ public interface AdminService {
 
     /** 分配假用户给客服 */
     void assignFakeToCs(Long fakeId, Long csUserId, String csName);
+
+    /** 获取所有假用户会话（管理员看全部，CS只看自己的） */
+    List<com.starluck.vo.AdminSessionVO> getAdminSessions(Long csUserId);
+
+    /** 客服以假用户身份发送消息 */
+    void sendAsCs(Long sessionId, String content);
 }

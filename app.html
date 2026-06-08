@@ -311,6 +311,10 @@ a{text-decoration:none;color:inherit;}
 .bubble-row .av{width:34px;height:34px;font-size:14px;}
 .bubble{padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.4;background:#1f0d3a;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.04);max-width:240px;word-break:break-word;}
 .bubble-row.me .bubble{background:linear-gradient(135deg,#a18cff,#ff8ad4);color:#fff;}
+.failed-msg{display:flex;align-items:center;gap:8px;padding:8px 12px;margin:4px 0;background:rgba(255,90,138,0.12);border:1px dashed rgba(255,90,138,0.4);border-radius:10px;cursor:pointer;font-size:13px;align-self:flex-end;max-width:80%;}
+.failed-msg .fm-icon{font-size:14px;flex-shrink:0;}
+.failed-msg .fm-text{color:rgba(255,255,255,0.7);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.failed-msg .fm-tag{font-size:11px;color:#ff5c8a;font-weight:600;flex-shrink:0;white-space:nowrap;}
 .bubble.gift{background:linear-gradient(135deg,rgba(255,217,102,0.15),rgba(255,154,60,0.2));border:1px solid #ffd966;color:#3a2a00;display:flex;align-items:center;gap:8px;}
 .bubble.gift .gi{font-size:28px;}
 .bubble.gift .gt{font-size:13px;}
@@ -822,7 +826,7 @@ const MOCK_RANK = [
 
 const MOCK_VIP_RIGHTS = [
   {ic:'👁️', nm:'谁看过我'},{ic:'💝',nm:'喜欢我'},{ic:'🔍',nm:'高级筛选'},{ic:'⭐',nm:'优先曝光'},
-  {ic:'💬',nm:'100条聊天/日'},{ic:'📞',nm:'通话8折'},{ic:'💎',nm:'每月300钻石'},{ic:'🎁',nm:'专属礼物'},
+  {ic:'💬',nm:'100条聊天/日'},{ic:'📞',nm:'通话8折'},{ic:'✨',nm:'每月300星光'},{ic:'🎁',nm:'专属礼物'},
 ]
 
 /* ===================== Store ===================== */
@@ -1062,8 +1066,8 @@ const biz = {
   recharge(rmb, diamond){
     // 本地立即扣加，保证体验
     store.diamonds += diamond
-    store.transactions.unshift({id:'t'+Date.now(), type:'out', cat:'recharge', t1:`充值 ${diamond}💎`, t2:'刚刚', amt:rmb})
-    toast(`充值成功 +${diamond}💎`)
+    store.transactions.unshift({id:'t'+Date.now(), type:'out', cat:'recharge', t1:`充值 ${diamond}✨`, t2:'刚刚', amt:rmb})
+    toast(`充值成功 +${diamond}✨`)
     if(!store.firstRechargeShown){ store.firstRechargeShown = true }
 
     // 异步同步到后端：根据金额匹配套餐ID（60/300/680/1280/3280/6480 -> 1/2/3/4/5/6）
@@ -1079,32 +1083,33 @@ const biz = {
   },
 
   // ---------- 聊天消息 ----------
-  sendChatMsg(chatId, text){
+  sendChatMsg(chatId, text, isRetry){
     const chat = store.chats.find(c=>c.id===chatId)
     if(!chat) return false
-    let cost = 1
+    let cost = 30
     if(store.user.vip && store.chatFreeRemain>0){
       store.chatFreeRemain--
       cost = 0
-    }else if(store.diamonds < 1){
-      toast('你的星屑不够照亮这条消息')
-      go('/recharge')
+    }else if(store.diamonds < 30){
+      if(!isRetry){
+        chat.msgs.push({type:'failed', text, time:'刚刚', _retry:true})
+        chat.lastMsg = `[发送失败] ${text}`
+        chat.time = '刚刚'
+      }
       return false
     }else{
-      store.diamonds -= 1
+      store.diamonds -= 30
     }
     chat.msgs.push({type:'out', text, time:'刚刚', cost})
     chat.lastMsg = text
     chat.time = '刚刚'
 
-    // 异步同步到后端（仅当 chat.sessionId 已绑定后端会话时）
     if(apiOn() && chat.sessionId){
       API.chat.sendMessage(chat.sessionId, text).catch(err=>{
         console.warn('[api] sendMessage failed, kept local:', err.message)
       })
     }
 
-    // 本地模拟回复（无后端时维持原体验）
     if(!apiOn() || !chat.sessionId){
       setTimeout(()=>{
         const replies = ['嗯嗯～','你说的对','哈哈～','是这样吗？','听你的','想见你了']
@@ -1189,7 +1194,7 @@ const biz = {
   finishAuth(){
     store.isAuthed = true
     store.diamonds += 100
-    toast('实名认证成功 +100💎')
+    toast('实名认证成功 +100✨')
     // 后端实名认证接口待补充（TODO）
   },
 
@@ -1198,7 +1203,7 @@ const biz = {
     Object.assign(store.user, data)
     store.onboarded = true
     store.diamonds += 88
-    toast('资料完善 +88💎')
+    toast('资料完善 +88✨')
 
     if(apiOn()){
       API.user.updateProfile({
@@ -1479,7 +1484,7 @@ const PageOnboard = {
     </div>
     <div class="onboard-actions">
       <div class="skip" @click="skip" v-if="step<5">跳过</div>
-      <button class="btn" :class="{block:step===5}" style="flex:2" @click="next">{{step===5?'完成 +88💎':'下一步'}}</button>
+      <button class="btn" :class="{block:step===5}" style="flex:2" @click="next">{{step===5?'完成 +88✨':'下一步'}}</button>
     </div>
   </div>`
 }
@@ -1617,7 +1622,7 @@ const PageMe = {
   setup(){
     const menus = [
       [{ic:'❤️',cl:'#a18cff',lbl:'我的喜欢',rt:'',path:''},{ic:'👁️',cl:'#7ab5ff',lbl:'谁看过我',rt:'12人',path:'/vip'},{ic:'🎁',cl:'#ff9a3c',lbl:'我的礼物',rt:'',path:''},{ic:'📷',cl:'#5eead4',lbl:'我的动态',rt:'',path:'/feed'}],
-      [{ic:'💎',cl:'#a18cff',lbl:'钱包',rt:'¥'+store.cash.toFixed(2),path:'/wallet'},{ic:'🆔',cl:'#7ab5ff',lbl:'实名认证',rt:store.isAuthed?'已认证':'未认证',path:'/auth'},{ic:'👑',cl:'#ffd966',lbl:'VIP会员',rt:store.user.vip?'已开通':'立即开通',path:'/vip'},{ic:'🎁',cl:'#ff5c8a',lbl:'邀请好友',rt:'赚¥3888',path:'/invite'}],
+      [{ic:'✨',cl:'#a18cff',lbl:'钱包',rt:'¥'+store.cash.toFixed(2),path:'/wallet'},{ic:'🆔',cl:'#7ab5ff',lbl:'实名认证',rt:store.isAuthed?'已认证':'未认证',path:'/auth'},{ic:'👑',cl:'#ffd966',lbl:'VIP会员',rt:store.user.vip?'已开通':'立即开通',path:'/vip'},{ic:'🎁',cl:'#ff5c8a',lbl:'邀请好友',rt:'赚¥3888',path:'/invite'}],
       [{ic:'⚙️',cl:'#999',lbl:'设置',rt:'',path:'/settings'},{ic:'💬',cl:'#999',lbl:'帮助反馈',rt:'',path:'/settings'}]
     ]
     return {store, menus, go}
@@ -1775,6 +1780,16 @@ const PageChat = {
       if(!txt.value.trim()) return
       const ok = biz.sendChatMsg(chat.value.id, txt.value)
       if(ok){ txt.value=''; aiSuggest.value='' }
+      else toast('星屑不足，请充值后再发送')
+    }
+    const retryMsg = (msg)=>{
+      const ok = biz.sendChatMsg(chat.value.id, msg.text, true)
+      if(ok){
+        const idx = chat.value.msgs.indexOf(msg)
+        if(idx>=0) chat.value.msgs.splice(idx,1)
+      }else{
+        toast('星屑仍不足，请充值')
+      }
     }
     const goToRecharge = ()=>go('/recharge')
     const askAI = async ()=>{
@@ -1798,7 +1813,7 @@ const PageChat = {
       aiLoading.value = false
     }
     const useAI = ()=>{ txt.value = aiSuggest.value; aiSuggest.value='' }
-    return {chat,user,txt,tools,send,store,goToRecharge,askAI,useAI,aiLoading,aiSuggest,back}
+    return {chat,user,txt,tools,send,store,goToRecharge,askAI,useAI,aiLoading,aiSuggest,back,retryMsg}
   },
   template:`<div class="screen chat-screen">
     <status-bar />
@@ -1811,7 +1826,7 @@ const PageChat = {
       <div class="right">···</div>
     </div>
     <div class="balance-bar">
-      <div class="bl">余额 <b>{{store.diamonds}}💎</b> · 文字 1💎/条<span v-if="store.user.vip"> · VIP 今日剩{{store.chatFreeRemain}}条免费</span></div>
+      <div class="bl">余额 <b>{{store.diamonds}}✨</b> · 文字 30✨/条<span v-if="store.user.vip"> · VIP 今日剩{{store.chatFreeRemain}}条免费</span></div>
       <div class="br" @click="goToRecharge">充值 ›</div>
     </div>
     <div class="msg-flow">
@@ -1826,13 +1841,18 @@ const PageChat = {
             <div class="av" :class="'av-'+store.user.av">我</div>
             <div class="bubble">{{m.text}}</div>
           </div>
-          <div v-if="m.cost" class="cost-tip">- {{m.cost}}💎</div>
+          <div v-if="m.cost" class="cost-tip">- {{m.cost}}✨</div>
         </div>
         <div v-else-if="m.type==='gift'" style="display:flex;flex-direction:column;align-items:center;gap:4px;">
           <div class="bubble gift">
             <div class="gi">{{m.em}}</div>
-            <div><div class="gt">{{m.from==='me'?'我送出了':'TA送出了'}} {{m.text}}</div><div class="gp">价值 {{m.price}}💎</div></div>
+            <div><div class="gt">{{m.from==='me'?'我送出了':'TA送出了'}} {{m.text}}</div><div class="gp">价值 {{m.price}}✨</div></div>
           </div>
+        </div>
+        <div v-else-if="m.type==='failed'" class="failed-msg" @click="retryMsg(m)">
+          <span class="fm-icon">⚠️</span>
+          <span class="fm-text">{{m.text}}</span>
+          <span class="fm-tag">发送失败·点击重发</span>
         </div>
       </template>
     </div>
@@ -1887,12 +1907,12 @@ const GiftPanel = {
           <div v-for="g in gifts" :key="g.id" class="gift-cell" :class="{selected:sel===g.id}" @click="sel=g.id">
             <div class="gem">{{g.em}}</div>
             <div class="gn">{{g.name}}</div>
-            <div class="gp">💎 {{g.price}}</div>
+            <div class="gp">✨ {{g.price}}</div>
           </div>
         </div>
         <div class="gift-bottom">
           <div class="gift-bal">
-            <div class="bl">余额 <b>{{store.diamonds}}💎</b></div>
+            <div class="bl">余额 <b>{{store.diamonds}}✨</b></div>
             <div class="br" @click="go('/recharge')">充值 ›</div>
           </div>
           <div class="gift-action-row">
@@ -1935,12 +1955,12 @@ const PageRecharge = {
     <nav-bar title="获取星屑" dark />
     <div class="recharge-balance">
       <div class="lbl">星屑余额</div>
-      <div class="num"><span class="di">💎</span>{{store.diamonds}}</div>
+      <div class="num"><span class="di">✨</span>{{store.diamonds}}</div>
     </div>
-    <div class="first-bonus">🎁 首充翻倍！充1得2，最高送 6480 钻石</div>
+    <div class="first-bonus">🎁 首充翻倍！充1得2，最高送 6480 星光</div>
     <div class="pkg-grid">
       <div v-for="(p,i) in PKGS" :key="i" class="pkg-card" :class="{selected:sel===i,hot:p.hot}" @click="sel=i">
-        <div class="di"><span class="ic">💎</span>{{p.d}}</div>
+        <div class="di"><span class="ic">✨</span>{{p.d}}</div>
         <div class="ex" v-if="p.ex">额外{{p.ex}}</div>
         <div class="price">¥{{p.p}}</div>
       </div>
@@ -1954,8 +1974,8 @@ const PageRecharge = {
       </div>
     </div>
     <div class="recharge-tip">
-      钻石用于平台内消费（聊天/礼物/视频通话/解锁）<br>
-      钻石不可提现、不可转赠，请按需购买<br>
+      星光用于平台内消费（聊天/礼物/视频通话/解锁）<br>
+      星光不可提现、不可转赠，请按需购买<br>
       支付即视为同意《充值协议》
     </div>
     <div class="recharge-bottom">
@@ -1988,7 +2008,7 @@ const PageWallet = {
       </div>
       <div class="wallet-quick">
         <div class="qi" @click="go('/withdraw')"><div class="qic c1">💰</div><div class="ql">提现</div></div>
-        <div class="qi" @click="go('/recharge')"><div class="qic c2">💎</div><div class="ql">充值</div></div>
+        <div class="qi" @click="go('/recharge')"><div class="qic c2">✨</div><div class="ql">充值</div></div>
         <div class="qi"><div class="qic c3">💳</div><div class="ql">银行卡</div></div>
         <div class="qi"><div class="qic c4">📋</div><div class="ql">明细</div></div>
       </div>
@@ -2006,7 +2026,7 @@ const PageWallet = {
       <div class="bill-section">
         <h3>最近账单</h3>
         <div v-for="t in store.transactions.slice(0,8)" :key="t.id" class="bill-item">
-          <div class="bi" :class="{in:t.type==='in'}">{{t.cat==='gift'?'🎁':t.cat==='call'?'📞':t.cat==='chat'?'💬':t.cat==='withdraw'?'💰':'💎'}}</div>
+          <div class="bi" :class="{in:t.type==='in'}">{{t.cat==='gift'?'🎁':t.cat==='call'?'📞':t.cat==='chat'?'💬':t.cat==='withdraw'?'💰':'✨'}}</div>
           <div class="bn">
             <div class="t1">{{t.t1}}</div>
             <div class="t2">{{t.t2}}</div>
@@ -2085,7 +2105,7 @@ const PageWithdraw = {
       </div>
       <div style="padding:6px 18px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.6;">
         · 单日最多 3 次，每日总额 ¥5000<br>
-        · 单笔 ≥ ¥10，钻石按 10:0.6 元换算<br>
+        · 单笔 ≥ ¥10，星光按 10:0.6 元换算<br>
         · 首次提现需完成实名认证
       </div>
       <div style="padding:18px;">
@@ -2152,7 +2172,7 @@ const PageVip = {
         <tr><td>高级筛选</td><td class="no">×</td><td class="yes">✓</td><td class="yes">✓</td></tr>
         <tr><td>视频通话</td><td>原价</td><td class="yes">8折</td><td class="yes">5折</td></tr>
         <tr><td>隐身访问</td><td class="no">×</td><td class="no">×</td><td class="yes">✓</td></tr>
-        <tr><td>每月赠送</td><td>—</td><td class="gold">300💎</td><td class="gold">1000💎</td></tr>
+        <tr><td>每月赠送</td><td>—</td><td class="gold">300✨</td><td class="gold">1000✨</td></tr>
       </table>
     </div>
     <div class="vip-bottom">
@@ -2182,7 +2202,7 @@ const PageCall = {
         sec.value++
         if(sec.value%60===0){
           const r = biz.callMinute(user.value.id)
-          if(!r){ toast('钻石不足，通话结束'); hangup() }
+          if(!r){ toast('星光不足，通话结束'); hangup() }
         }
       },1000)
     })
@@ -2202,12 +2222,12 @@ const PageCall = {
           <div class="nm">{{user.name}}</div>
           <div class="tm">● {{fmt(sec)}}</div>
         </div>
-        <div class="ct-r">💎 {{rate}}/分</div>
+        <div class="ct-r">✨ {{rate}}/分</div>
       </div>
       <div v-if="remainMin<10" class="call-warning">⚠️ 余额仅剩 {{remainMin}} 分钟，请及时充值</div>
       <div class="call-bottom">
         <div class="call-balance">
-          <div class="bal">余额 <b>{{store.diamonds}}💎</b> · 已消耗 {{min*rate}}💎</div>
+          <div class="bal">余额 <b>{{store.diamonds}}✨</b> · 已消耗 {{min*rate}}✨</div>
           <div class="recharge" @click="go('/recharge')">充值</div>
         </div>
         <div class="call-controls">
@@ -2274,7 +2294,7 @@ const PageAuth = {
         <div style="text-align:center;padding:48px 24px;">
           <div style="font-size:64px;">✓</div>
           <h2 style="margin-top:14px;">认证成功</h2>
-          <div style="margin-top:8px;color:rgba(255,255,255,0.55);font-size:13px;">奖励 +100💎 已发放</div>
+          <div style="margin-top:8px;color:rgba(255,255,255,0.55);font-size:13px;">奖励 +100✨ 已发放</div>
         </div>
       </template>
     </div>
@@ -2286,9 +2306,9 @@ const PageInvite = {
   components:{StatusBar,NavBar},
   setup(){
     const tasks = [
-      {ic:'1',t1:'邀请 1 人注册',t2:'+88💎',done:true},
-      {ic:'2',t1:'邀请 5 人实名',t2:'+500💎',done:true},
-      {ic:'3',t1:'邀请 10 人首充',t2:'+2000💎+VIP',done:false},
+      {ic:'1',t1:'邀请 1 人注册',t2:'+88✨',done:true},
+      {ic:'2',t1:'邀请 5 人实名',t2:'+500✨',done:true},
+      {ic:'3',t1:'邀请 10 人首充',t2:'+2000✨+VIP',done:false},
       {ic:'4',t1:'邀请 50 人活跃',t2:'+¥888现金',done:false},
     ]
     const SHARES = [
@@ -2337,8 +2357,8 @@ const PageInvite = {
     <div class="reward-card">
       <h3>🎁 双向奖励</h3>
       <div class="reward-row">
-        <div class="rw"><div class="n">邀请人（你）</div><div class="v">388💎</div></div>
-        <div class="rw"><div class="n">被邀请人（TA）</div><div class="v">288💎+7天VIP</div></div>
+        <div class="rw"><div class="n">邀请人（你）</div><div class="v">388✨</div></div>
+        <div class="rw"><div class="n">被邀请人（TA）</div><div class="v">288✨+7天VIP</div></div>
       </div>
     </div>
     <div class="invite-tasks">
@@ -2434,7 +2454,7 @@ const PageInviteStats = {
         <div class="gi"><div class="n">{{store.invitedCount}}</div><div class="l">已邀请</div></div>
         <div class="gi"><div class="n">8</div><div class="l">已实名</div></div>
         <div class="gi"><div class="n">{{store.invitedPaid}}</div><div class="l">已充值</div></div>
-        <div class="gi"><div class="n">2580</div><div class="l">钻石奖励</div></div>
+        <div class="gi"><div class="n">2580</div><div class="l">星光奖励</div></div>
         <div class="gi"><div class="n">¥386</div><div class="l">现金返佣</div></div>
         <div class="gi"><div class="n">¥300</div><div class="l">特权奖金</div></div>
       </div>
@@ -2451,7 +2471,7 @@ const PageInviteStats = {
               <div class="pg"><div class="p" :style="{width:i.progress+'%'}"></div></div>
             </div>
           </div>
-          <div class="ra"><div class="ar">+{{i.reward}}💎</div><div class="at">{{i.time}}</div></div>
+          <div class="ra"><div class="ar">+{{i.reward}}✨</div><div class="at">{{i.time}}</div></div>
         </div>
       </div>
     </div>
@@ -2463,7 +2483,7 @@ const PageLanding = {
   components:{StatusBar},
   setup(){
     const PKG = [
-      {em:'💎',n:'888钻石',v:'¥88'},
+      {em:'✨',n:'888星光',v:'¥88'},
       {em:'👑',n:'7天VIP',v:'¥30'},
       {em:'🌹',n:'10朵玫瑰',v:'¥6'},
       {em:'💬',n:'免费聊天卡',v:'¥10'},
@@ -2532,7 +2552,7 @@ const PosterModal = {
       <div class="sl">每颗星，都在等另一颗<br>就差你了！</div>
       <div class="pkg">
         <div class="pgt">免费领取</div>
-        <div class="pg">💎 👑 🌹 💬</div>
+        <div class="pg">✨ 👑 🌹 💬</div>
       </div>
       <div class="qr">📱</div>
       <div class="cd">邀请码 <b>{{store.inviteCode}}</b></div>
@@ -2569,10 +2589,10 @@ const FirstRechargeModal = {
       <div class="deco">🎉</div>
       <div class="ct">⏰ 23:59:42 后失效</div>
       <h2>首充礼包</h2>
-      <div class="sub">钻石翻倍 + 豪华大礼</div>
+      <div class="sub">星光翻倍 + 豪华大礼</div>
       <div class="fr-pkgs">
         <div v-for="(p,i) in PKGS" :key="i" class="fr-pkg" :style="sel===i?'box-shadow:0 0 0 3px #ffd966;':''" @click="sel=i">
-          <div class="di">💎 {{p.d}}</div>
+          <div class="di">✨ {{p.d}}</div>
           <div class="ex">送 {{p.b}}</div>
           <div class="pr">¥{{p.p}}</div>
         </div>

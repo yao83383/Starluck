@@ -6,6 +6,7 @@ import com.starluck.entity.FakeUser;
 import com.starluck.entity.PushRule;
 import com.starluck.entity.User;
 import com.starluck.service.AdminService;
+import com.starluck.vo.AdminSessionVO;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -112,5 +113,24 @@ public class AdminController {
     @PostMapping("/ai/suggest")
     public Result<String> getAiSuggestion(@RequestParam Long sessionId) {
         return Result.ok(adminService.getAiSuggestion(sessionId));
+    }
+
+    @GetMapping("/sessions")
+    public Result<List<AdminSessionVO>> getAdminSessions() {
+        Long userId = SecurityUtil.getCurrentUserId();
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                .stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        return Result.ok(adminService.getAdminSessions(isAdmin ? null : userId));
+    }
+
+    @PostMapping("/chat/send")
+    public Result<Void> sendAsCs(@RequestBody Map<String, Object> body) {
+        Long sessionId = Long.valueOf(body.get("sessionId").toString());
+        String content = (String) body.get("content");
+        if (content == null || content.trim().isEmpty()) {
+            return Result.fail("消息不能为空");
+        }
+        adminService.sendAsCs(sessionId, content.trim());
+        return Result.okMsg("发送成功");
     }
 }

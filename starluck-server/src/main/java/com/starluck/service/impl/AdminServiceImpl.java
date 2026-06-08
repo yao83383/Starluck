@@ -2,6 +2,7 @@ package com.starluck.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.starluck.client.GlmClient;
 import com.starluck.common.BusinessException;
 import com.starluck.entity.ChatMessage;
 import com.starluck.entity.ChatSession;
@@ -15,14 +16,20 @@ import com.starluck.mapper.FakeUserMapper;
 import com.starluck.mapper.PushLogMapper;
 import com.starluck.mapper.PushRuleMapper;
 import com.starluck.mapper.UserMapper;
+import com.starluck.mapper.UserProfileMapper;
+import com.starluck.entity.UserProfile;
 import com.starluck.service.AdminService;
+import com.starluck.vo.AdminSessionVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -47,16 +54,21 @@ public class AdminServiceImpl implements AdminService {
     private final ChatSessionMapper sessionMapper;
     private final ChatMessageMapper messageMapper;
     private final UserMapper userMapper;
+    private final UserProfileMapper userProfileMapper;
+    private final GlmClient glmClient;
 
     public AdminServiceImpl(FakeUserMapper fakeUserMapper, PushRuleMapper pushRuleMapper,
                             PushLogMapper pushLogMapper, ChatSessionMapper sessionMapper,
-                            ChatMessageMapper messageMapper, UserMapper userMapper) {
+                            ChatMessageMapper messageMapper, UserMapper userMapper,
+                            UserProfileMapper userProfileMapper, GlmClient glmClient) {
         this.fakeUserMapper = fakeUserMapper;
         this.pushRuleMapper = pushRuleMapper;
         this.pushLogMapper = pushLogMapper;
         this.sessionMapper = sessionMapper;
         this.messageMapper = messageMapper;
         this.userMapper = userMapper;
+        this.userProfileMapper = userProfileMapper;
+        this.glmClient = glmClient;
     }
 
     @Override
@@ -209,8 +221,81 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public String getAiSuggestion(Long sessionId) {
-        // TODO: 对接GLM-4-Flash API
-        return "（AI建议功能需配置GLM API Key）";
+        ChatSession session = sessionMapper.selectById(sessionId);
+        if (session == null) {
+            throw new BusinessException("会话不存在");
+        }
+
+        Long fakeUserId = session.getFemaleUserId();
+        Long maleUserId = session.getMaleUserId();
+
+        FakeUser fake = fakeUserMapper.selectById(fakeUserId);
+        if (fake == null) {
+            throw new BusinessException("假用户不存在");
+        }
+
+        List<ChatMessage> msgs = messageMapper.selectList(
+                new LambdaQueryWrapper<ChatMessage>()
+                        .eq(ChatMessage::getSessionId, sessionId)
+                        .eq(ChatMessage::getMsgType, "text")
+                        .orderByDesc(ChatMessage::getId)
+                        .last("LIMIT 6"));
+        Collections.reverse(msgs);
+
+        String tags = "";
+        if (fake.getTags() != null && !fake.getTags().isEmpty()) {
+            try {
+                tags = JSONUtil.toJsonStr(JSONUtil.parseArray(fake.getTags()));
+                tags = tags.replace("[", "").replace("]", "").replace("\"", "");
+            } catch (Exception ignore) {
+                tags = fake.getTags();
+            }
+        }
+
+        String systemPrompt = String.format(
+                "你是%s，%d岁女孩，%s人。性格：%s。签名：%s。兴趣：%s。" +
+                "你正在和刚认识的男生聊天。回复要求：像真人微信聊天，尽量短，通常1句话，最多不超过15个字。" +
+                "语气轻松自然，可以适当加1个emoji。不主动提钱和礼物。不用每句都带问句。",
+                fake.getName(), fake.getAge(), fake.getCity(),
+                fake.getPersona() != null ? fake.getPersona() : "温柔、爱笑",
+                fake.getSign() != null ? fake.getSign() : "",
+                tags
+        );
+
+        List<Map<String, String>> messages = new ArrayList<>();
+        Map<String, String> sysMsg = new HashMap<>();
+        sysMsg.put("role", "system");
+        sysMsg.put("content", systemPrompt);
+        messages.add(sysMsg);
+
+        for (ChatMessage msg : msgs) {
+            Map<String, String> m = new HashMap<>();
+            if (msg.getSenderId().equals(maleUserId)) {
+                m.put("role", "user");
+            } else if (msg.getSenderId().equals(fakeUserId)) {
+                m.put("role", "assistant");
+            } else {
+                continue;
+            }
+            m.put("content", msg.getContent());
+            messages.add(m);
+        }
+
+        boolean hasUserMsg = false;
+        for (Map<String, String> m : messages) {
+            if ("user".equals(m.get("role"))) {
+                hasUserMsg = true;
+                break;
+            }
+        }
+        if (!hasUserMsg) {
+            Map<String, String> m = new HashMap<>();
+            m.put("role", "user");
+            m.put("content", "（对方刚刚向你打招呼，请友好回复）");
+            messages.add(m);
+        }
+
+        return glmClient.chat(messages);
     }
 
     @Override
@@ -227,8 +312,92 @@ public class AdminServiceImpl implements AdminService {
     public void assignFakeToCs(Long fakeId, Long csUserId, String csName) {
         FakeUser fake = fakeUserMapper.selectById(fakeId);
         if (fake == null) throw new BusinessException("假用户不存在");
-        // csOwner 存客服ID以便 CS 过滤查询
         fake.setCsOwner(csUserId != null ? String.valueOf(csUserId) : null);
         fakeUserMapper.updateById(fake);
+    }
+
+    @Override
+    public List<AdminSessionVO> getAdminSessions(Long csUserId) {
+        List<ChatSession> sessions = sessionMapper.selectList(
+                new LambdaQueryWrapper<ChatSession>()
+                        .eq(ChatSession::getIsFake, true)
+                        .orderByDesc(ChatSession::getUpdatedAt));
+
+        List<Long> fakeIds = sessions.stream().map(ChatSession::getFemaleUserId).distinct().collect(java.util.stream.Collectors.toList());
+        List<FakeUser> fakes = fakeIds.isEmpty() ? Collections.emptyList() :
+                fakeUserMapper.selectBatchIds(fakeIds);
+        Map<Long, FakeUser> fakeMap = fakes.stream().collect(java.util.stream.Collectors.toMap(FakeUser::getId, f -> f, (a, b) -> a));
+
+        if (csUserId != null) {
+            String csStr = String.valueOf(csUserId);
+            sessions = sessions.stream().filter(s -> {
+                FakeUser f = fakeMap.get(s.getFemaleUserId());
+                return f != null && csStr.equals(f.getCsOwner());
+            }).collect(java.util.stream.Collectors.toList());
+        }
+
+        List<Long> maleIds = sessions.stream().map(ChatSession::getMaleUserId).distinct().collect(java.util.stream.Collectors.toList());
+        List<User> males = maleIds.isEmpty() ? Collections.emptyList() : userMapper.selectBatchIds(maleIds);
+        Map<Long, User> maleMap = males.stream().collect(java.util.stream.Collectors.toMap(User::getId, u -> u, (a, b) -> a));
+
+        List<UserProfile> profiles = maleIds.isEmpty() ? Collections.emptyList() :
+                userProfileMapper.selectList(new LambdaQueryWrapper<UserProfile>().in(UserProfile::getUserId, maleIds));
+        Map<Long, UserProfile> profileMap = profiles.stream().collect(java.util.stream.Collectors.toMap(UserProfile::getUserId, p -> p, (a, b) -> a));
+
+        List<AdminSessionVO> result = new ArrayList<>();
+        for (ChatSession s : sessions) {
+            FakeUser fake = fakeMap.get(s.getFemaleUserId());
+            User male = maleMap.get(s.getMaleUserId());
+            UserProfile profile = profileMap.get(s.getMaleUserId());
+
+            result.add(AdminSessionVO.builder()
+                    .sessionId(s.getId())
+                    .maleId(s.getMaleUserId())
+                    .maleName(profile != null && profile.getNickname() != null ? profile.getNickname() : (male != null ? male.getPhone() : "未知"))
+                    .malePhone(male != null ? male.getPhone() : "")
+                    .maleAv(profile != null ? profile.getAvatarNo() : 1)
+                    .femaleId(s.getFemaleUserId())
+                    .femaleName(fake != null ? fake.getName() : "已删除")
+                    .femaleAv(fake != null ? fake.getAvatarNo() : 1)
+                    .lastMsg(s.getLastMsg())
+                    .lastTime(s.getLastTime())
+                    .maleUnread(s.getMaleUnread() != null ? s.getMaleUnread() : 0)
+                    .femaleUnread(s.getFemaleUnread() != null ? s.getFemaleUnread() : 0)
+                    .build());
+        }
+        return result;
+    }
+
+    @Override
+    public void sendAsCs(Long sessionId, String content) {
+        ChatSession session = sessionMapper.selectById(sessionId);
+        if (session == null) throw new BusinessException("会话不存在");
+
+        Long fakeUserId = session.getFemaleUserId();
+        Long maleUserId = session.getMaleUserId();
+        String now = LocalDateTime.now().format(TIME_FMT);
+
+        ChatMessage msg = new ChatMessage();
+        msg.setSessionId(sessionId);
+        msg.setSenderId(fakeUserId);
+        msg.setSenderRole("female");
+        msg.setMsgType("text");
+        msg.setContent(content);
+        msg.setMsgTime(now);
+        msg.setIsRead(0);
+        msg.setReplied(0);
+        messageMapper.insert(msg);
+
+        session.setLastMsg(content);
+        session.setLastTime(now);
+        session.setMaleUnread((session.getMaleUnread() == null ? 0 : session.getMaleUnread()) + 1);
+        sessionMapper.updateById(session);
+
+        Map<String, Object> pushData = new HashMap<>();
+        pushData.put("type", "new_message");
+        pushData.put("sessionId", sessionId);
+        pushData.put("content", content);
+        pushData.put("senderId", fakeUserId);
+        com.starluck.config.ChatWebSocketHandler.sendToUser(maleUserId, JSONUtil.toJsonStr(pushData));
     }
 }

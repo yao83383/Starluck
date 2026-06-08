@@ -168,6 +168,8 @@ tr:hover td{background:#fafafd;}
 .form-row label{display:block;font-size:12px;color:#666;margin-bottom:4px;font-weight:500;}
 
 .toast{position:fixed;top:24px;right:24px;background:#1e293b;color:#fff;padding:10px 16px;border-radius:6px;font-size:13px;z-index:9999;animation:slideIn .25s;}
+.modal-overlay{position:fixed;inset:0;background:rgba(10,4,24,0.85);z-index:1000;display:flex;align-items:center;justify-content:center;}
+.modal-overlay .modal{background:rgba(180,140,255,0.08);border:1px solid rgba(180,140,255,0.2);border-radius:14px;padding:24px;max-width:90vw;box-shadow:0 8px 32px rgba(10,4,24,0.5);}
 @keyframes slideIn{from{transform:translateX(120%);}to{transform:translateX(0);}}
 
 .empty{padding:60px 20px;text-align:center;color:#bbb;font-size:13px;}
@@ -200,6 +202,42 @@ const USE_BACKEND = true
 const API = (typeof window !== 'undefined' && window.starluckApi) ? window.starluckApi : null
 const apiOn = ()=> USE_BACKEND && API
 
+/* ===================== 后台登录状态 ===================== */
+const adminAuth = reactive({
+  token: localStorage.getItem('starluck_token') || '',
+  phone: '',
+  role: '',
+  loggedIn: false,
+})
+try{
+  const at = adminAuth.token
+  if(at){
+    API.auth.getUserInfo().then(data => {
+      adminAuth.loggedIn = true
+      adminAuth.phone = data.phone || ''
+      adminAuth.role = data.role || ''
+    }).catch(()=>{ API.setToken(''); adminAuth.token=''; localStorage.removeItem('starluck_token') })
+  }
+}catch(e){}
+
+const adminLogin = async (phone, password)=>{
+  if(!API) throw new Error('后端未连接')
+  const data = await API.admin.login(phone, password)
+  adminAuth.token = data.token
+  adminAuth.phone = data.phone
+  adminAuth.role = data.role || 'ADMIN'
+  adminAuth.loggedIn = true
+}
+const adminLogout = ()=>{
+  API.setToken('')
+  adminAuth.token = ''
+  adminAuth.loggedIn = false
+  adminAuth.phone = ''
+  adminAuth.role = ''
+  localStorage.removeItem('starluck_token')
+  view.value = 'dashboard'
+}
+
 /* ===================== 共享 Store（与 app.html 同源 localStorage） ===================== */
 const DEFAULT_STORE = {
   loggedIn:false, onboarded:false,
@@ -210,8 +248,8 @@ const DEFAULT_STORE = {
     {start:'19:00',end:'22:30',maxPer:2},
   ], strategy:'active', cooldownMin:30},
   pushLog:[],
-  csConfig:{...},
-  adminAnalytics:{...},
+  csConfig:{systemPrompt:'你是一个温柔可爱的女生，正在和一个有趣的男生聊天。请用女性视角回复，语气自然。', aiKey:'', templates:['你好呀～','在干嘛呢','哈哈是的','我也这么觉得'], autoReplyEnabled:false},
+  adminAnalytics:{pushed:0, opened:0, replied:0, paidAfter:0},
   csList:[]  // 客服列表
 }
 
@@ -805,165 +843,186 @@ const ViewFakes = {
 /* 客服工作台 */
 const ViewWorkbench = {
   setup(){
+    const allSessions = ref([])
+    const loading = ref(true)
+    const filterMale = ref('')
+    const filterFemale = ref('')
+    const activeSession = ref(null)
+    const msgs = ref([])
+    const reply = ref('')
+    const aiLoading = ref(false)
+    const aiSuggest = ref('')
     const msgFlowRef = ref(null)
-    watch(()=>activeConv.value?.msgs?.length, async ()=>{
+    let _chatPoll = null
+
+    const loadSessions = async ()=>{
+      if(!API) return
+      loading.value = true
+      try{ allSessions.value = await API.admin.getSessions() || [] }catch(e){ toast('加载会话失败: '+e.message) }
+      loading.value = false
+    }
+    onMounted(loadSessions)
+
+    const maleOptions = computed(()=>{
+      const map = {}
+      allSessions.value.forEach(s=>{ map[s.maleId] = s.maleName || s.malePhone })
+      return Object.entries(map).map(([id,name])=>({id:Number(id), name}))
+    })
+    const femaleOptions = computed(()=>{
+      const map = {}
+      allSessions.value.forEach(s=>{ map[s.femaleId] = s.femaleName })
+      return Object.entries(map).map(([id,name])=>({id:Number(id), name}))
+    })
+    const filteredSessions = computed(()=>{
+      let list = allSessions.value
+      if(filterMale.value) list = list.filter(s=>s.maleId===Number(filterMale.value))
+      if(filterFemale.value) list = list.filter(s=>s.femaleId===Number(filterFemale.value))
+      return list
+    })
+
+    const openChat = async (s)=>{
+      activeSession.value = s
+      msgs.value = []
+      try{
+        const raw = await API.chat.getMessages(s.sessionId)
+        msgs.value = (raw||[]).map(m=>({
+          type: m.senderRole==='male'?'out': m.senderRole==='system'?'sys':'in',
+          text: m.content, time: m.msgTime, cost: m.costDiamond||0
+        }))
+        await nextTick()
+        if(msgFlowRef.value) msgFlowRef.value.scrollTop = msgFlowRef.value.scrollHeight
+      }catch(e){ toast('加载消息失败: '+e.message) }
+      if(_chatPoll) clearInterval(_chatPoll)
+      _chatPoll = setInterval(async ()=>{
+        if(!activeSession.value) return
+        try{
+          const raw = await API.chat.getMessages(activeSession.value.sessionId)
+          const newMsgs = (raw||[]).map(m=>({
+            type: m.senderRole==='male'?'out': m.senderRole==='system'?'sys':'in',
+            text: m.content, time: m.msgTime, cost: m.costDiamond||0
+          }))
+          if(newMsgs.length !== msgs.value.length){ msgs.value = newMsgs; await nextTick(); if(msgFlowRef.value) msgFlowRef.value.scrollTop = msgFlowRef.value.scrollHeight }
+        }catch(e){}
+      }, 5000)
+    }
+    const closeChat = ()=>{ activeSession.value = null; msgs.value = []; if(_chatPoll){ clearInterval(_chatPoll); _chatPoll=null } }
+
+    const send = async ()=>{
+      if(!reply.value.trim() || !activeSession.value) return
+      const text = reply.value.trim()
+      msgs.value.push({type:'in', text, time:'刚刚', cost:0})
+      reply.value = ''
+      aiSuggest.value = ''
+      try{
+        await API.admin.chatSend(activeSession.value.sessionId, text)
+        const idx = allSessions.value.findIndex(s=>s.sessionId===activeSession.value.sessionId)
+        if(idx>=0){ allSessions.value[idx].lastMsg = text; allSessions.value[idx].lastTime='刚刚' }
+      }catch(e){ toast('发送失败: '+e.message) }
       await nextTick()
       if(msgFlowRef.value) msgFlowRef.value.scrollTop = msgFlowRef.value.scrollHeight
-    })
-    const pickConv = (c)=>{
-      ui.activeConvId = c.id
-      c.unread = 0
-      ui.aiSuggest = ''
-      nextTick(()=>{
-        if(msgFlowRef.value) msgFlowRef.value.scrollTop = msgFlowRef.value.scrollHeight
-      })
     }
-    const useAI = ()=>{
-      ui.reply = ui.aiSuggest
-      ui.aiSuggest = ''
+
+    const askAI = async ()=>{
+      if(!activeSession.value) return
+      aiLoading.value = true; aiSuggest.value = ''
+      try{ aiSuggest.value = await API.admin.getAiSuggestion(activeSession.value.sessionId) }
+      catch(e){ toast('AI错误: '+e.message) }
+      aiLoading.value = false
     }
-    const send = ()=>ops.sendReply(ui.reply)
-    const pickTemplate = (t)=>{ ui.reply = t }
-    const meInfo = computed(()=>({
-      diamonds: store.diamonds || 0,
-      cash: typeof store.cash === 'number' ? store.cash : 0,
-      vip: !!store.user?.vip,
-      authed: !!store.isAuthed,
-    }))
-    return {store, ui, ops, fakeConvs, activeConv, activeFake, pickConv, useAI, send, pickTemplate, meInfo, msgFlowRef, findUser, totalUnread}
+    const useAI = ()=>{ reply.value = aiSuggest.value; aiSuggest.value='' }
+
+    return {allSessions, loading, filterMale, filterFemale, filteredSessions, maleOptions, femaleOptions,
+            activeSession, msgs, reply, aiLoading, aiSuggest, openChat, closeChat, send, askAI, useAI, msgFlowRef, loadSessions}
   },
-  template:`<div class="cs-layout">
-    <!-- 左：会话列表 -->
-    <div class="cs-col">
-      <div class="cs-col-head">
-        <span>待回复会话 <span v-if="totalUnread" class="tag red">{{totalUnread}}</span></span>
-        <span class="tag">{{fakeConvs.length}}</span>
+  template:`<div>
+    <div v-if="!activeSession">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+        <div style="font-size:13px;color:rgba(255,255,255,0.5);">筛选：</div>
+        <select v-model="filterMale" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(180,140,255,0.25);background:#1f0d3a;color:#fff;font-size:12px;">
+          <option value="">全部男用户</option>
+          <option v-for="o in maleOptions" :key="o.id" :value="o.id">{{o.name}}</option>
+        </select>
+        <select v-model="filterFemale" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(180,140,255,0.25);background:#1f0d3a;color:#fff;font-size:12px;">
+          <option value="">全部女用户</option>
+          <option v-for="o in femaleOptions" :key="o.id" :value="o.id">{{o.name}}</option>
+        </select>
+        <span style="font-size:12px;color:rgba(255,255,255,0.3);">共 {{filteredSessions.length}} 个会话</span>
+        <button class="btn small ghost" @click="loadSessions" style="margin-left:auto;">🔄 刷新</button>
       </div>
-      <div class="cs-col-body">
-        <div v-if="!fakeConvs.length" class="empty"><div class="ei">📭</div><div>暂无会话<br><small>男用户和假用户开始聊天后会出现在此</small></div></div>
-        <div v-for="c in fakeConvs" :key="c.id" class="conv-item" :class="{active:ui.activeConvId===c.id}" @click="pickConv(c)">
-          <div class="av" :class="'av-'+(findUser(c.uid)?.av||1)">{{findUser(c.uid)?.name?.[0]||'?'}}</div>
-          <div class="iv">
-            <div class="nm">
-              <span class="n">{{findUser(c.uid)?.name}}</span>
-              <span class="t">{{c.time}}</span>
-            </div>
-            <div class="ln">{{c.lastMsg||'(无消息)'}}</div>
-            <div class="as">扮演 → 男用户 #{{store.user.id}}</div>
-          </div>
-          <div v-if="c.unread" class="bd">{{c.unread}}</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 中：聊天上下文 -->
-    <div class="cs-col cs-chat">
-      <template v-if="activeConv && activeFake">
-        <div class="cs-chat-head">
-          <div class="av" :class="'av-'+(activeFake.av||1)">{{activeFake.name?.[0]||'?'}}</div>
-          <div class="iv">
-            <div class="n">扮演 {{activeFake.name}}（假身份）</div>
-            <div class="m">对话男用户：{{store.user.name}} · 钻石 {{store.diamonds}} · {{store.user.vip?'VIP':'普通'}}</div>
-          </div>
-          <span class="tag green" v-if="activeFake.online">● 在线</span>
-        </div>
-        <div class="cs-msg-flow" ref="msgFlowRef">
-          <template v-for="(m,i) in activeConv.msgs" :key="i">
-            <div v-if="m.type==='sys'" class="cs-sys">{{m.text}}</div>
-            <div v-else-if="m.type==='out'" class="cs-bubble-row">
-              <div class="av" :class="'av-'+store.user.av">{{store.user.name?.[0]||'?'}}</div>
-              <div>
-                <div class="cs-bubble">{{m.text}}</div>
-                <div class="meta">男用户 · {{m.time}}{{m.cost?' · -'+m.cost+'💎':''}}</div>
+      <div v-if="loading" style="text-align:center;padding:40px;color:rgba(255,255,255,0.4);">加载中...</div>
+      <div v-else-if="!filteredSessions.length" class="empty" style="padding:40px;"><div class="ei">📭</div>暂无会话</div>
+      <div v-else class="card" style="overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead><tr style="background:rgba(180,140,255,0.06);color:rgba(255,255,255,0.5);">
+            <th style="padding:10px 14px;text-align:left;">男用户</th>
+            <th style="padding:10px 14px;text-align:left;">扮演女用户</th>
+            <th style="padding:10px 14px;text-align:left;">最后消息</th>
+            <th style="padding:10px 14px;text-align:left;">时间</th>
+            <th style="padding:10px 14px;text-align:left;">未读</th>
+            <th style="padding:10px 14px;text-align:left;">操作</th>
+          </tr></thead>
+          <tbody><tr v-for="s in filteredSessions" :key="s.sessionId" style="border-bottom:1px solid rgba(180,140,255,0.08);cursor:pointer;" @click="openChat(s)">
+            <td style="padding:10px 14px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="av av-sm" :class="'av-'+(s.maleAv||1)">{{(s.maleName||'?')[0]}}</div>
+                <div><div>{{s.maleName}}</div><div style="font-size:11px;color:rgba(255,255,255,0.4);">{{s.malePhone}}</div></div>
               </div>
-            </div>
-            <div v-else-if="m.type==='in'" class="cs-bubble-row fake">
-              <div class="av" :class="'av-'+(activeFake.av||1)">{{activeFake.name?.[0]||'?'}}</div>
-              <div>
-                <div class="cs-bubble">{{m.text}}</div>
-                <div class="meta" style="text-align:right;">{{m.cs?'客服回复':'系统推送'}} · {{m.time}}</div>
+            </td>
+            <td style="padding:10px 14px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="av av-sm" :class="'av-'+(s.femaleAv||1)">{{(s.femaleName||'?')[0]}}</div>
+                <span>{{s.femaleName}}</span>
               </div>
-            </div>
-            <div v-else-if="m.type==='gift'" class="cs-bubble-row">
-              <div class="av" :class="'av-'+store.user.av">{{store.user.name?.[0]||'?'}}</div>
-              <div>
-                <div class="cs-bubble" style="background:linear-gradient(135deg,#fff5d6,#ffe8b3);color:#5a3a00;">{{m.from==='me'?'对方送出 ':'我送出 '}}{{m.em}} {{m.text}} <small>({{m.price}}💎)</small></div>
-              </div>
-            </div>
-          </template>
-        </div>
-        <div class="cs-input-bar">
-          <div class="cs-input-row">
-            <textarea v-model="ui.reply" :placeholder="'作为 '+activeFake.name+' 回复对方...'" @keydown.ctrl.enter="send"></textarea>
-            <div style="display:flex;flex-direction:column;gap:6px;">
-              <button class="btn" @click="send" :disabled="!ui.reply.trim()">发送</button>
-              <button class="btn ghost small" @click="ops.askAI" :disabled="ui.aiLoading">{{ui.aiLoading?'AI思考中...':'💡 AI 建议'}}</button>
-            </div>
-          </div>
-          <div class="cs-quick-row">
-            <span v-for="t in store.csConfig.templates" :key="t" class="q" @click="pickTemplate(t)">{{t}}</span>
-          </div>
-          <div style="margin-top:6px;font-size:10px;color:#aaa;">Ctrl+Enter 快速发送</div>
-        </div>
-      </template>
-      <div v-else class="empty" style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-        <div class="ei">👈</div>
-        <div v-if="!activeConv">从左侧选择一个会话开始</div>
-        <div v-else>选中的会话假用户已被删除，请选择其他会话</div>
+            </td>
+            <td style="padding:10px 14px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:rgba(255,255,255,0.6);">{{s.lastMsg||'—'}}</td>
+            <td style="padding:10px 14px;color:rgba(255,255,255,0.4);font-size:12px;">{{s.lastTime||'—'}}</td>
+            <td style="padding:10px 14px;"><span v-if="s.femaleUnread" class="tag red">{{s.femaleUnread}}</span></td>
+            <td style="padding:10px 14px;"><button class="btn small ghost" @click.stop="openChat(s)">💬 接入</button></td>
+          </tr></tbody>
+        </table>
       </div>
     </div>
 
-    <!-- 右：男用户画像 + AI建议 -->
-    <div class="cs-col">
-      <div class="cs-col-head">对话信息</div>
-      <div class="cs-col-body">
-        <template v-if="activeConv">
-          <div class="cs-side-section">
-            <h4>男用户画像</h4>
-            <div class="cs-profile">
-              <div class="av" :class="'av-'+(store.user.av||1)">{{store.user.name?.[0]||'?'}}</div>
-              <div class="iv">
-                <div class="n">{{store.user.name}} <span v-if="meInfo.vip" class="tag gold">VIP</span></div>
-                <div class="m">ID: {{store.user.id}} · {{store.user.city}}</div>
+    <div v-else>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+        <button class="btn small ghost" @click="closeChat">← 返回列表</button>
+        <div style="font-size:14px;font-weight:600;">扮演「{{activeSession.femaleName}}」与「{{activeSession.maleName}}」对话</div>
+      </div>
+      <div class="cs-layout" style="height:calc(100vh - 200px);">
+        <div class="cs-col cs-chat" style="flex:2;">
+          <div class="cs-msg-flow" ref="msgFlowRef">
+            <template v-for="(m,i) in msgs" :key="i">
+              <div v-if="m.type==='sys'" class="cs-sys">{{m.text}}</div>
+              <div v-else-if="m.type==='out'" class="cs-bubble-row">
+                <div class="av av-sm" :class="'av-'+(activeSession.maleAv||1)">{{(activeSession.maleName||'?')[0]}}</div>
+                <div>
+                  <div class="cs-bubble">{{m.text}}</div>
+                  <div class="meta">男用户 · {{m.time}}{{m.cost?' · -'+m.cost+'✨':''}}</div>
+                </div>
+              </div>
+              <div v-else-if="m.type==='in'" class="cs-bubble-row fake">
+                <div class="av av-sm" :class="'av-'+(activeSession.femaleAv||1)">{{(activeSession.femaleName||'?')[0]}}</div>
+                <div>
+                  <div class="cs-bubble">{{m.text}}</div>
+                  <div class="meta" style="text-align:right;">客服回复 · {{m.time}}</div>
+                </div>
+              </div>
+            </template>
+          </div>
+          <div class="cs-input-bar">
+            <div class="cs-input-row">
+              <textarea v-model="reply" :placeholder="'作为 '+activeSession.femaleName+' 回复...'" @keydown.ctrl.enter="send"></textarea>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <button class="btn" @click="send" :disabled="!reply.trim()">发送</button>
+                <button class="btn ghost small" @click="askAI" :disabled="aiLoading">{{aiLoading?'思考中...':'💡 AI'}}</button>
               </div>
             </div>
-            <div class="profile-stats">
-              <div class="ps"><div class="l">钻石</div><div class="v">💎 {{meInfo.diamonds}}</div></div>
-              <div class="ps"><div class="l">余额</div><div class="v">¥{{meInfo.cash.toFixed(2)}}</div></div>
-              <div class="ps"><div class="l">VIP</div><div class="v">{{meInfo.vip?'已开通':'未开通'}}</div></div>
-              <div class="ps"><div class="l">实名</div><div class="v">{{meInfo.authed?'已认证':'未认证'}}</div></div>
+            <div v-if="aiSuggest" style="margin-top:8px;padding:8px 12px;background:rgba(255,217,102,0.08);border:1px solid rgba(255,217,102,0.2);border-radius:8px;font-size:13px;display:flex;align-items:center;gap:8px;">
+              <span style="flex:1;color:rgba(255,255,255,0.8);">{{aiSuggest}}</span>
+              <button class="btn tiny gold" @click="useAI">采用</button>
             </div>
+            <div style="margin-top:6px;font-size:10px;color:rgba(255,255,255,0.3);">Ctrl+Enter 发送</div>
           </div>
-
-          <div class="cs-side-section">
-            <h4>💡 AI 建议回复</h4>
-            <div class="ai-suggest">
-              <div class="hd">🤖 GLM-4-Flash</div>
-              <div class="tx" v-if="ui.aiLoading">思考中...</div>
-              <div class="tx" v-else-if="ui.aiSuggest">{{ui.aiSuggest}}</div>
-              <div class="tx" v-else style="color:#bbb;">点击下方按钮获取建议</div>
-              <div class="act">
-                <button class="btn tiny ghost" @click="ops.askAI" :disabled="ui.aiLoading">{{ui.aiSuggest?'重新生成':'生成建议'}}</button>
-                <button class="btn tiny gold" v-if="ui.aiSuggest" @click="useAI">采用</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="cs-side-section">
-            <h4>扮演角色信息</h4>
-            <div style="font-size:12px;line-height:1.7;" v-if="activeFake">
-              <div><b>{{activeFake.name}}</b>，{{activeFake.age}}岁，{{activeFake.city}}</div>
-              <div style="color:#888;">{{activeFake.sign}}</div>
-              <div style="margin-top:6px;">
-                <span v-for="t in (activeFake.tags||[])" :key="t" class="tag pink" style="margin-right:3px;">{{t}}</span>
-              </div>
-              <div style="margin-top:8px;color:#888;font-style:italic;">人设：{{activeFake.persona}}</div>
-            </div>
-            <div v-else style="font-size:12px;color:#bbb;">该会话假用户已被删除</div>
-          </div>
-        </template>
-        <div v-else class="empty" style="padding:30px 20px;">
-          <div>未选中会话</div>
         </div>
       </div>
     </div>
@@ -1150,11 +1209,191 @@ const ViewLogs = {
   </div>`
 }
 
+/* ===================== 🔐 后台登录页 ===================== */
+const ViewLogin = {
+  setup(){
+    const phone = ref('')
+    const password = ref('')
+    const loading = ref(false)
+    const errMsg = ref('')
+    const doLogin = async ()=>{
+      errMsg.value = ''
+      if(!phone.value.trim()){ errMsg.value='请输入手机号'; return }
+      if(!password.value){ errMsg.value='请输入密码'; return }
+      loading.value = true
+      try{
+        await adminLogin(phone.value.trim(), password.value)
+      }catch(e){
+        errMsg.value = e.message || '登录失败'
+      }finally{ loading.value = false }
+    }
+    return {phone, password, loading, errMsg, doLogin}
+  },
+  template:`<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0a0418,#1f0d3a);">
+    <div style="width:380px;padding:40px;background:rgba(180,140,255,0.08);border:1px solid rgba(180,140,255,0.2);border-radius:16px;box-shadow:0 8px 32px rgba(10,4,24,0.5);">
+      <div style="text-align:center;margin-bottom:30px;">
+        <div style="font-size:36px;">✨</div>
+        <div style="font-size:20px;font-weight:700;color:#fff;margin:8px 0;">Starluck 后台管理</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.5);">管理员 / 客服登录</div>
+      </div>
+      <div v-if="errMsg" style="padding:10px;margin-bottom:16px;background:rgba(255,90,138,0.15);border:1px solid rgba(255,90,138,0.3);border-radius:8px;color:#ff5c8a;font-size:13px;">{{errMsg}}</div>
+      <div style="margin-bottom:16px;">
+        <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:6px;">手机号</div>
+        <input v-model="phone" style="width:100%;padding:10px 14px;background:rgba(180,140,255,0.06);border:1px solid rgba(180,140,255,0.25);border-radius:10px;color:#fff;font-size:14px;box-sizing:border-box;" placeholder="管理员手机号" @keyup.enter="doLogin" />
+      </div>
+      <div style="margin-bottom:24px;">
+        <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:6px;">密码</div>
+        <input v-model="password" type="password" style="width:100%;padding:10px 14px;background:rgba(180,140,255,0.06);border:1px solid rgba(180,140,255,0.25);border-radius:10px;color:#fff;font-size:14px;box-sizing:border-box;" placeholder="输入密码" @keyup.enter="doLogin" />
+      </div>
+      <button @click="doLogin" :disabled="loading" style="width:100%;padding:12px;background:linear-gradient(135deg,#a18cff,#ff8ad4);border:none;border-radius:22px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;">
+        {{loading?'登录中...':'登 录'}}
+      </button>
+    </div>
+  </div>`
+}
+
+/* ===================== 👥 用户管理 ===================== */
+const ViewUserMgr = {
+  setup(){
+    const users = ref([])
+    const loading = ref(false)
+    const showForm = ref(false)
+    const editUser = ref(null)
+    const formPhone = ref('')
+    const formPwd = ref('')
+    const formRole = ref('CS')
+    const formStatus = ref('1')
+
+    const loadUsers = async ()=>{
+      if(!API) return
+      loading.value = true
+      try{
+        const list = await API.admin.getUsers()
+        users.value = list || []
+      }catch(e){ toast('加载失败: '+e.message) }
+      loading.value = false
+    }
+    onMounted(loadUsers)
+
+    const openCreate = ()=>{
+      editUser.value = null; formPhone.value=''; formPwd.value=''; formRole.value='CS'; formStatus.value='1'
+      showForm.value = true
+    }
+    const openEdit = (u)=>{
+      editUser.value = u; formPhone.value=u.phone; formRole.value=u.role; formStatus.value=String(u.status)
+      formPwd.value = ''
+      showForm.value = true
+    }
+    const saveUser = async ()=>{
+      if(!formPhone.value.trim()){ toast('手机号不能为空'); return }
+      try{
+        if(editUser.value){
+          await API.admin.updateUser(editUser.value.id, {role:formRole.value, status:parseInt(formStatus.value)})
+          if(formPwd.value) await API.admin.resetPassword(editUser.value.id, formPwd.value)
+          toast('已更新')
+        }else{
+          if(!formPwd.value){ toast('密码不能为空'); return }
+          await API.admin.createUser(formPhone.value.trim(), formPwd.value, formRole.value)
+          toast('已创建')
+        }
+        showForm.value = false; loadUsers()
+      }catch(e){ toast(e.message) }
+    }
+    const delUser = async (u)=>{
+      if(!confirm('确定删除 '+u.phone+'？')) return
+      try{ await API.admin.deleteUser(u.id); toast('已删除'); loadUsers() }catch(e){ toast(e.message) }
+    }
+    return {users, loading, showForm, editUser, formPhone, formPwd, formRole, formStatus,
+            openCreate, openEdit, saveUser, delUser}
+  },
+  template:`<div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <span style="font-size:13px;color:rgba(255,255,255,0.5);">共 {{users.length}} 个账号</span>
+      <button class="btn" @click="openCreate" style="background:linear-gradient(135deg,#a18cff,#ff8ad4);color:#fff;border:none;padding:8px 16px;border-radius:18px;cursor:pointer;font-size:12px;">+ 新建账号</button>
+    </div>
+    <div v-if="loading" style="text-align:center;padding:40px;color:rgba(255,255,255,0.4);">加载中...</div>
+    <div v-else class="card" style="overflow:hidden;">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead><tr style="background:rgba(180,140,255,0.06);color:rgba(255,255,255,0.5);">
+          <th style="padding:10px 14px;text-align:left;">ID</th><th style="padding:10px 14px;text-align:left;">手机号</th>
+          <th style="padding:10px 14px;text-align:left;">角色</th><th style="padding:10px 14px;text-align:left;">状态</th>
+          <th style="padding:10px 14px;text-align:left;">假用户数</th><th style="padding:10px 14px;text-align:left;">最后登录</th>
+          <th style="padding:10px 14px;text-align:left;">操作</th>
+        </tr></thead>
+        <tbody><tr v-for="u in users" :key="u.id" style="border-bottom:1px solid rgba(180,140,255,0.08);">
+          <td style="padding:10px 14px;color:rgba(255,255,255,0.4);">{{u.id}}</td>
+          <td style="padding:10px 14px;">{{u.phone}}</td>
+          <td style="padding:10px 14px;">
+            <span :style="{padding:'2px 8px',borderRadius:'10px',fontSize:'11px',background:u.role==='ADMIN'?'rgba(161,140,255,0.2)':'rgba(122,181,255,0.2)',color:u.role==='ADMIN'?'#a18cff':'#7ab5ff'}">{{u.role}}</span>
+          </td>
+          <td style="padding:10px 14px;">
+            <span style="color:u.status===1?'#5eead4':'#ff5c8a';">{{u.status===1?'启用':'禁用'}}</span>
+          </td>
+          <td style="padding:10px 14px;">{{u.fakeUserCount||0}}</td>
+          <td style="padding:10px 14px;color:rgba(255,255,255,0.4);font-size:12px;">{{u.lastLoginTime||'-'}}</td>
+          <td style="padding:10px 14px;">
+            <button class="btn small ghost" @click="openEdit(u)">编辑</button>
+            <button class="btn small ghost" @click="delUser(u)" style="color:#ff5c8a;">删除</button>
+          </td>
+        </tr></tbody>
+      </table>
+    </div>
+
+    <div v-if="showForm" class="modal-overlay" @click.self="showForm=false">
+      <div class="modal" style="width:400px;">
+        <div class="card-title">{{editUser?'编辑账号':'新建账号'}}</div>
+        <div class="form-row"><label>手机号</label><input class="input" v-model="formPhone" :disabled="!!editUser" /></div>
+        <div class="form-row"><label>密码{{editUser?'（留空不修改）':''}}</label><input class="input" v-model="formPwd" type="password" /></div>
+        <div class="form-row"><label>角色</label>
+          <select v-model="formRole" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(180,140,255,0.25);background:#1f0d3a;color:#fff;">
+            <option value="ADMIN">管理员 ADMIN</option>
+            <option value="CS">客服 CS</option>
+          </select>
+        </div>
+        <div v-if="editUser" class="form-row"><label>状态</label>
+          <select v-model="formStatus" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(180,140,255,0.25);background:#1f0d3a;color:#fff;">
+            <option value="1">启用</option>
+            <option value="0">禁用</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
+          <button class="btn ghost" @click="showForm=false">取消</button>
+          <button class="btn" @click="saveUser" style="background:linear-gradient(135deg,#a18cff,#ff8ad4);color:#fff;border:none;padding:8px 20px;border-radius:18px;">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>`
+}
+
 /* 根 App */
 const App = {
-  components:{ViewDashboard,ViewFakes,ViewWorkbench,ViewPush,ViewAI,ViewLogs},
+  components:{ViewDashboard,ViewFakes,ViewWorkbench,ViewPush,ViewAI,ViewLogs,ViewLogin,ViewUserMgr},
   setup(){
-    const NAVS = [
+    const currentRole = computed(()=>adminAuth.role)
+    const isLoggedIn = computed(()=>adminAuth.loggedIn)
+    const adminUnread = ref(0)
+    let _adminPoll = null
+
+    const pollUnread = async ()=>{
+      if(!API || !adminAuth.loggedIn) return
+      try{
+        const sessions = await API.admin.getSessions()
+        const total = (sessions||[]).reduce((s,x)=>(s+(x.femaleUnread||0)),0)
+        if(total > adminUnread.value && adminUnread.value >= 0){
+          toast('收到新消息 (' + total + ' 条未读)')
+        }
+        adminUnread.value = total
+      }catch(e){}
+    }
+    watch(isLoggedIn, (v)=>{
+      if(v){
+        pollUnread()
+        _adminPoll = setInterval(pollUnread, 2000)
+      }else{
+        if(_adminPoll){ clearInterval(_adminPoll); _adminPoll=null }
+      }
+    }, {immediate:true})
+    const baseNavs = [
       {k:'dashboard',ic:'📊',n:'数据看板'},
       {k:'fakes',ic:'👤',n:'假用户管理'},
       {k:'workbench',ic:'💬',n:'客服工作台'},
@@ -1162,27 +1401,33 @@ const App = {
       {k:'ai',ic:'🤖',n:'AI 设置'},
       {k:'logs',ic:'📋',n:'推送日志'},
     ]
-    const titles = {dashboard:'数据看板',fakes:'假用户管理',workbench:'客服工作台',push:'推送规则',ai:'AI 设置',logs:'推送日志'}
+    const NAVS = computed(()=>{
+      const list = [...baseNavs]
+      if(currentRole.value === 'ADMIN') list.push({k:'users',ic:'⚙️',n:'用户管理'})
+      return list
+    })
+    const titles = {dashboard:'数据看板',fakes:'假用户管理',workbench:'客服工作台',push:'推送规则',ai:'AI 设置',logs:'推送日志',users:'用户管理'}
     const currentView = computed(()=>{
-      const map = {dashboard:'view-dashboard',fakes:'view-fakes',workbench:'view-workbench',push:'view-push',ai:'view-ai',logs:'view-logs'}
+      const map = {dashboard:'view-dashboard',fakes:'view-fakes',workbench:'view-workbench',push:'view-push',ai:'view-ai',logs:'view-logs',users:'view-user-mgr'}
       return map[view.value]||'view-dashboard'
     })
     const appOnline = computed(()=>store.loggedIn)
-    return {view, NAVS, titles, currentView, store, toastState, totalUnread, appOnline}
+    return {view, NAVS, titles, currentView, store, toastState, totalUnread, appOnline, isLoggedIn, currentRole, adminAuth, adminLogout, adminUnread}
   },
-  template:`<div class="layout">
+  template:`<div v-if="!isLoggedIn" style="position:fixed;inset:0;z-index:9999;"><view-login /></div>
+  <div v-else class="layout">
     <div class="sidebar">
       <div class="logo"><span class="ic">💕</span>Starluck 后台</div>
       <div class="nav">
         <div v-for="n in NAVS" :key="n.k" class="nav-item" :class="{active:view===n.k}" @click="view=n.k">
           <span class="ic">{{n.ic}}</span>
           <span>{{n.n}}</span>
-          <span v-if="n.k==='workbench'&&totalUnread" class="bd">{{totalUnread}}</span>
+          <span v-if="n.k==='workbench'&&adminUnread" class="bd">{{adminUnread}}</span>
         </div>
       </div>
       <div class="footer">
-        v1.0 · 演示版本<br>
-        <span style="opacity:.6;">localStorage 共享于 app.html</span>
+        <div style="margin-bottom:8px;">{{adminAuth.phone}} · {{currentRole}}</div>
+        <button class="btn small ghost" @click="adminLogout" style="color:#ff5c8a;">退出登录</button>
       </div>
     </div>
     <div class="main">
@@ -1190,7 +1435,7 @@ const App = {
         <div class="title">{{titles[view]||''}}</div>
         <div class="right">
           <span class="dot" :class="{off:!appOnline}">{{appOnline?'男用户端已登录':'男用户端未登录'}}</span>
-          <span>钻石 💎 {{store.diamonds}}</span>
+          <span>星光 ✨ {{store.diamonds}}</span>
           <span>余额 ¥{{store.cash.toFixed(2)}}</span>
           <a href="app.html" target="_blank" class="btn small ghost" style="text-decoration:none;">↗ 打开 app.html</a>
         </div>

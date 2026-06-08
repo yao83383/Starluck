@@ -38,17 +38,27 @@ jwt:
 
 # 应用配置
 app:
-  # 钻石兑换比例：1元 = 10钻石
-  diamond-rate: 10
+  # 星光兑换比例：1元 = 100星光
+  diamond-rate: 100
   # 提现兑换比例：10钻石 = 0.6元
   withdraw-rate: 0.06
   # 提现手续费率
   withdraw-fee-rate: 0.006
   # 聊天单价（钻石/条）
-  chat-price: 1
+  chat-price: 30
   # VIP每日免费聊天数
   vip-daily-free-chat: 100
   # 视频通话单价（钻石/分钟）
   call-price-per-minute: 6
+  # 粉钻回复奖励数量
+  pink-diamond-reward: 10
   # 上传路径
   upload-path: ./uploads
+
+# 智谱 GLM AI 配置
+glm:
+  api-key: ${GLM_API_KEY:}
+  model: glm-4-flash
+  api-url: https://open.bigmodel.cn/api/paas/v4/chat/completions
+  max-tokens: 100
+  temperature: 0.9

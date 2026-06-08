@@ -197,6 +197,46 @@
 
   // ============ 后台管理接口 ============
   var admin = {
+    /** 后台管理员登录 */
+    login: function (phone, password) {
+      return request('POST', '/api/admin/login', { body: { phone: phone, password: password } })
+        .then(function (data) {
+          if (data && data.token) setToken(data.token)
+          return data
+        })
+    },
+    /** 管理员/客服账号列表 */
+    getUsers: function () {
+      return request('GET', '/api/admin/users')
+    },
+    /** 创建管理员/客服账号 */
+    createUser: function (phone, password, role) {
+      return request('POST', '/api/admin/users', {
+        body: { phone: phone, password: password, role: role }
+      })
+    },
+    /** 更新账号信息 */
+    updateUser: function (id, data) {
+      return request('PUT', '/api/admin/users/' + id, { body: data })
+    },
+    /** 删除账号 */
+    deleteUser: function (id) {
+      return request('DELETE', '/api/admin/users/' + id)
+    },
+    /** 重置密码 */
+    resetPassword: function (id, newPassword) {
+      return request('PUT', '/api/admin/users/' + id + '/password', {
+        body: { password: newPassword }
+      })
+    },
+    /** 当前CS自己的统计 */
+    getMyStats: function () {
+      return request('GET', '/api/admin/users/me/stats')
+    },
+    /** 查指定CS统计（管理员用） */
+    getCsStats: function (id) {
+      return request('GET', '/api/admin/users/' + id + '/stats')
+    },
     /** 假用户列表 */
     getFakeUsers: function (keyword) {
       return request('GET', '/api/admin/fake-users', { query: keyword ? { keyword: keyword } : {} })
@@ -225,6 +265,20 @@
     /** AI回复建议 */
     getAiSuggestion: function (sessionId) {
       return request('POST', '/api/admin/ai/suggest', { query: { sessionId: sessionId } })
+    },
+    /** 获取所有会话（管理员/CS） */
+    getSessions: function () {
+      return request('GET', '/api/admin/sessions')
+    },
+    /** 以假用户身份发送消息 */
+    chatSend: function (sessionId, content) {
+      return request('POST', '/api/admin/chat/send', { body: { sessionId: sessionId, content: content } })
+    },
+    /** 分配假用户给客服 */
+    assignFakeToCs: function (fakeId, csUserId, csName) {
+      return request('PUT', '/api/admin/fake-users/' + fakeId + '/assign', {
+        query: { csUserId: csUserId || 0, csName: csName || '' }
+      })
     }
   }
 

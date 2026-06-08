@@ -30,6 +30,7 @@ public class SecurityConfig {
 
     private static final List<String> PUBLIC_URLS = List.of(
             "/api/auth/**",
+            "/api/admin/login",
             "/ws/**",
             "/druid/**",
             "/uploads/**",

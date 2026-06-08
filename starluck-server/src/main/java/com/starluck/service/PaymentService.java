@@ -30,4 +30,12 @@ public interface PaymentService {
      * 申请提现
      */
     void applyWithdraw(Long userId, BigDecimal amount, String method, String account);
+
+    /**
+     * 星尘兑换为可提现余额
+     * @param userId 用户ID
+     * @param amount 星尘数量
+     * @return 兑换后现金余额
+     */
+    BigDecimal exchangePinkDiamonds(Long userId, Integer amount);
 }

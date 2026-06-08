@@ -95,6 +95,7 @@ CREATE TABLE IF NOT EXISTS `chat_message` (
     `gift_name`    VARCHAR(50)  DEFAULT NULL,
     `cost_diamond` INT          DEFAULT 0,
     `msg_time`     VARCHAR(20)  DEFAULT NULL,
+    `replied`      TINYINT      DEFAULT 0,
     `created_at`   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -205,6 +206,7 @@ CREATE TABLE IF NOT EXISTS `user_balance` (
     `vip_expire_time`  TIMESTAMP     DEFAULT NULL,
     `daily_free_chat`  INT           DEFAULT 0,
     `is_authed`        TINYINT       DEFAULT 0,
+    `pink_diamonds`    INT           DEFAULT 0,
     `created_at`       TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
     `updated_at`       TIMESTAMP     DEFAULT CURRENT_TIMESTAMP
 );

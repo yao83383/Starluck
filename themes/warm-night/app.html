@@ -9,10 +9,10 @@
 <meta name="x5-orientation" content="portrait" />
 <meta name="screen-orientation" content="portrait" />
 <meta name="full-screen" content="yes" />
-<title>Starluck · 暖夜蓝</title>
+<title>Starluck</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#050714;color:#fff;line-height:1.4;font-size:14px;overflow:hidden;}
+html,body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#06020f;color:#fff;line-height:1.4;font-size:14px;overflow:hidden;}
 body{display:flex;align-items:center;justify-content:center;min-height:100vh;}
 img{max-width:100%;display:block;}
 button{border:none;outline:none;background:none;font-family:inherit;cursor:pointer;}
@@ -21,31 +21,31 @@ input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.35);}
 a{text-decoration:none;color:inherit;}
 
 /* 手机壳（桌面端可见） */
-.phone-shell{width:375px;height:812px;background:#23264c;border-radius:42px;box-shadow:0 30px 80px rgba(0,0,0,.45),0 0 0 14px #111 inset,0 0 0 18px #2a2a2a;position:relative;overflow:hidden;}
+.phone-shell{width:375px;height:812px;background:#1f0d3a;border-radius:42px;box-shadow:0 30px 80px rgba(0,0,0,.45),0 0 0 14px #111 inset,0 0 0 18px #2a2a2a;position:relative;overflow:hidden;}
 .phone-shell::before{content:"";position:absolute;top:8px;left:50%;transform:translateX(-50%);width:130px;height:28px;background:#111;border-radius:0 0 18px 18px;z-index:9999;}
 
-/* === ✨ Starluck · 全局星光层（叠加在所有页面背景上方） === */
-.screen::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(1.5px 1.5px at 12% 18%,#fff,transparent),radial-gradient(1px 1px at 28% 42%,#e0c8ff,transparent),radial-gradient(2px 2px at 47% 76%,#fff,transparent),radial-gradient(1px 1px at 63% 23%,#ffd6e8,transparent),radial-gradient(1.5px 1.5px at 78% 57%,#fff,transparent),radial-gradient(1px 1px at 88% 88%,#e0c8ff,transparent),radial-gradient(1px 1px at 92% 14%,#fff,transparent),radial-gradient(1.5px 1.5px at 35% 64%,#ffd6e8,transparent),radial-gradient(1px 1px at 56% 91%,#fff,transparent);background-size:380px 380px;opacity:.6;animation:slTwinkle 6s ease-in-out infinite;}
+/* === �?Starluck · 全局星光层（叠加在所有页面背景上方） === */
+.screen::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(1.5px 1.5px at 12% 18%,#fff,transparent),radial-gradient(1px 1px at 28% 42%,#e0c8ff,transparent),radial-gradient(2px 2px at 47% 76%,#fff,transparent),radial-gradient(1px 1px at 63% 23%,#ffd6f5,transparent),radial-gradient(1.5px 1.5px at 78% 57%,#fff,transparent),radial-gradient(1px 1px at 88% 88%,#e0c8ff,transparent),radial-gradient(1px 1px at 92% 14%,#fff,transparent),radial-gradient(1.5px 1.5px at 35% 64%,#ffd6f5,transparent),radial-gradient(1px 1px at 56% 91%,#fff,transparent);background-size:380px 380px;opacity:.6;animation:slTwinkle 6s ease-in-out infinite;}
 .screen > *{position:relative;z-index:1;}
 @keyframes slTwinkle{0%,100%{opacity:.35;}50%{opacity:.7;}}
 @media(prefers-reduced-motion:reduce){.screen::before{animation:none;}}
 
 @media(max-width:430px){
-  body{background:#050714;}
+  body{background:#06020f;}
   .phone-shell{width:100vw;height:100vh;border-radius:0;box-shadow:none;}
   .phone-shell::before{display:none;}
 }
 
 /* 屏幕容器 */
-.screen{width:100%;height:100%;background:linear-gradient(180deg,#23264c 0%,#080a18 100%);position:relative;overflow:hidden;display:flex;flex-direction:column;}
+.screen{width:100%;height:100%;background:linear-gradient(180deg,#1f0d3a 0%,#0a0418 100%);position:relative;overflow:hidden;display:flex;flex-direction:column;}
 
 /* 状态栏 */
 .status-bar{height:38px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 24px 6px;font-size:13px;font-weight:600;color:#fff;flex-shrink:0;position:relative;z-index:10;}
 .status-bar .icons{display:flex;gap:5px;align-items:center;}
 .status-bar.dark{color:#fff;}
 
-/* 顶部导航条 */
-.nav-bar{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:#23264c;flex-shrink:0;position:relative;z-index:9;}
+/* 顶部导航�?*/
+.nav-bar{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:#1f0d3a;flex-shrink:0;position:relative;z-index:9;}
 .nav-bar .back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;}
 .nav-bar .title{font-size:17px;font-weight:700;color:#fff;flex:1;text-align:center;}
 .nav-bar .right{min-width:32px;font-size:14px;color:rgba(255,255,255,0.7);text-align:right;}
@@ -54,7 +54,7 @@ a{text-decoration:none;color:inherit;}
 .nav-bar.dark .back,.nav-bar.dark .title,.nav-bar.dark .right{color:#fff;}
 
 /* 页面顶部大标题区 */
-.page-top{padding:6px 18px 14px;background:#23264c;flex-shrink:0;}
+.page-top{padding:6px 18px 14px;background:#1f0d3a;flex-shrink:0;}
 .page-top h1{font-size:24px;font-weight:800;color:#fff;margin-bottom:2px;}
 .page-top .sub{font-size:12px;color:rgba(255,255,255,0.55);}
 
@@ -63,39 +63,39 @@ a{text-decoration:none;color:inherit;}
 .content::-webkit-scrollbar{display:none;}
 
 /* 底部 Tab Bar */
-.tab-bar{height:60px;display:flex;background:#23264c;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0);}
+.tab-bar{height:60px;display:flex;background:#1f0d3a;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0);}
 .tab-bar .tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,0.55);font-size:11px;gap:2px;}
 .tab-bar .tab-item .ico{font-size:22px;line-height:1;}
-.tab-bar .tab-item.active{color:#ff8ab0;font-weight:600;}
+.tab-bar .tab-item.active{color:#a18cff;font-weight:600;}
 
 /* 主CTA按钮 */
-.btn{display:inline-flex;align-items:center;justify-content:center;height:46px;padding:0 24px;border-radius:23px;font-size:15px;font-weight:600;background:linear-gradient(135deg,#ff8ab0 0%,#7a9eff 100%);color:#fff;box-shadow:0 6px 18px rgba(255,138,176,.35);transition:transform .15s ease;}
+.btn{display:inline-flex;align-items:center;justify-content:center;height:46px;padding:0 24px;border-radius:23px;font-size:15px;font-weight:600;background:linear-gradient(135deg,#a18cff 0%,#ff8ad4 100%);color:#fff;box-shadow:0 6px 18px rgba(161,140,255,.35);transition:transform .15s ease;}
 .btn:active{transform:scale(.96);}
 .btn.block{width:100%;}
 .btn.gold{background:linear-gradient(135deg,#ffd966 0%,#ff9a3c 100%);color:#3a2a00;box-shadow:0 6px 18px rgba(255,154,60,.35);}
-.btn.ghost{background:rgba(255,138,176,0.1);color:#ff8ab0;border:1.5px solid #ff8ab0;box-shadow:none;}
+.btn.ghost{background:rgba(161,140,255,0.1);color:#a18cff;border:1.5px solid #a18cff;box-shadow:none;}
 .btn.dark{background:#2d2d3a;box-shadow:0 6px 18px rgba(0,0,0,.2);}
 .btn.small{height:32px;padding:0 14px;border-radius:16px;font-size:13px;}
-.btn.danger{background:linear-gradient(135deg,#ff5c8a 0%,#ff8ab0 100%);}
+.btn.danger{background:linear-gradient(135deg,#ff5c8a 0%,#a18cff 100%);}
 .btn:disabled{opacity:.5;box-shadow:none;}
 
 /* 头像渐变 */
 .av{width:50px;height:50px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;flex-shrink:0;font-size:18px;}
-.av-1{background:linear-gradient(135deg,#ff8ab0,#7a9eff);}
-.av-2{background:linear-gradient(135deg,#a8c4ff,#5eead4);}
+.av-1{background:linear-gradient(135deg,#a18cff,#ff8ad4);}
+.av-2{background:linear-gradient(135deg,#7ab5ff,#5eead4);}
 .av-3{background:linear-gradient(135deg,#ffd966,#ff9a3c);}
 .av-4{background:linear-gradient(135deg,#ff5c8a,#ffd966);}
-.av-5{background:linear-gradient(135deg,#5eead4,#a8c4ff);}
-.av-6{background:linear-gradient(135deg,#7a9eff,#ff8ab0);}
+.av-5{background:linear-gradient(135deg,#5eead4,#7ab5ff);}
+.av-6{background:linear-gradient(135deg,#ff8ad4,#a18cff);}
 .av-7{background:linear-gradient(135deg,#ff9a3c,#ff5c8a);}
-.av-8{background:linear-gradient(135deg,#a8c4ff,#ff8ab0);}
+.av-8{background:linear-gradient(135deg,#7ab5ff,#a18cff);}
 
 /* 通用卡片 */
-.card{background:#23264c;border:1px solid rgba(255,138,176,.18);border-radius:14px;padding:14px;box-shadow:0 6px 20px rgba(8,10,24,.4);}
+.card{background:#1f0d3a;border:1px solid rgba(180,140,255,.18);border-radius:14px;padding:14px;box-shadow:0 6px 20px rgba(10,4,24,.4);}
 
 /* 标签 */
-.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:500;background:rgba(255,138,176,0.15);color:#ff8ab0;}
-.tag.purple{background:#080a18;color:#a8c4ff;}
+.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:500;background:rgba(180,140,255,0.15);color:#a18cff;}
+.tag.purple{background:#0a0418;color:#7ab5ff;}
 .tag.gold{background:rgba(255,217,102,0.15);color:#ff9a3c;}
 .tag.green{background:rgba(94,234,212,0.15);color:#5eead4;}
 .tag.gray{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.7);}
@@ -105,50 +105,50 @@ a{text-decoration:none;color:inherit;}
 .badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;background:#ff5c8a;color:#fff;font-size:10px;font-weight:700;border-radius:9px;}
 .badge.dot{min-width:8px;height:8px;padding:0;border-radius:50%;}
 
-/* === ① 登录页 === */
-.login-page{padding:32px 28px;display:flex;flex-direction:column;height:100%;background:linear-gradient(180deg,#23264c 0%,#080a18 100%);}
+/* === �?登录�?=== */
+.login-page{padding:32px 28px;display:flex;flex-direction:column;height:100%;background:linear-gradient(180deg,#1f0d3a 0%,#0a0418 100%);}
 .login-page .logo{font-size:48px;text-align:center;margin-top:60px;}
-.login-page h1{font-size:32px;font-weight:800;text-align:center;margin-top:14px;background:linear-gradient(135deg,#ff8ab0,#7a9eff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.login-page h1{font-size:32px;font-weight:800;text-align:center;margin-top:14px;background:linear-gradient(135deg,#a18cff,#ff8ad4);-webkit-background-clip:text;background-clip:text;color:transparent;}
 .login-page .slogan{font-size:14px;color:rgba(255,255,255,0.55);text-align:center;margin-top:8px;}
 .login-page .form{margin-top:48px;}
-.login-page .input-row{background:rgba(255,138,176,0.1);border:1px solid rgba(255,138,176,0.25);border-radius:12px;padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;backdrop-filter:blur(8px);}
-.login-page .input-row .prefix{color:#ff8ab0;font-weight:600;}
+.login-page .input-row{background:rgba(180,140,255,0.1);border:1px solid rgba(180,140,255,0.25);border-radius:12px;padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;backdrop-filter:blur(8px);}
+.login-page .input-row .prefix{color:#a18cff;font-weight:600;}
 .login-page .input-row input{flex:1;font-size:15px;color:#fff;}
 .login-page .input-row input::placeholder{color:rgba(255,255,255,0.4);}
-.login-page .input-row .send-code{color:#7a9eff;font-weight:600;font-size:13px;}
+.login-page .input-row .send-code{color:#ff8ad4;font-weight:600;font-size:13px;}
 .login-page .send-code.disabled{color:rgba(255,255,255,0.3);}
 .login-page .agree{display:flex;align-items:flex-start;gap:6px;font-size:11px;color:rgba(255,255,255,0.55);margin-top:14px;}
 .login-page .agree .cb{width:14px;height:14px;border-radius:50%;border:1.5px solid #ccc;flex-shrink:0;margin-top:2px;}
-.login-page .agree .cb.on{background:#ff8ab0;border-color:#ff8ab0;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;}
-.login-page .agree a{color:#ff8ab0;}
+.login-page .agree .cb.on{background:#a18cff;border-color:#a18cff;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;}
+.login-page .agree a{color:#a18cff;}
 .login-page .third{margin-top:40px;text-align:center;}
 .login-page .third .label{font-size:11px;color:rgba(255,255,255,0.4);position:relative;margin-bottom:20px;}
 .login-page .third .label::before,.login-page .third .label::after{content:"";position:absolute;top:50%;width:40px;height:1px;background:#eee;}
 .login-page .third .label::before{right:calc(50% + 50px);}
 .login-page .third .label::after{left:calc(50% + 50px);}
 .login-page .third .ico-row{display:flex;justify-content:center;gap:24px;}
-.login-page .third .ico{width:44px;height:44px;border-radius:50%;background:#23264c;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 14px rgba(8,10,24,.3);}
+.login-page .third .ico{width:44px;height:44px;border-radius:50%;background:#1f0d3a;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 14px rgba(10,4,24,.3);}
 
-/* === ② 发现/用户列表 === */
-.discover-tabs{display:flex;gap:18px;padding:0 18px 12px;background:#23264c;overflow-x:auto;}
+/* === �?发现/用户列表 === */
+.discover-tabs{display:flex;gap:18px;padding:0 18px 12px;background:#1f0d3a;overflow-x:auto;}
 .discover-tabs::-webkit-scrollbar{display:none;}
 .discover-tabs .tab{font-size:15px;color:rgba(255,255,255,0.55);font-weight:500;white-space:nowrap;padding:6px 2px;position:relative;}
 .discover-tabs .tab.active{color:#fff;font-weight:700;font-size:17px;}
-.discover-tabs .tab.active::after{content:"";position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:18px;height:3px;border-radius:2px;background:linear-gradient(90deg,#ff8ab0,#7a9eff);}
-.filter-bar{display:flex;gap:8px;padding:10px 18px;background:#23264c;overflow-x:auto;}
+.discover-tabs .tab.active::after{content:"";position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:18px;height:3px;border-radius:2px;background:linear-gradient(90deg,#a18cff,#ff8ad4);}
+.filter-bar{display:flex;gap:8px;padding:10px 18px;background:#1f0d3a;overflow-x:auto;}
 .filter-bar::-webkit-scrollbar{display:none;}
-.filter-bar .chip{padding:6px 12px;background:rgba(255,138,176,0.08);color:rgba(255,255,255,0.7);font-size:12px;border-radius:14px;white-space:nowrap;}
-.filter-bar .chip.active{background:rgba(255,138,176,0.15);color:#ff8ab0;font-weight:600;}
+.filter-bar .chip{padding:6px 12px;background:rgba(180,140,255,0.08);color:rgba(255,255,255,0.7);font-size:12px;border-radius:14px;white-space:nowrap;}
+.filter-bar .chip.active{background:rgba(180,140,255,0.15);color:#a18cff;font-weight:600;}
 .user-grid{padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.user-card{background:#23264c;border:1px solid rgba(255,138,176,.18);border-radius:14px;overflow:hidden;box-shadow:0 6px 20px rgba(8,10,24,.4);position:relative;}
+.user-card{background:#1f0d3a;border:1px solid rgba(180,140,255,.18);border-radius:14px;overflow:hidden;box-shadow:0 6px 20px rgba(10,4,24,.4);position:relative;}
 .user-card .cover{width:100%;aspect-ratio:1/1.15;display:flex;align-items:flex-end;padding:8px;position:relative;color:#fff;}
 .user-card .cover::before{content:"";position:absolute;inset:0;z-index:0;}
-.user-card.av-1 .cover::before{background:linear-gradient(135deg,#ff8ab0,#7a9eff);}
-.user-card.av-2 .cover::before{background:linear-gradient(135deg,#a8c4ff,#5eead4);}
+.user-card.av-1 .cover::before{background:linear-gradient(135deg,#a18cff,#ff8ad4);}
+.user-card.av-2 .cover::before{background:linear-gradient(135deg,#7ab5ff,#5eead4);}
 .user-card.av-3 .cover::before{background:linear-gradient(135deg,#ffd966,#ff9a3c);}
 .user-card.av-4 .cover::before{background:linear-gradient(135deg,#ff5c8a,#ffd966);}
-.user-card.av-5 .cover::before{background:linear-gradient(135deg,#5eead4,#a8c4ff);}
-.user-card.av-6 .cover::before{background:linear-gradient(135deg,#7a9eff,#ff8ab0);}
+.user-card.av-5 .cover::before{background:linear-gradient(135deg,#5eead4,#7ab5ff);}
+.user-card.av-6 .cover::before{background:linear-gradient(135deg,#ff8ad4,#a18cff);}
 .user-card .cover-inner{position:relative;z-index:1;width:100%;}
 .user-card .top-flags{position:absolute;top:8px;left:8px;display:flex;gap:4px;z-index:2;}
 .user-card .flag{padding:2px 6px;font-size:10px;background:rgba(0,0,0,.4);color:#fff;border-radius:8px;backdrop-filter:blur(4px);}
@@ -159,19 +159,19 @@ a{text-decoration:none;color:inherit;}
 .user-card .info .meta{font-size:11px;color:rgba(255,255,255,0.55);margin-top:2px;}
 .user-card .info .tags{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;}
 
-/* === ③ 消息列表 === */
-.msg-quick{padding:14px 18px;background:#23264c;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+/* === �?消息列表 === */
+.msg-quick{padding:14px 18px;background:#1f0d3a;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
 .msg-quick .qi{display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;}
 .msg-quick .qi .ico{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;}
-.msg-quick .qi .ico.c1{background:linear-gradient(135deg,#ff8ab0,#7a9eff);}
-.msg-quick .qi .ico.c2{background:linear-gradient(135deg,#a8c4ff,#5eead4);}
+.msg-quick .qi .ico.c1{background:linear-gradient(135deg,#a18cff,#ff8ad4);}
+.msg-quick .qi .ico.c2{background:linear-gradient(135deg,#7ab5ff,#5eead4);}
 .msg-quick .qi .ico.c3{background:linear-gradient(135deg,#ffd966,#ff9a3c);}
 .msg-quick .qi .ico.c4{background:linear-gradient(135deg,#5eead4,#5eead4);}
 .msg-quick .qi .lbl{font-size:11px;color:rgba(255,255,255,0.7);}
 .msg-quick .qi .bd{position:absolute;top:-4px;right:14px;}
 .chat-list{background:transparent;}
 .chat-item{display:flex;align-items:center;padding:12px 18px;gap:12px;border-bottom:1px solid rgba(255,255,255,0.06);}
-.chat-item:active{background:rgba(255,138,176,0.06);}
+.chat-item:active{background:rgba(180,140,255,0.06);}
 .chat-item .av-wrap{position:relative;}
 .chat-item .av-wrap .online-dot{position:absolute;bottom:0;right:0;width:10px;height:10px;background:#5eead4;border:2px solid #fff;border-radius:50%;}
 .chat-item .info{flex:1;min-width:0;}
@@ -181,8 +181,8 @@ a{text-decoration:none;color:inherit;}
 .chat-item .info .last{font-size:13px;color:rgba(255,255,255,0.55);margin-top:4px;display:flex;justify-content:space-between;align-items:center;}
 .chat-item .info .last span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px;}
 
-/* === ④ 个人中心 === */
-.me-header{padding:18px;background:linear-gradient(135deg,#ff8ab0,#7a9eff);color:#fff;position:relative;}
+/* === �?个人中心 === */
+.me-header{padding:18px;background:linear-gradient(135deg,#a18cff,#ff8ad4);color:#fff;position:relative;}
 .me-header .top-row{display:flex;align-items:center;gap:14px;}
 .me-header .av{width:64px;height:64px;font-size:24px;border:3px solid rgba(255,255,255,.3);}
 .me-header .ns{flex:1;}
@@ -193,31 +193,31 @@ a{text-decoration:none;color:inherit;}
 .me-stats{display:grid;grid-template-columns:repeat(4,1fr);margin-top:18px;text-align:center;}
 .me-stats .num{font-size:18px;font-weight:800;}
 .me-stats .lbl{font-size:11px;opacity:.85;margin-top:2px;}
-.vip-banner{margin:14px;padding:14px;border-radius:14px;background:linear-gradient(135deg,#2a2d52,#080a18);color:#ffd966;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;}
+.vip-banner{margin:14px;padding:14px;border-radius:14px;background:linear-gradient(135deg,#2a1545,#0a0418);color:#ffd966;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;}
 .vip-banner::after{content:"👑";position:absolute;right:-10px;top:-10px;font-size:80px;opacity:.1;}
 .vip-banner .vip-i{font-size:28px;}
 .vip-banner .vt{flex:1;}
 .vip-banner .vt .t1{font-size:14px;font-weight:700;}
 .vip-banner .vt .t2{font-size:11px;opacity:.8;margin-top:2px;}
 .vip-banner .vb{padding:6px 14px;background:linear-gradient(135deg,#ffd966,#ff9a3c);color:#3a2a00;border-radius:14px;font-size:12px;font-weight:700;}
-.menu-group{margin:0 14px 14px;background:#23264c;border-radius:14px;overflow:hidden;}
+.menu-group{margin:0 14px 14px;background:#1f0d3a;border-radius:14px;overflow:hidden;}
 .menu-item{display:flex;align-items:center;padding:14px;gap:12px;border-bottom:1px solid rgba(255,255,255,0.06);}
 .menu-item:last-child{border-bottom:none;}
-.menu-item:active{background:rgba(255,138,176,0.06);}
+.menu-item:active{background:rgba(180,140,255,0.06);}
 .menu-item .ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;}
 .menu-item .lbl{flex:1;font-size:14px;color:#fff;}
 .menu-item .rt{font-size:12px;color:rgba(255,255,255,0.55);}
 .menu-item .arr{color:rgba(255,255,255,0.3);font-size:18px;}
 
-/* === ⑤ 个人主页 === */
-.profile-page{background:linear-gradient(180deg,#23264c,#080a18);height:100%;display:flex;flex-direction:column;overflow:hidden;}
+/* === �?个人主页 === */
+.profile-page{background:linear-gradient(180deg,#1f0d3a,#0a0418);height:100%;display:flex;flex-direction:column;overflow:hidden;}
 .profile-cover{height:380px;position:relative;color:#fff;flex-shrink:0;}
-.profile-cover.av-1{background:linear-gradient(135deg,#ff8ab0,#7a9eff);}
-.profile-cover.av-2{background:linear-gradient(135deg,#a8c4ff,#5eead4);}
+.profile-cover.av-1{background:linear-gradient(135deg,#a18cff,#ff8ad4);}
+.profile-cover.av-2{background:linear-gradient(135deg,#7ab5ff,#5eead4);}
 .profile-cover.av-3{background:linear-gradient(135deg,#ffd966,#ff9a3c);}
 .profile-cover.av-4{background:linear-gradient(135deg,#ff5c8a,#ffd966);}
-.profile-cover.av-5{background:linear-gradient(135deg,#5eead4,#a8c4ff);}
-.profile-cover.av-6{background:linear-gradient(135deg,#7a9eff,#ff8ab0);}
+.profile-cover.av-5{background:linear-gradient(135deg,#5eead4,#7ab5ff);}
+.profile-cover.av-6{background:linear-gradient(135deg,#ff8ad4,#a18cff);}
 .profile-cover::after{content:"";position:absolute;bottom:0;left:0;right:0;height:120px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.5));}
 .profile-cover .top{position:absolute;top:48px;left:0;right:0;padding:0 14px;display:flex;justify-content:space-between;align-items:center;z-index:2;}
 .profile-cover .ic-btn{width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;backdrop-filter:blur(8px);}
@@ -225,9 +225,9 @@ a{text-decoration:none;color:inherit;}
 .profile-cover .name{font-size:24px;font-weight:800;display:flex;align-items:center;gap:6px;}
 .profile-cover .meta{font-size:12px;margin-top:4px;opacity:.9;display:flex;align-items:center;gap:10px;}
 .profile-cover .sign{font-size:13px;margin-top:8px;opacity:.95;}
-.profile-content{flex:1;overflow-y:auto;background:linear-gradient(180deg,#23264c,#080a18);padding-bottom:80px;}
+.profile-content{flex:1;overflow-y:auto;background:linear-gradient(180deg,#1f0d3a,#0a0418);padding-bottom:80px;}
 .profile-content::-webkit-scrollbar{display:none;}
-.profile-section{background:rgba(255,138,176,0.08);border:1px solid rgba(255,138,176,0.18);margin:10px 14px;padding:14px;border-radius:14px;}
+.profile-section{background:rgba(180,140,255,0.08);border:1px solid rgba(180,140,255,0.18);margin:10px 14px;padding:14px;border-radius:14px;}
 .profile-section h3{font-size:15px;font-weight:700;margin-bottom:12px;}
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .info-grid .it{display:flex;flex-direction:column;gap:2px;}
@@ -236,17 +236,17 @@ a{text-decoration:none;color:inherit;}
 .interest-tags{display:flex;flex-wrap:wrap;gap:8px;}
 .album-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
 .album-grid .photo{aspect-ratio:1;border-radius:8px;}
-.album-grid .photo.p1{background:linear-gradient(135deg,#ff8ab0,#7a9eff);}
-.album-grid .photo.p2{background:linear-gradient(135deg,#a8c4ff,#5eead4);}
+.album-grid .photo.p1{background:linear-gradient(135deg,#a18cff,#ff8ad4);}
+.album-grid .photo.p2{background:linear-gradient(135deg,#7ab5ff,#5eead4);}
 .album-grid .photo.p3{background:linear-gradient(135deg,#ffd966,#ff9a3c);}
 .album-grid .photo.p4{background:linear-gradient(135deg,#ff5c8a,#ffd966);}
-.album-grid .photo.p5{background:linear-gradient(135deg,#5eead4,#a8c4ff);}
-.album-grid .photo.p6{background:linear-gradient(135deg,#7a9eff,#ff8ab0);}
-.profile-cta{position:absolute;bottom:0;left:0;right:0;padding:12px 14px;background:#23264c;display:flex;gap:8px;box-shadow:0 -4px 16px rgba(0,0,0,.05);padding-bottom:calc(12px + env(safe-area-inset-bottom,0));}
+.album-grid .photo.p5{background:linear-gradient(135deg,#5eead4,#7ab5ff);}
+.album-grid .photo.p6{background:linear-gradient(135deg,#ff8ad4,#a18cff);}
+.profile-cta{position:absolute;bottom:0;left:0;right:0;padding:12px 14px;background:#1f0d3a;display:flex;gap:8px;box-shadow:0 -4px 16px rgba(0,0,0,.05);padding-bottom:calc(12px + env(safe-area-inset-bottom,0));}
 .profile-cta .b{flex:1;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;gap:4px;}
 .profile-cta .b.b-gift{background:linear-gradient(135deg,#ffd966,#ff9a3c);color:#3a2a00;}
-.profile-cta .b.b-fav{background:rgba(255,138,176,0.15);color:#ff8ab0;}
-.profile-cta .b.b-chat{background:linear-gradient(135deg,#ff8ab0,#7a9eff);color:#fff;box-shadow:0 6px 18px rgba(255,138,176,.35);flex:2;}
+.profile-cta .b.b-fav{background:rgba(180,140,255,0.15);color:#a18cff;}
+.profile-cta .b.b-chat{background:linear-gradient(135deg,#a18cff,#ff8ad4);color:#fff;box-shadow:0 6px 18px rgba(161,140,255,.35);flex:2;}
 
 /* === 通用 Toast === */
 .toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.75);color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:99999;animation:fadeIn .2s;}
@@ -255,16 +255,16 @@ a{text-decoration:none;color:inherit;}
 /* === 通用 Modal === */
 .modal-mask{position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s;}
 .modal-mask.bottom{align-items:flex-end;}
-.modal-card{background:#23264c;border:1px solid rgba(255,138,176,0.25);border-radius:18px;width:85%;max-width:320px;overflow:hidden;animation:modalIn .25s;color:#fff;}
+.modal-card{background:#1f0d3a;border:1px solid rgba(180,140,255,0.25);border-radius:18px;width:85%;max-width:320px;overflow:hidden;animation:modalIn .25s;color:#fff;}
 .modal-card.full{width:100%;border-radius:18px 18px 0 0;max-width:none;}
 @keyframes modalIn{from{transform:scale(.9);opacity:0;}to{transform:scale(1);opacity:1;}}
 
-/* 空状态 */
+/* 空状�?*/
 .empty{padding:60px 20px;text-align:center;color:rgba(255,255,255,0.4);font-size:13px;}
 .empty .ei{font-size:48px;opacity:.5;margin-bottom:14px;}
 
-/* === ⑥ 充值 === */
-.recharge-page{background:linear-gradient(180deg,#080a18 0%,#23264c 100%);color:#fff;height:100%;overflow-y:auto;}
+/* === �?充�?=== */
+.recharge-page{background:linear-gradient(180deg,#0a0418 0%,#1f0d3a 100%);color:#fff;height:100%;overflow-y:auto;}
 .recharge-page::-webkit-scrollbar{display:none;}
 .recharge-balance{padding:24px 18px;text-align:center;}
 .recharge-balance .lbl{font-size:12px;opacity:.7;}
@@ -274,7 +274,7 @@ a{text-decoration:none;color:inherit;}
 .pkg-grid{padding:0 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
 .pkg-card{background:rgba(255,255,255,.08);border:1.5px solid transparent;border-radius:12px;padding:14px 8px;text-align:center;position:relative;transition:all .2s;}
 .pkg-card.selected{border-color:#ffd966;background:rgba(255,217,102,.15);}
-.pkg-card.hot::before{content:"超值热销";position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#ff5c8a,#ff8ab0);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;}
+.pkg-card.hot::before{content:"超值热销";position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#ff5c8a,#a18cff);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;}
 .pkg-card .di{font-size:24px;font-weight:800;color:#ffd966;display:flex;align-items:center;justify-content:center;gap:2px;}
 .pkg-card .di .ic{font-size:16px;}
 .pkg-card .ex{font-size:10px;color:#5eead4;margin-top:2px;}
@@ -293,38 +293,42 @@ a{text-decoration:none;color:inherit;}
 .recharge-tip{font-size:11px;color:rgba(255,255,255,.5);padding:14px 18px;line-height:1.6;}
 .recharge-bottom{padding:14px 18px;background:rgba(0,0,0,.3);}
 
-/* === ⑦ 聊天对话 === */
-.chat-screen{display:flex;flex-direction:column;height:100%;background:linear-gradient(180deg,#23264c,#080a18);}
+/* === �?聊天对话 === */
+.chat-screen{display:flex;flex-direction:column;height:100%;background:linear-gradient(180deg,#1f0d3a,#0a0418);}
 .chat-nav-info{display:flex;align-items:center;gap:8px;flex:1;justify-content:center;}
 .chat-nav-info .av{width:30px;height:30px;font-size:13px;}
 .chat-nav-info .ni .n{font-size:14px;font-weight:600;}
 .chat-nav-info .ni .st{font-size:10px;color:#5eead4;}
-.balance-bar{padding:8px 18px;background:linear-gradient(90deg,rgba(255,217,102,0.15),rgba(255,138,176,0.15));font-size:12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06);}
+.balance-bar{padding:8px 18px;background:linear-gradient(90deg,rgba(255,217,102,0.15),rgba(180,140,255,0.15));font-size:12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06);}
 .balance-bar .bl{color:rgba(255,255,255,0.7);}
 .balance-bar .bl b{color:#ff9a3c;font-weight:700;}
-.balance-bar .br{color:#ff8ab0;font-weight:600;}
+.balance-bar .br{color:#a18cff;font-weight:600;}
 .msg-flow{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:14px;}
 .msg-flow::-webkit-scrollbar{display:none;}
 .sys-tip{text-align:center;font-size:11px;color:rgba(255,255,255,0.55);padding:6px 12px;background:rgba(0,0,0,.04);border-radius:10px;align-self:center;max-width:80%;}
 .bubble-row{display:flex;gap:8px;align-items:flex-end;max-width:80%;}
 .bubble-row.me{align-self:flex-end;flex-direction:row-reverse;}
 .bubble-row .av{width:34px;height:34px;font-size:14px;}
-.bubble{padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.4;background:#23264c;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.04);max-width:240px;word-break:break-word;}
+.bubble{padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.4;background:#1f0d3a;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.04);max-width:240px;word-break:break-word;}
 .bubble-row.me .bubble{background:linear-gradient(135deg,#ff8ab0,#7a9eff);color:#fff;}
+.failed-msg{display:flex;align-items:center;gap:8px;padding:8px 12px;margin:4px 0;background:rgba(255,90,138,0.12);border:1px dashed rgba(255,90,138,0.4);border-radius:10px;cursor:pointer;font-size:13px;align-self:flex-end;max-width:80%;}
+.failed-msg .fm-icon{font-size:14px;flex-shrink:0;}
+.failed-msg .fm-text{color:rgba(255,255,255,0.7);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.failed-msg .fm-tag{font-size:11px;color:#ff5c8a;font-weight:600;flex-shrink:0;white-space:nowrap;}
 .bubble.gift{background:linear-gradient(135deg,rgba(255,217,102,0.15),rgba(255,154,60,0.2));border:1px solid #ffd966;color:#3a2a00;display:flex;align-items:center;gap:8px;}
 .bubble.gift .gi{font-size:28px;}
 .bubble.gift .gt{font-size:13px;}
 .bubble.gift .gp{font-size:11px;color:#ff9a3c;font-weight:600;}
 .cost-tip{font-size:10px;color:rgba(255,255,255,0.4);align-self:flex-end;}
 .cost-tip.left{align-self:flex-start;}
-.chat-input-bar{background:rgba(35,38,76,0.95);backdrop-filter:blur(12px);padding:8px 14px;padding-bottom:calc(8px + env(safe-area-inset-bottom,0));border-top:1px solid rgba(255,255,255,0.06);}
+.chat-input-bar{background:rgba(31,13,58,0.95);backdrop-filter:blur(12px);padding:8px 14px;padding-bottom:calc(8px + env(safe-area-inset-bottom,0));border-top:1px solid rgba(255,255,255,0.06);}
 .chat-input-row{display:flex;align-items:center;gap:8px;}
-.chat-input-row .ib{flex:1;background:linear-gradient(180deg,#23264c,#080a18);border-radius:18px;padding:8px 14px;font-size:14px;color:#fff;}
+.chat-input-row .ib{flex:1;background:linear-gradient(180deg,#1f0d3a,#0a0418);border-radius:18px;padding:8px 14px;font-size:14px;color:#fff;}
 .chat-input-row .ib::placeholder{color:rgba(255,255,255,0.4);}
-.chat-input-row .sb{padding:8px 16px;background:linear-gradient(135deg,#ff8ab0,#7a9eff);color:#fff;border-radius:16px;font-size:13px;font-weight:600;}
+.chat-input-row .sb{padding:8px 16px;background:linear-gradient(135deg,#a18cff,#ff8ad4);color:#fff;border-radius:16px;font-size:13px;font-weight:600;}
 .chat-tools{display:flex;justify-content:space-around;padding:12px 0 0;}
 .chat-tools .tl{display:flex;flex-direction:column;align-items:center;gap:4px;color:rgba(255,255,255,0.7);font-size:10px;}
-.chat-tools .tl .ti{width:36px;height:36px;background:linear-gradient(180deg,#23264c,#080a18);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.chat-tools .tl .ti{width:36px;height:36px;background:linear-gradient(180deg,#1f0d3a,#0a0418);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;}
 .ai-btn{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#ffd966,#ff9a3c);color:#3a2a00;font-size:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
 .ai-btn:disabled{opacity:.5;}
 .ai-suggest-bar{margin-bottom:8px;padding:8px 12px;background:linear-gradient(135deg,rgba(255,217,102,.15),rgba(255,154,60,.08));border:1px solid rgba(255,154,60,.3);border-radius:10px;display:flex;align-items:center;gap:8px;font-size:12px;}
@@ -333,16 +337,16 @@ a{text-decoration:none;color:inherit;}
 .ai-suggest-bar .ts{flex:1;color:#fff;}
 .ai-suggest-bar .ub{padding:4px 10px;background:#ff9a3c;color:#fff;border-radius:10px;font-size:11px;font-weight:600;flex-shrink:0;}
 
-/* === ⑧ 礼物面板 === */
-.gift-panel{background:#23264c;border-radius:18px 18px 0 0;padding:14px;max-height:60%;display:flex;flex-direction:column;}
+/* === �?礼物面板 === */
+.gift-panel{background:#1f0d3a;border-radius:18px 18px 0 0;padding:14px;max-height:60%;display:flex;flex-direction:column;}
 .gift-tabs{display:flex;gap:18px;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:10px;margin-bottom:12px;}
 .gift-tabs .gt{font-size:14px;color:rgba(255,255,255,0.55);font-weight:500;}
 .gift-tabs .gt.active{color:#fff;font-weight:700;position:relative;}
-.gift-tabs .gt.active::after{content:"";position:absolute;bottom:-11px;left:50%;transform:translateX(-50%);width:18px;height:3px;background:#ff8ab0;border-radius:2px;}
+.gift-tabs .gt.active::after{content:"";position:absolute;bottom:-11px;left:50%;transform:translateX(-50%);width:18px;height:3px;background:#a18cff;border-radius:2px;}
 .gift-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;overflow-y:auto;max-height:280px;}
 .gift-grid::-webkit-scrollbar{display:none;}
-.gift-cell{background:rgba(255,138,176,0.06);border-radius:10px;padding:10px 4px;text-align:center;border:1.5px solid transparent;position:relative;}
-.gift-cell.selected{border-color:#ff8ab0;background:rgba(255,138,176,0.15);}
+.gift-cell{background:rgba(180,140,255,0.06);border-radius:10px;padding:10px 4px;text-align:center;border:1.5px solid transparent;position:relative;}
+.gift-cell.selected{border-color:#a18cff;background:rgba(180,140,255,0.15);}
 .gift-cell .gem{font-size:38px;line-height:1;}
 .gift-cell .gn{font-size:11px;color:#fff;margin-top:4px;font-weight:500;}
 .gift-cell .gp{font-size:10px;color:#ff9a3c;font-weight:700;margin-top:2px;display:flex;align-items:center;justify-content:center;gap:2px;}
@@ -350,39 +354,39 @@ a{text-decoration:none;color:inherit;}
 .gift-bal{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:10px;}
 .gift-bal .bl{color:rgba(255,255,255,0.7);}
 .gift-bal .bl b{color:#ff9a3c;font-weight:700;}
-.gift-bal .br{color:#ff8ab0;}
+.gift-bal .br{color:#a18cff;}
 .gift-action-row{display:flex;gap:8px;align-items:center;}
-.gift-num{display:flex;background:linear-gradient(180deg,#23264c,#080a18);border-radius:14px;padding:2px;}
+.gift-num{display:flex;background:linear-gradient(180deg,#1f0d3a,#0a0418);border-radius:14px;padding:2px;}
 .gift-num .nb{padding:6px 10px;font-size:12px;color:rgba(255,255,255,0.7);border-radius:12px;}
-.gift-num .nb.on{background:linear-gradient(135deg,#ff8ab0,#7a9eff);color:#fff;font-weight:700;box-shadow:0 2px 8px rgba(255,138,176,.4);}
-.gift-send{flex:1;height:40px;border-radius:20px;background:linear-gradient(135deg,#ff8ab0,#7a9eff);color:#fff;font-weight:700;font-size:14px;}
+.gift-num .nb.on{background:linear-gradient(135deg,#a18cff,#ff8ad4);color:#fff;font-weight:700;box-shadow:0 2px 8px rgba(161,140,255,.4);}
+.gift-send{flex:1;height:40px;border-radius:20px;background:linear-gradient(135deg,#a18cff,#ff8ad4);color:#fff;font-weight:700;font-size:14px;}
 
-/* === ⑨ 钱包 === */
-.wallet-top{padding:24px 18px;background:linear-gradient(135deg,#ff8ab0,#7a9eff);color:#fff;}
+/* === �?钱包 === */
+.wallet-top{padding:24px 18px;background:linear-gradient(135deg,#a18cff,#ff8ad4);color:#fff;}
 .wallet-top .lbl{font-size:12px;opacity:.85;}
 .wallet-top .amt{font-size:32px;font-weight:800;margin-top:6px;}
 .wallet-top .amt .u{font-size:14px;margin-left:4px;font-weight:500;}
-.wallet-quick{display:grid;grid-template-columns:repeat(4,1fr);background:#23264c;margin:-20px 14px 0;border-radius:14px;padding:14px 0;box-shadow:0 6px 20px rgba(8,10,24,.4),0 0 0 1px rgba(255,138,176,.1);}
+.wallet-quick{display:grid;grid-template-columns:repeat(4,1fr);background:#1f0d3a;margin:-20px 14px 0;border-radius:14px;padding:14px 0;box-shadow:0 6px 20px rgba(10,4,24,.4),0 0 0 1px rgba(180,140,255,.1);}
 .wallet-quick .qi{display:flex;flex-direction:column;align-items:center;gap:4px;}
 .wallet-quick .qi .qic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;}
-.wallet-quick .qi .qic.c1{background:linear-gradient(135deg,#ff8ab0,#7a9eff);}
+.wallet-quick .qi .qic.c1{background:linear-gradient(135deg,#a18cff,#ff8ad4);}
 .wallet-quick .qi .qic.c2{background:linear-gradient(135deg,#ffd966,#ff9a3c);}
-.wallet-quick .qi .qic.c3{background:linear-gradient(135deg,#a8c4ff,#5eead4);}
+.wallet-quick .qi .qic.c3{background:linear-gradient(135deg,#7ab5ff,#5eead4);}
 .wallet-quick .qi .qic.c4{background:linear-gradient(135deg,#5eead4,#5eead4);}
 .wallet-quick .qi .ql{font-size:11px;color:rgba(255,255,255,0.7);}
-.month-income{margin:14px;padding:14px;background:#23264c;border-radius:14px;}
+.month-income{margin:14px;padding:14px;background:#1f0d3a;border-radius:14px;}
 .month-income .mi-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
 .month-income .mi-top .mt{font-size:14px;font-weight:700;}
-.month-income .mi-top .am{font-size:18px;font-weight:800;color:#ff8ab0;}
+.month-income .mi-top .am{font-size:18px;font-weight:800;color:#a18cff;}
 .month-detail{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.month-detail .md{background:rgba(255,138,176,0.06);border-radius:10px;padding:10px;text-align:center;}
+.month-detail .md{background:rgba(180,140,255,0.06);border-radius:10px;padding:10px;text-align:center;}
 .month-detail .md .ln{font-size:11px;color:rgba(255,255,255,0.55);}
 .month-detail .md .lv{font-size:14px;font-weight:700;color:#fff;margin-top:2px;}
-.bill-section{margin:14px;background:#23264c;border-radius:14px;}
+.bill-section{margin:14px;background:#1f0d3a;border-radius:14px;}
 .bill-section h3{padding:14px;font-size:14px;font-weight:700;border-bottom:1px solid rgba(255,255,255,0.06);}
 .bill-item{display:flex;align-items:center;padding:12px 14px;gap:10px;border-bottom:1px solid rgba(255,255,255,0.06);}
 .bill-item:last-child{border-bottom:none;}
-.bill-item .bi{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(255,138,176,0.15);color:#ff8ab0;}
+.bill-item .bi{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(180,140,255,0.15);color:#a18cff;}
 .bill-item .bi.in{background:rgba(94,234,212,0.15);color:#5eead4;}
 .bill-item .bn{flex:1;}
 .bill-item .bn .t1{font-size:13px;font-weight:600;color:#fff;}
@@ -390,27 +394,27 @@ a{text-decoration:none;color:inherit;}
 .bill-item .ba{font-size:14px;font-weight:700;color:#ff5c8a;}
 .bill-item .ba.in{color:#5eead4;}
 
-/* === ⑩ 提现 === */
-.withdraw-top{padding:24px 18px;text-align:center;background:#23264c;}
+/* === �?提现 === */
+.withdraw-top{padding:24px 18px;text-align:center;background:#1f0d3a;}
 .withdraw-top .lbl{font-size:12px;color:rgba(255,255,255,0.55);}
 .withdraw-top .amt{font-size:28px;font-weight:800;margin-top:4px;}
-.withdraw-top .all{font-size:12px;color:#ff8ab0;margin-top:8px;}
-.withdraw-form{margin:14px;background:#23264c;border-radius:14px;padding:18px;}
+.withdraw-top .all{font-size:12px;color:#a18cff;margin-top:8px;}
+.withdraw-form{margin:14px;background:#1f0d3a;border-radius:14px;padding:18px;}
 .withdraw-amt-input{display:flex;align-items:center;gap:8px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.06);}
 .withdraw-amt-input .u{font-size:24px;font-weight:700;color:#fff;}
 .withdraw-amt-input input{flex:1;font-size:28px;font-weight:700;color:#fff;}
 .withdraw-amt-input input::placeholder{color:#ddd;}
 .withdraw-quick{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
-.withdraw-quick .qa{flex:1;min-width:60px;padding:8px 0;text-align:center;background:linear-gradient(180deg,#23264c,#080a18);border-radius:10px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.7);}
-.withdraw-quick .qa.on{background:rgba(255,138,176,0.15);color:#ff8ab0;}
+.withdraw-quick .qa{flex:1;min-width:60px;padding:8px 0;text-align:center;background:linear-gradient(180deg,#1f0d3a,#0a0418);border-radius:10px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.7);}
+.withdraw-quick .qa.on{background:rgba(180,140,255,0.15);color:#a18cff;}
 .withdraw-info{font-size:11px;color:rgba(255,255,255,0.55);margin-top:14px;line-height:1.6;}
 .withdraw-info .row{display:flex;justify-content:space-between;padding:4px 0;}
 .withdraw-info .row .v{color:#fff;font-weight:600;}
-.withdraw-method{margin:14px;background:#23264c;border-radius:14px;padding:14px;}
+.withdraw-method{margin:14px;background:#1f0d3a;border-radius:14px;padding:14px;}
 .withdraw-method h4{font-size:14px;font-weight:700;margin-bottom:10px;}
 
-/* === ⑪ 邀请主页 === */
-.invite-page{background:linear-gradient(180deg,#080a18 0%,#23264c 100%);color:#fff;min-height:100%;overflow-y:auto;}
+/* === �?邀请主�?=== */
+.invite-page{background:linear-gradient(180deg,#0a0418 0%,#1f0d3a 100%);color:#fff;min-height:100%;overflow-y:auto;}
 .invite-page::-webkit-scrollbar{display:none;}
 .invite-hero{padding:24px 18px;text-align:center;}
 .invite-hero h1{font-size:24px;font-weight:800;color:#ffd966;}
@@ -450,8 +454,8 @@ a{text-decoration:none;color:inherit;}
 .privilege-progress .pp{height:100%;background:linear-gradient(90deg,#ffd966,#ff9a3c);}
 .privilege-levels{display:flex;justify-content:space-between;margin-top:10px;font-size:9px;opacity:.7;}
 
-/* === ⑫ 邀请排行榜 === */
-.rank-page{background:linear-gradient(180deg,#080a18,#23264c);color:#fff;min-height:100%;}
+/* === �?邀请排行榜 === */
+.rank-page{background:linear-gradient(180deg,#0a0418,#1f0d3a);color:#fff;min-height:100%;}
 .rank-tabs{display:flex;justify-content:center;gap:24px;padding:14px;}
 .rank-tabs .rt{font-size:14px;color:rgba(255,255,255,.5);}
 .rank-tabs .rt.active{color:#ffd966;font-weight:700;position:relative;}
@@ -476,23 +480,23 @@ a{text-decoration:none;color:inherit;}
 .rank-row .nb .n{font-size:13px;font-weight:600;}
 .rank-row .nb .c{font-size:10px;opacity:.7;margin-top:2px;}
 .rank-row .rw{font-size:12px;color:#ffd966;font-weight:700;}
-.my-rank{position:sticky;bottom:0;background:linear-gradient(135deg,rgba(255,138,176,.3),rgba(182,109,255,.3));backdrop-filter:blur(10px);padding:12px 18px;display:flex;align-items:center;gap:10px;border-top:1px solid rgba(255,255,255,.1);}
+.my-rank{position:sticky;bottom:0;background:linear-gradient(135deg,rgba(161,140,255,.3),rgba(182,109,255,.3));backdrop-filter:blur(10px);padding:12px 18px;display:flex;align-items:center;gap:10px;border-top:1px solid rgba(255,255,255,.1);}
 .my-rank .mn{flex:1;font-size:12px;}
 .my-rank .mn b{color:#ffd966;}
 
-/* === ⑬ 我的战绩 === */
-.stats-top{padding:24px 18px;background:linear-gradient(135deg,#080a18,#2a2d52);color:#ffd966;text-align:center;}
+/* === �?我的战绩 === */
+.stats-top{padding:24px 18px;background:linear-gradient(135deg,#0a0418,#2a1545);color:#ffd966;text-align:center;}
 .stats-top .lbl{font-size:12px;opacity:.7;color:#fff;}
 .stats-top .amt{font-size:32px;font-weight:800;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:4px;}
 .stats-top .amt .u{font-size:16px;}
-.stats-grid{margin:-20px 14px 0;background:#23264c;border-radius:14px;padding:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;box-shadow:0 6px 20px rgba(8,10,24,.4),0 0 0 1px rgba(255,138,176,.1);}
+.stats-grid{margin:-20px 14px 0;background:#1f0d3a;border-radius:14px;padding:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;box-shadow:0 6px 20px rgba(10,4,24,.4),0 0 0 1px rgba(180,140,255,.1);}
 .stats-grid .gi{text-align:center;}
 .stats-grid .gi .n{font-size:18px;font-weight:800;color:#fff;}
 .stats-grid .gi .l{font-size:11px;color:rgba(255,255,255,0.55);margin-top:2px;}
-.stats-filter{display:flex;gap:8px;padding:14px;background:#23264c;margin:14px 14px 0;border-radius:14px 14px 0 0;}
-.stats-filter .sf{padding:6px 14px;background:linear-gradient(180deg,#23264c,#080a18);border-radius:14px;font-size:12px;color:rgba(255,255,255,0.7);}
-.stats-filter .sf.on{background:rgba(255,138,176,0.15);color:#ff8ab0;font-weight:600;}
-.invitee-list{margin:0 14px 14px;background:#23264c;border-radius:0 0 14px 14px;}
+.stats-filter{display:flex;gap:8px;padding:14px;background:#1f0d3a;margin:14px 14px 0;border-radius:14px 14px 0 0;}
+.stats-filter .sf{padding:6px 14px;background:linear-gradient(180deg,#1f0d3a,#0a0418);border-radius:14px;font-size:12px;color:rgba(255,255,255,0.7);}
+.stats-filter .sf.on{background:rgba(180,140,255,0.15);color:#a18cff;font-weight:600;}
+.invitee-list{margin:0 14px 14px;background:#1f0d3a;border-radius:0 0 14px 14px;}
 .invitee-row{display:flex;align-items:center;padding:12px 14px;gap:10px;border-bottom:1px solid rgba(255,255,255,0.06);}
 .invitee-row:last-child{border-bottom:none;}
 .invitee-row .av{width:36px;height:36px;font-size:14px;}
@@ -500,24 +504,24 @@ a{text-decoration:none;color:inherit;}
 .invitee-row .iv .n{font-size:13px;font-weight:600;}
 .invitee-row .iv .st{display:flex;align-items:center;gap:6px;margin-top:4px;}
 .invitee-row .iv .pg{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;width:80px;overflow:hidden;}
-.invitee-row .iv .pg .p{height:100%;background:linear-gradient(90deg,#ff8ab0,#7a9eff);}
+.invitee-row .iv .pg .p{height:100%;background:linear-gradient(90deg,#a18cff,#ff8ad4);}
 .invitee-row .ra{text-align:right;}
-.invitee-row .ra .ar{font-size:13px;font-weight:700;color:#ff8ab0;}
+.invitee-row .ra .ar{font-size:13px;font-weight:700;color:#a18cff;}
 .invitee-row .ra .at{font-size:10px;color:rgba(255,255,255,0.55);}
 
-/* === ⑭ 新人落地页 === */
-.landing-page{background:linear-gradient(180deg,#ff8ab0 0%,#7a9eff 100%);color:#fff;min-height:100%;overflow-y:auto;}
+/* === �?新人落地�?=== */
+.landing-page{background:linear-gradient(180deg,#a18cff 0%,#ff8ad4 100%);color:#fff;min-height:100%;overflow-y:auto;}
 .landing-page::-webkit-scrollbar{display:none;}
 .landing-hero{padding:48px 24px 18px;text-align:center;}
 .landing-inviter{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;background:rgba(0,0,0,.2);border-radius:18px;padding:6px 12px;width:fit-content;margin:0 auto;}
 .landing-inviter .av{width:24px;height:24px;font-size:10px;}
 .landing-hero h1{font-size:32px;font-weight:800;margin-top:18px;}
 .landing-hero .sub{font-size:14px;margin-top:8px;opacity:.95;}
-.gift-package{margin:14px;background:#23264c;border-radius:16px;padding:18px;color:#fff;position:relative;}
+.gift-package{margin:14px;background:#1f0d3a;border-radius:16px;padding:18px;color:#fff;position:relative;}
 .gift-package::before{content:"🎁";position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:40px;}
-.gift-package h2{text-align:center;font-size:18px;font-weight:800;margin-bottom:14px;color:#ff8ab0;}
+.gift-package h2{text-align:center;font-size:18px;font-weight:800;margin-bottom:14px;color:#a18cff;}
 .gift-package .gi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-.gift-package .gi-cell{background:linear-gradient(135deg,rgba(255,138,176,0.15),#080a18);border-radius:10px;padding:10px 6px;text-align:center;}
+.gift-package .gi-cell{background:linear-gradient(135deg,rgba(180,140,255,0.15),#0a0418);border-radius:10px;padding:10px 6px;text-align:center;}
 .gift-package .gi-cell .em{font-size:28px;line-height:1;}
 .gift-package .gi-cell .gn{font-size:11px;font-weight:600;margin-top:4px;}
 .gift-package .gi-cell .gv{font-size:10px;color:#ff9a3c;margin-top:2px;}
@@ -528,8 +532,8 @@ a{text-decoration:none;color:inherit;}
 .landing-features .fi .fn{font-size:11px;margin-top:4px;}
 .landing-cta-wrap{padding:14px 18px 24px;}
 
-/* === ⑮ VIP 开通 === */
-.vip-page{background:linear-gradient(180deg,#080a18 0%,#2a2d52 100%);color:#fff;min-height:100%;overflow-y:auto;}
+/* === �?VIP 开�?=== */
+.vip-page{background:linear-gradient(180deg,#0a0418 0%,#2a1545 100%);color:#fff;min-height:100%;overflow-y:auto;}
 .vip-page::-webkit-scrollbar{display:none;}
 .vip-header{padding:24px 18px;text-align:center;}
 .vip-header .crown{font-size:48px;}
@@ -543,7 +547,7 @@ a{text-decoration:none;color:inherit;}
 .vip-plans{padding:0 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
 .vip-plan{background:rgba(255,255,255,.08);border:1.5px solid transparent;border-radius:12px;padding:14px 8px;text-align:center;position:relative;}
 .vip-plan.selected{border-color:#ffd966;background:rgba(255,217,102,.15);}
-.vip-plan.hot::before{content:"限时5折";position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#ff5c8a;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;}
+.vip-plan.hot::before{content:"限时5�?;position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#ff5c8a;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;}
 .vip-plan .pn{font-size:13px;font-weight:600;}
 .vip-plan .pp{font-size:24px;font-weight:800;color:#ffd966;margin-top:6px;}
 .vip-plan .pp .u{font-size:12px;font-weight:500;}
@@ -566,18 +570,18 @@ a{text-decoration:none;color:inherit;}
 .vip-bottom{padding:14px 18px;background:rgba(0,0,0,.3);}
 .vip-agree{font-size:10px;opacity:.6;text-align:center;margin-top:10px;}
 
-/* === ⑯ 视频通话 === */
-.call-page{position:relative;width:100%;height:100%;color:#fff;overflow:hidden;background:linear-gradient(180deg,#080a18,#2a2d52);}
+/* === �?视频通话 === */
+.call-page{position:relative;width:100%;height:100%;color:#fff;overflow:hidden;background:linear-gradient(180deg,#0a0418,#2a1545);}
 .call-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:120px;font-weight:800;opacity:.8;}
-.call-bg.av-1{background:linear-gradient(135deg,#ff8ab0,#7a9eff);}
-.call-bg.av-2{background:linear-gradient(135deg,#a8c4ff,#5eead4);}
+.call-bg.av-1{background:linear-gradient(135deg,#a18cff,#ff8ad4);}
+.call-bg.av-2{background:linear-gradient(135deg,#7ab5ff,#5eead4);}
 .call-bg.av-3{background:linear-gradient(135deg,#ffd966,#ff9a3c);}
-.call-self{position:absolute;top:90px;right:14px;width:80px;height:108px;border-radius:10px;border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:36px;background:linear-gradient(135deg,#a8c4ff,#ff8ab0);z-index:5;}
+.call-self{position:absolute;top:90px;right:14px;width:80px;height:108px;border-radius:10px;border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:36px;background:linear-gradient(135deg,#7ab5ff,#a18cff);z-index:5;}
 .call-top{position:absolute;top:48px;left:0;right:0;padding:0 14px;display:flex;justify-content:space-between;align-items:center;z-index:5;}
 .call-top .ct-l .nm{font-size:18px;font-weight:700;}
 .call-top .ct-l .tm{font-size:12px;opacity:.85;margin-top:4px;display:flex;align-items:center;gap:4px;}
 .call-top .ct-r{background:rgba(0,0,0,.5);backdrop-filter:blur(8px);padding:6px 12px;border-radius:14px;font-size:12px;color:#ffd966;font-weight:600;}
-.call-warning{position:absolute;top:170px;left:14px;right:14px;background:linear-gradient(135deg,rgba(255,59,92,.9),rgba(255,138,176,.9));backdrop-filter:blur(8px);padding:8px 14px;border-radius:10px;font-size:12px;display:flex;align-items:center;gap:6px;z-index:5;}
+.call-warning{position:absolute;top:170px;left:14px;right:14px;background:linear-gradient(135deg,rgba(255,59,92,.9),rgba(161,140,255,.9));backdrop-filter:blur(8px);padding:8px 14px;border-radius:10px;font-size:12px;display:flex;align-items:center;gap:6px;z-index:5;}
 .call-bottom{position:absolute;bottom:0;left:0;right:0;padding:0 0 24px;z-index:5;}
 .call-balance{background:rgba(0,0,0,.5);backdrop-filter:blur(8px);margin:0 14px 14px;padding:10px 14px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;font-size:12px;}
 .call-balance .bal b{color:#ffd966;}
@@ -586,32 +590,32 @@ a{text-decoration:none;color:inherit;}
 .call-controls .cb{width:50px;height:50px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;}
 .call-controls .cb.hangup{background:#ff5c8a;}
 
-/* === ⑰ 实名认证 === */
-.auth-steps{padding:14px 18px;background:#23264c;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+/* === �?实名认证 === */
+.auth-steps{padding:14px 18px;background:#1f0d3a;display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .auth-step{flex:1;text-align:center;position:relative;}
 .auth-step .sn{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-bottom:4px;}
-.auth-step.active .sn{background:linear-gradient(135deg,#ff8ab0,#7a9eff);color:#fff;}
+.auth-step.active .sn{background:linear-gradient(135deg,#a18cff,#ff8ad4);color:#fff;}
 .auth-step.done .sn{background:#5eead4;color:#fff;}
 .auth-step .sl{font-size:11px;color:rgba(255,255,255,0.55);}
 .auth-step.active .sl,.auth-step.done .sl{color:#fff;font-weight:600;}
 .auth-step:not(:last-child)::after{content:"";position:absolute;top:13px;right:-50%;width:100%;height:1px;background:rgba(255,255,255,0.06);z-index:0;}
 .auth-step.done:not(:last-child)::after{background:#5eead4;}
-.auth-form{margin:14px;background:#23264c;border-radius:14px;padding:14px;}
+.auth-form{margin:14px;background:#1f0d3a;border-radius:14px;padding:14px;}
 .auth-form .field{padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.06);}
 .auth-form .field:last-child{border-bottom:none;}
 .auth-form .field .l{font-size:12px;color:rgba(255,255,255,0.55);margin-bottom:6px;}
 .auth-form .field input,.auth-form .field select{font-size:15px;color:#fff;width:100%;background:transparent;border:none;}
 .id-upload{margin:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.id-upload .up{aspect-ratio:1.5/1;border:1.5px dashed #ddd;border-radius:10px;background:rgba(255,138,176,0.06);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:rgba(255,255,255,0.55);font-size:12px;}
+.id-upload .up{aspect-ratio:1.5/1;border:1.5px dashed #ddd;border-radius:10px;background:rgba(180,140,255,0.06);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:rgba(255,255,255,0.55);font-size:12px;}
 .id-upload .up .uic{font-size:32px;}
-.face-frame{margin:24px auto;width:200px;height:240px;border:3px solid #ff8ab0;border-radius:12px;position:relative;background:linear-gradient(135deg,rgba(255,138,176,0.15),#080a18);display:flex;align-items:center;justify-content:center;font-size:64px;overflow:hidden;}
-.face-frame::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#ff8ab0,transparent);animation:scan 2s infinite;}
+.face-frame{margin:24px auto;width:200px;height:240px;border:3px solid #a18cff;border-radius:12px;position:relative;background:linear-gradient(135deg,rgba(180,140,255,0.15),#0a0418);display:flex;align-items:center;justify-content:center;font-size:64px;overflow:hidden;}
+.face-frame::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#a18cff,transparent);animation:scan 2s infinite;}
 @keyframes scan{0%{top:0;}50%{top:100%;}100%{top:0;}}
-.auth-tip{margin:14px;padding:12px;background:rgba(255,138,176,0.15);border-radius:10px;font-size:11px;color:rgba(255,255,255,0.7);line-height:1.6;}
+.auth-tip{margin:14px;padding:12px;background:rgba(180,140,255,0.15);border-radius:10px;font-size:11px;color:rgba(255,255,255,0.7);line-height:1.6;}
 
-/* === ⑱ 邀请海报弹层 === */
+/* === �?邀请海报弹�?=== */
 .poster-modal{background:rgba(0,0,0,.85);position:absolute;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;animation:fadeIn .2s;}
-.poster-card{width:280px;background:linear-gradient(180deg,#ff8ab0,#7a9eff);border-radius:18px;padding:18px;text-align:center;color:#fff;position:relative;}
+.poster-card{width:280px;background:linear-gradient(180deg,#a18cff,#ff8ad4);border-radius:18px;padding:18px;text-align:center;color:#fff;position:relative;}
 .poster-card .pti{font-size:11px;background:rgba(255,255,255,.2);padding:4px 10px;border-radius:10px;display:inline-block;}
 .poster-card .av{margin:14px auto 8px;width:50px;height:50px;border:2px solid rgba(255,255,255,.4);}
 .poster-card .nm{font-size:14px;font-weight:700;}
@@ -619,7 +623,7 @@ a{text-decoration:none;color:inherit;}
 .poster-card .pkg{background:rgba(255,255,255,.15);border-radius:10px;padding:10px;margin:10px 0;}
 .poster-card .pkg .pgt{font-size:11px;opacity:.9;margin-bottom:6px;}
 .poster-card .pkg .pg{display:flex;justify-content:space-around;font-size:18px;}
-.poster-card .qr{margin:14px auto 8px;width:90px;height:90px;background:#23264c;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:48px;color:#000;}
+.poster-card .qr{margin:14px auto 8px;width:90px;height:90px;background:#1f0d3a;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:48px;color:#000;}
 .poster-card .cd{font-size:11px;}
 .poster-card .cd b{font-size:16px;color:#ffd966;letter-spacing:2px;}
 .poster-share{display:flex;gap:18px;margin-top:18px;}
@@ -627,79 +631,79 @@ a{text-decoration:none;color:inherit;}
 .poster-share .ps .psc{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:20px;}
 .poster-close{position:absolute;top:24px;right:24px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.15);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;}
 
-/* === ⑲ 动态广场 === */
-.feed-tabs{display:flex;gap:18px;padding:6px 18px 12px;background:#23264c;overflow-x:auto;}
+/* === �?动态广�?=== */
+.feed-tabs{display:flex;gap:18px;padding:6px 18px 12px;background:#1f0d3a;overflow-x:auto;}
 .feed-tabs::-webkit-scrollbar{display:none;}
 .feed-tabs .ft{font-size:15px;color:rgba(255,255,255,0.55);white-space:nowrap;padding:6px 0;}
 .feed-tabs .ft.active{color:#fff;font-weight:700;font-size:17px;position:relative;}
-.feed-tabs .ft.active::after{content:"";position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:18px;height:3px;border-radius:2px;background:linear-gradient(90deg,#ff8ab0,#7a9eff);}
-.topic-row{display:flex;gap:8px;padding:10px 14px;background:#23264c;overflow-x:auto;}
+.feed-tabs .ft.active::after{content:"";position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:18px;height:3px;border-radius:2px;background:linear-gradient(90deg,#a18cff,#ff8ad4);}
+.topic-row{display:flex;gap:8px;padding:10px 14px;background:#1f0d3a;overflow-x:auto;}
 .topic-row::-webkit-scrollbar{display:none;}
-.topic-row .tp{padding:6px 12px;background:linear-gradient(135deg,rgba(255,138,176,0.15),#080a18);color:#ff8ab0;font-size:12px;border-radius:14px;white-space:nowrap;font-weight:600;}
-.feed-card{margin:10px 14px;background:#23264c;border-radius:14px;padding:14px;}
+.topic-row .tp{padding:6px 12px;background:linear-gradient(135deg,rgba(180,140,255,0.15),#0a0418);color:#a18cff;font-size:12px;border-radius:14px;white-space:nowrap;font-weight:600;}
+.feed-card{margin:10px 14px;background:#1f0d3a;border-radius:14px;padding:14px;}
 .feed-card .fc-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
 .feed-card .fc-top .av{width:40px;height:40px;font-size:14px;}
 .feed-card .fc-top .fcb{flex:1;}
 .feed-card .fc-top .fcb .n{font-size:14px;font-weight:600;display:flex;align-items:center;gap:4px;}
 .feed-card .fc-top .fcb .m{font-size:10px;color:rgba(255,255,255,0.55);margin-top:2px;}
-.feed-card .fc-top .fb{padding:4px 12px;border:1px solid #ff8ab0;color:#ff8ab0;border-radius:12px;font-size:12px;font-weight:600;}
+.feed-card .fc-top .fb{padding:4px 12px;border:1px solid #a18cff;color:#a18cff;border-radius:12px;font-size:12px;font-weight:600;}
 .feed-card .fc-text{font-size:14px;line-height:1.5;margin-bottom:10px;}
 .feed-card .fc-img-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:10px;}
 .feed-card .fc-img{aspect-ratio:1;border-radius:8px;}
-.feed-card .fc-img.p1{background:linear-gradient(135deg,#ff8ab0,#7a9eff);}
-.feed-card .fc-img.p2{background:linear-gradient(135deg,#a8c4ff,#5eead4);}
+.feed-card .fc-img.p1{background:linear-gradient(135deg,#a18cff,#ff8ad4);}
+.feed-card .fc-img.p2{background:linear-gradient(135deg,#7ab5ff,#5eead4);}
 .feed-card .fc-img.p3{background:linear-gradient(135deg,#ffd966,#ff9a3c);}
 .feed-card .fc-img.p4{background:linear-gradient(135deg,#ff5c8a,#ffd966);}
 .feed-card .fc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
 .feed-card .fc-tools{display:flex;justify-content:space-around;border-top:1px solid #f5f5f8;padding-top:10px;}
 .feed-card .fc-tools .ft{display:flex;align-items:center;gap:4px;color:rgba(255,255,255,0.7);font-size:12px;}
 
-/* === ⑳ 新人资料填写 === */
-.onboard-page{background:linear-gradient(180deg,#23264c,#080a18);min-height:100%;padding-bottom:24px;}
+/* === �?新人资料填写 === */
+.onboard-page{background:linear-gradient(180deg,#1f0d3a,#0a0418);min-height:100%;padding-bottom:24px;}
 .onboard-progress{padding:18px;}
 .onboard-progress .pb{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;}
-.onboard-progress .pb .pp{height:100%;background:linear-gradient(90deg,#ff8ab0,#7a9eff);transition:width .3s;}
+.onboard-progress .pb .pp{height:100%;background:linear-gradient(90deg,#a18cff,#ff8ad4);transition:width .3s;}
 .onboard-progress .pt{font-size:11px;color:rgba(255,255,255,0.55);margin-top:6px;text-align:right;}
 .onboard-form{padding:0 18px;}
 .onboard-form h2{font-size:22px;font-weight:800;margin-bottom:8px;}
 .onboard-form .sub{font-size:12px;color:rgba(255,255,255,0.55);margin-bottom:24px;}
-.avatar-upload{width:120px;height:120px;border-radius:50%;background:#23264c;margin:24px auto;border:2px dashed #ff8ab0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#ff8ab0;gap:6px;}
+.avatar-upload{width:120px;height:120px;border-radius:50%;background:#1f0d3a;margin:24px auto;border:2px dashed #a18cff;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#a18cff;gap:6px;}
 .avatar-upload .ai{font-size:36px;}
 .avatar-upload .at{font-size:11px;}
 .real-tip{text-align:center;font-size:11px;color:#ff9a3c;background:rgba(255,217,102,0.15);padding:6px 14px;border-radius:14px;width:fit-content;margin:0 auto 14px;}
 .gender-pick{display:flex;gap:14px;margin:24px 0;}
-.gender-pick .g{flex:1;padding:24px 0;text-align:center;background:#23264c;border-radius:14px;border:2px solid transparent;cursor:pointer;}
-.gender-pick .g.on{border-color:#ff8ab0;background:rgba(255,138,176,0.15);}
+.gender-pick .g{flex:1;padding:24px 0;text-align:center;background:#1f0d3a;border-radius:14px;border:2px solid transparent;cursor:pointer;}
+.gender-pick .g.on{border-color:#a18cff;background:rgba(180,140,255,0.15);}
 .gender-pick .g .gi{font-size:48px;}
 .gender-pick .g .gn{font-size:14px;font-weight:600;margin-top:6px;}
-.onboard-field{margin-bottom:14px;background:#23264c;border-radius:12px;padding:12px 14px;}
+.onboard-field{margin-bottom:14px;background:#1f0d3a;border-radius:12px;padding:12px 14px;}
 .onboard-field .l{font-size:11px;color:rgba(255,255,255,0.55);margin-bottom:4px;}
 .onboard-field input,.onboard-field select{font-size:15px;color:#fff;width:100%;}
 .interest-pick{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
-.interest-pick .ic{padding:8px 14px;background:#23264c;border-radius:18px;font-size:13px;color:rgba(255,255,255,0.7);border:1.5px solid transparent;}
-.interest-pick .ic.on{border-color:#ff8ab0;background:rgba(255,138,176,0.15);color:#ff8ab0;font-weight:600;}
+.interest-pick .ic{padding:8px 14px;background:#1f0d3a;border-radius:18px;font-size:13px;color:rgba(255,255,255,0.7);border:1.5px solid transparent;}
+.interest-pick .ic.on{border-color:#a18cff;background:rgba(180,140,255,0.15);color:#a18cff;font-weight:600;}
 .onboard-actions{padding:24px 18px;display:flex;gap:10px;}
 .onboard-actions .skip{flex:1;text-align:center;padding:12px;color:rgba(255,255,255,0.55);font-size:13px;}
 
-/* === ㉑ 首充弹窗 === */
+/* === �?首充弹窗 === */
 .first-recharge-modal{background:rgba(0,0,0,.7);position:absolute;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeIn .2s;}
-.fr-card{width:300px;background:linear-gradient(180deg,#ff8ab0,#7a9eff);border-radius:18px;padding:24px 18px;color:#fff;text-align:center;position:relative;}
+.fr-card{width:300px;background:linear-gradient(180deg,#a18cff,#ff8ad4);border-radius:18px;padding:24px 18px;color:#fff;text-align:center;position:relative;}
 .fr-card .deco{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:48px;}
 .fr-card .ct{font-size:11px;background:rgba(0,0,0,.3);padding:4px 10px;border-radius:10px;display:inline-block;margin-top:14px;}
 .fr-card h2{font-size:24px;font-weight:800;margin:14px 0 6px;}
 .fr-card .sub{font-size:12px;opacity:.9;}
 .fr-pkgs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;}
 .fr-pkg{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:12px 8px;color:#fff;text-align:center;backdrop-filter:blur(8px);}
-.fr-pkg .di{font-size:20px;font-weight:800;color:#ff8ab0;display:flex;align-items:center;justify-content:center;gap:2px;}
+.fr-pkg .di{font-size:20px;font-weight:800;color:#a18cff;display:flex;align-items:center;justify-content:center;gap:2px;}
 .fr-pkg .ex{font-size:10px;color:#5eead4;font-weight:600;margin-top:2px;}
 .fr-pkg .pr{font-size:13px;font-weight:700;margin-top:6px;}
 .fr-bonus{background:rgba(0,0,0,.2);border-radius:10px;padding:10px;font-size:12px;line-height:1.6;}
 .fr-bonus .bt{font-weight:700;color:#ffd966;margin-bottom:4px;}
 .fr-close{position:absolute;top:18px;right:18px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.3);color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;}
 
-/* === ㉒ 设置 === */
-.settings-page{background:linear-gradient(180deg,#23264c,#080a18);min-height:100%;}
-.settings-group{margin:12px 14px;background:#23264c;border-radius:14px;overflow:hidden;}
+/* === �?设置 === */
+.settings-page{background:linear-gradient(180deg,#1f0d3a,#0a0418);min-height:100%;}
+.settings-group{margin:12px 14px;background:#1f0d3a;border-radius:14px;overflow:hidden;}
 .settings-group h4{padding:14px 14px 6px;font-size:11px;color:rgba(255,255,255,0.55);}
 .settings-item{display:flex;align-items:center;padding:14px;gap:10px;border-bottom:1px solid rgba(255,255,255,0.06);}
 .settings-item:last-child{border-bottom:none;}
@@ -707,10 +711,10 @@ a{text-decoration:none;color:inherit;}
 .settings-item .val{font-size:12px;color:rgba(255,255,255,0.55);}
 .settings-item .arr{color:rgba(255,255,255,0.3);}
 .settings-item .sw{width:42px;height:24px;background:#e5e5ec;border-radius:12px;position:relative;transition:background .2s;}
-.settings-item .sw.on{background:#ff8ab0;}
-.settings-item .sw::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:#23264c;border-radius:50%;transition:transform .2s;box-shadow:0 2px 4px rgba(0,0,0,.2);}
+.settings-item .sw.on{background:#a18cff;}
+.settings-item .sw::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:#1f0d3a;border-radius:50%;transition:transform .2s;box-shadow:0 2px 4px rgba(0,0,0,.2);}
 .settings-item .sw.on::after{transform:translateX(18px);}
-.logout-btn{margin:24px 14px;background:#23264c;padding:14px;text-align:center;border-radius:14px;color:#ff5c8a;font-size:14px;font-weight:600;}
+.logout-btn{margin:24px 14px;background:#1f0d3a;padding:14px;text-align:center;border-radius:14px;color:#ff5c8a;font-size:14px;font-weight:600;}
 .delete-acc{text-align:center;padding:14px;color:rgba(255,255,255,0.4);font-size:11px;}
 </style>
 </head>
@@ -721,10 +725,10 @@ a{text-decoration:none;color:inherit;}
 <script>
 const { createApp, reactive, ref, computed, watch, onMounted, h } = Vue
 
-/* ===================== 后端API开关 =====================
+/* ===================== 后端API开�?=====================
  * 设为 true  => 优先调用真实后端API (api.js)
- * 设为 false => 完全本地 Mock + localStorage（旧行为）
- * 调用失败时自动降级回本地逻辑，保证体验可用。
+ * 设为 false => 完全本地 Mock + localStorage（旧行为�?
+ * 调用失败时自动降级回本地逻辑，保证体验可用�?
  */
 const USE_BACKEND = true
 const API = (typeof window !== 'undefined' && window.starluckApi) ? window.starluckApi : null
@@ -732,31 +736,31 @@ const apiOn = ()=> USE_BACKEND && API
 
 /* ===================== Mock 数据 ===================== */
 const MOCK_USERS = [
-  {id:'u1', name:'小诗', av:1, age:23, city:'上海', dist:'1.2km', tags:['旅行','咖啡','摄影'], sign:'在城市的尽头，还能看见星', online:true, vip:true, height:165, weight:48, job:'设计师', edu:'本科', home:'江苏南京', love:'单身'},
-  {id:'u2', name:'阿哲', av:2, age:26, city:'北京', dist:'2.5km', tags:['健身','电影','游戏'], sign:'认真生活，努力变更好', online:true, vip:false, height:180, weight:72, job:'程序员', edu:'硕士', home:'山东青岛', love:'单身'},
-  {id:'u3', name:'糖糖', av:3, age:22, city:'广州', dist:'0.8km', tags:['美食','音乐','宠物'], sign:'喵～找一个一起撸猫的人', online:false, vip:true, height:162, weight:45, job:'插画师', edu:'本科', home:'广东深圳', love:'单身'},
-  {id:'u4', name:'子墨', av:4, age:28, city:'深圳', dist:'3.1km', tags:['读书','登山','投资'], sign:'寻找灵魂契合的另一半', online:true, vip:true, height:178, weight:68, job:'金融', edu:'硕士', home:'湖北武汉', love:'单身'},
-  {id:'u5', name:'梨花', av:5, age:24, city:'杭州', dist:'1.8km', tags:['汉服','茶道','古风'], sign:'愿与君煮茶论诗', online:true, vip:false, height:168, weight:50, job:'编辑', edu:'本科', home:'浙江杭州', love:'单身'},
-  {id:'u6', name:'阿岚', av:6, age:25, city:'成都', dist:'5.2km', tags:['吉他','旅行','美食'], sign:'生活需要一点音乐', online:false, vip:true, height:175, weight:65, job:'音乐人', edu:'本科', home:'四川成都', love:'单身'},
-  {id:'u7', name:'柚柚', av:7, age:21, city:'武汉', dist:'2.0km', tags:['二次元','游戏','奶茶'], sign:'寻找搭档一起开黑～', online:true, vip:false, height:160, weight:46, job:'学生', edu:'在读', home:'湖北襄阳', love:'单身'},
-  {id:'u8', name:'若兮', av:8, age:27, city:'南京', dist:'4.5km', tags:['瑜伽','烹饪','旅行'], sign:'用心去爱，温暖如初', online:true, vip:true, height:170, weight:52, job:'教师', edu:'硕士', home:'江苏苏州', love:'单身'},
+  {id:'u1', name:'小诗', av:1, age:23, city:'上海', dist:'1.2km', tags:['旅行','咖啡','摄影'], sign:'在城市的尽头，还能看见星', online:true, vip:true, height:165, weight:48, job:'设计�?, edu:'本科', home:'江苏南京', love:'单身'},
+  {id:'u2', name:'阿哲', av:2, age:26, city:'北京', dist:'2.5km', tags:['健身','电影','游戏'], sign:'认真生活，努力变更好', online:true, vip:false, height:180, weight:72, job:'程序�?, edu:'硕士', home:'山东青岛', love:'单身'},
+  {id:'u3', name:'糖糖', av:3, age:22, city:'广州', dist:'0.8km', tags:['美食','音乐','宠物'], sign:'喵～找一个一起撸猫的�?, online:false, vip:true, height:162, weight:45, job:'插画�?, edu:'本科', home:'广东深圳', love:'单身'},
+  {id:'u4', name:'子墨', av:4, age:28, city:'深圳', dist:'3.1km', tags:['读书','登山','投资'], sign:'寻找灵魂契合的另一�?, online:true, vip:true, height:178, weight:68, job:'金融', edu:'硕士', home:'湖北武汉', love:'单身'},
+  {id:'u5', name:'梨花', av:5, age:24, city:'杭州', dist:'1.8km', tags:['汉服','茶道','古风'], sign:'愿与君煮茶论�?, online:true, vip:false, height:168, weight:50, job:'编辑', edu:'本科', home:'浙江杭州', love:'单身'},
+  {id:'u6', name:'阿岚', av:6, age:25, city:'成都', dist:'5.2km', tags:['吉他','旅行','美食'], sign:'生活需要一点音�?, online:false, vip:true, height:175, weight:65, job:'音乐�?, edu:'本科', home:'四川成都', love:'单身'},
+  {id:'u7', name:'柚柚', av:7, age:21, city:'武汉', dist:'2.0km', tags:['二次�?,'游戏','奶茶'], sign:'寻找搭档一起开黑～', online:true, vip:false, height:160, weight:46, job:'学生', edu:'在读', home:'湖北襄阳', love:'单身'},
+  {id:'u8', name:'若兮', av:8, age:27, city:'南京', dist:'4.5km', tags:['瑜伽','烹饪','旅行'], sign:'用心去爱，温暖如�?, online:true, vip:true, height:170, weight:52, job:'教师', edu:'硕士', home:'江苏苏州', love:'单身'},
 ]
-// 查找用户：先查 MOCK_USERS（内置真实用户），再查 store.fakeUsers（后台/admin推送的假用户）
-// 修复：admin 推送过来的假用户 id 可能是数字或 'f' 开头字符串，findUser 必须能查到对应人，
-// 否则会一律回退到 MOCK_USERS[0]（小诗），导致所有会话都显示成"小诗"。
+// 查找用户：先�?MOCK_USERS（内置真实用户），再�?store.fakeUsers（后�?admin推送的假用户）
+// 修复：admin 推送过来的假用�?id 可能是数字或 'f' 开头字符串，findUser 必须能查到对应人�?
+// 否则会一律回退�?MOCK_USERS[0]（小诗），导致所有会话都显示�?小诗"�?
 const findUser = id => {
   if(id == null) return MOCK_USERS[0]
   // eq 比较，兼容字符串/数字
   const eq = (a,b)=> a === b || String(a) === String(b)
   let u = MOCK_USERS.find(u=>eq(u.id, id))
   if(u) return u
-  // 查 store.fakeUsers（store 可能在脚本前期尚未初始化，用 try 兜底）
+  // �?store.fakeUsers（store 可能在脚本前期尚未初始化，用 try 兜底�?
   let storeRef = null
   try { storeRef = store } catch(e) {}
   if(storeRef && Array.isArray(storeRef.fakeUsers)){
     const f = storeRef.fakeUsers.find(f=>eq(f.id, id))
     if(f){
-      // 把假用户转换成 MOCK_USERS 形状并缓存进 MOCK_USERS，避免重复查询
+      // 把假用户转换�?MOCK_USERS 形状并缓存进 MOCK_USERS，避免重复查�?
       const conv = {
         id: f.id,
         name: f.name || '神秘嘉宾',
@@ -784,19 +788,19 @@ const findUser = id => {
 
 const MOCK_GIFTS = [
   {id:'g1', cat:'hot', name:'玫瑰', em:'🌹', price:66},
-  {id:'g2', cat:'hot', name:'么么哒', em:'💋', price:99},
+  {id:'g2', cat:'hot', name:'么么�?, em:'💋', price:99},
   {id:'g3', cat:'romantic', name:'爱心', em:'💖', price:188},
   {id:'g4', cat:'romantic', name:'戒指', em:'💍', price:520},
   {id:'g5', cat:'romantic', name:'告白', em:'💐', price:888},
-  {id:'g6', cat:'luxury', name:'跑车', em:'🏎️', price:1314},
-  {id:'g7', cat:'luxury', name:'游艇', em:'🛥️', price:2888},
+  {id:'g6', cat:'luxury', name:'跑车', em:'🏎�?, price:1314},
+  {id:'g7', cat:'luxury', name:'游艇', em:'🛥�?, price:2888},
   {id:'g8', cat:'luxury', name:'城堡', em:'🏰', price:5200},
 ]
 
 const MOCK_FEED = [
-  {id:'f1', uid:'u1', text:'周末逛了一家很有调性的咖啡店，分享给大家～', tags:['#周末分享','#咖啡探店'], imgs:['p1','p2','p3'], likes:128, comments:23, time:'10分钟前'},
-  {id:'f2', uid:'u5', text:'最近迷上了汉服～感觉穿越了一样～有人一起约拍吗', tags:['#汉服','#古风'], imgs:['p4','p5'], likes:256, comments:45, time:'1小时前'},
-  {id:'f3', uid:'u4', text:'今天的早餐~每一天都要好好生活', tags:['#美食'], imgs:[], likes:89, comments:12, time:'3小时前'},
+  {id:'f1', uid:'u1', text:'周末逛了一家很有调性的咖啡店，分享给大家～', tags:['#周末分享','#咖啡探店'], imgs:['p1','p2','p3'], likes:128, comments:23, time:'10分钟�?},
+  {id:'f2', uid:'u5', text:'最近迷上了汉服～感觉穿越了一样～有人一起约拍吗', tags:['#汉服','#古风'], imgs:['p4','p5'], likes:256, comments:45, time:'1小时�?},
+  {id:'f3', uid:'u4', text:'今天的早餐~每一天都要好好生�?, tags:['#美食'], imgs:[], likes:89, comments:12, time:'3小时�?},
 ]
 
 const MOCK_INVITEES = [
@@ -821,50 +825,50 @@ const MOCK_RANK = [
 ]
 
 const MOCK_VIP_RIGHTS = [
-  {ic:'👁️', nm:'谁看过我'},{ic:'💝',nm:'喜欢我'},{ic:'🔍',nm:'高级筛选'},{ic:'⭐',nm:'优先曝光'},
-  {ic:'💬',nm:'100条聊天/日'},{ic:'📞',nm:'通话8折'},{ic:'💎',nm:'每月300钻石'},{ic:'🎁',nm:'专属礼物'},
+  {ic:'👁�?, nm:'谁看过我'},{ic:'💝',nm:'喜欢�?},{ic:'🔍',nm:'高级筛�?},{ic:'�?,nm:'优先曝光'},
+  {ic:'💬',nm:'100条聊�?�?},{ic:'📞',nm:'通话8�?},{ic:'💎',nm:'每月300钻石'},{ic:'🎁',nm:'专属礼物'},
 ]
 
 /* ===================== Store ===================== */
 const DEFAULT_STORE = {
   loggedIn: false,
   onboarded: false,
-  /* === 运营端扩展字段（admin.html 共享） === */
-  fakeUsers: [],            // 客服管理的假女性用户
-  pushRules: {              // 自动推送规则
+  /* === 运营端扩展字段（admin.html 共享�?=== */
+  fakeUsers: [],            // 客服管理的假女性用�?
+  pushRules: {              // 自动推送规�?
     enabled: true,
     timeSlots: [
       {start:'09:00', end:'11:00', maxPer:1},
       {start:'12:00', end:'14:00', maxPer:1},
       {start:'19:00', end:'22:30', maxPer:2},
     ],
-    strategy: 'active',     // active=活跃度优先 / vip=VIP优先 / random=随机
-    cooldownMin: 30,        // 同一假用户对同一男用户最低冷却(分)
+    strategy: 'active',     // active=活跃度优�?/ vip=VIP优先 / random=随机
+    cooldownMin: 30,        // 同一假用户对同一男用户最低冷�?�?
   },
-  pushLog: [],              // 推送记录 {ts, fakeUid, toUid, opened, replied}
+  pushLog: [],              // 推送记�?{ts, fakeUid, toUid, opened, replied}
   csConfig: {
     aiKey: '',              // 智谱 API Key
-    systemPrompt: '你是一个温柔、有趣、积极的年轻女性，正在和一位男性聊天交友。回复要：1) 简短自然（30字内）2) 偶尔反问引导对方说更多 3) 不主动提钱、礼物、转账 4) 不暴露你是AI。',
-    templates: ['哈哈是的呢～','你说的对','在做什么呢？','想见你了','晚点聊好吗？','谢谢你的礼物～'],
+    systemPrompt: '你是一个温柔、有趣、积极的年轻女性，正在和一位男性聊天交友。回复要�?) 简短自然（30字内�?) 偶尔反问引导对方说更�?3) 不主动提钱、礼物、转�?4) 不暴露你是AI�?,
+    templates: ['哈哈是的呢～','你说的对','在做什么呢�?,'想见你了','晚点聊好吗？','谢谢你的礼物�?],
     autoReplyEnabled: false,// 是否自动用AI回复（演示开关）
   },
   adminAnalytics: {pushed:0, opened:0, replied:0, paidAfter:0},
-  user: {id:'me', name:'我', av:1, ageInt:24, city:'上海', sign:'寻找那颗读懂你光芒的星', vip:false, vipExpire:'', followers:128, fans:256, friends:42, likes:1280},
+  user: {id:'me', name:'�?, av:1, ageInt:24, city:'上海', sign:'寻找那颗读懂你光芒的�?, vip:false, vipExpire:'', followers:128, fans:256, friends:42, likes:1280},
   diamonds: 666,
   cash: 88.50,
   isAuthed: false,
   chatFreeRemain: 5,
   chats: [
-    {id:'c1', uid:'u1', lastMsg:'你好呀～', time:'10:23', unread:2, msgs:[
-      {type:'sys', text:'欢迎来到Starluck，请遵守平台规则，注意防范诈骗'},
-      {type:'in', text:'你好呀～', time:'10:20'},
+    {id:'c1', uid:'u1', lastMsg:'你好呀�?, time:'10:23', unread:2, msgs:[
+      {type:'sys', text:'欢迎来到Starluck，请遵守平台规则，注意防范诈�?},
+      {type:'in', text:'你好呀�?, time:'10:20'},
       {type:'in', text:'看你也喜欢咖啡，有空一起喝吗？', time:'10:21'},
-      {type:'out', text:'好啊，你常去哪家？', time:'10:22', cost:1},
+      {type:'out', text:'好啊，你常去哪家�?, time:'10:22', cost:1},
       {type:'in', text:'就在浦东的Manner，离我家很近', time:'10:23'},
     ]},
     {id:'c2', uid:'u3', lastMsg:'[礼物] 玫瑰 ×1', time:'昨天', unread:0, msgs:[
-      {type:'sys', text:'温馨提示：请勿向陌生人转账'},
-      {type:'in', text:'谢谢你的礼物～', time:'昨天 22:10'},
+      {type:'sys', text:'温馨提示：请勿向陌生人转�?},
+      {type:'in', text:'谢谢你的礼物�?, time:'昨天 22:10'},
       {type:'out', text:'喜欢就好', time:'昨天 22:11', cost:1},
       {type:'gift', text:'玫瑰', em:'🌹', price:66, from:'me'},
     ]},
@@ -873,9 +877,9 @@ const DEFAULT_STORE = {
     ]},
   ],
   transactions:[
-    {id:'t1', type:'in', cat:'gift', t1:'收到 阿哲 的礼物', t2:'10-31 14:23', amt:39.60},
-    {id:'t2', type:'in', cat:'gift', t1:'收到 子墨 的礼物', t2:'10-30 22:10', amt:113.60},
-    {id:'t3', type:'out', cat:'withdraw', t1:'提现到微信', t2:'10-28 10:15', amt:200.00},
+    {id:'t1', type:'in', cat:'gift', t1:'收到 阿哲 的礼�?, t2:'10-31 14:23', amt:39.60},
+    {id:'t2', type:'in', cat:'gift', t1:'收到 子墨 的礼�?, t2:'10-30 22:10', amt:113.60},
+    {id:'t3', type:'out', cat:'withdraw', t1:'提现到微�?, t2:'10-28 10:15', amt:200.00},
     {id:'t4', type:'in', cat:'call', t1:'视频通话收益', t2:'10-27 21:30', amt:18.00},
     {id:'t5', type:'in', cat:'chat', t1:'聊天收益', t2:'10-26 全天', amt:6.00},
   ],
@@ -892,14 +896,14 @@ const DEFAULT_STORE = {
 
 const store = reactive(JSON.parse(JSON.stringify(DEFAULT_STORE)))
 
-// 从 localStorage 还原
+// �?localStorage 还原
 try{
   const saved = JSON.parse(localStorage.getItem('yqyr_store')||'null')
   if(saved) Object.assign(store, saved)
 }catch(e){}
 
-// 启动时把 localStorage 中已存在的 fakeUsers 注入 MOCK_USERS，
-// 保证刷新页面后会话列表/聊天页能正确显示对应假用户的头像和昵称
+// 启动时把 localStorage 中已存在�?fakeUsers 注入 MOCK_USERS�?
+// 保证刷新页面后会话列�?聊天页能正确显示对应假用户的头像和昵�?
 if(Array.isArray(store.fakeUsers)){
   store.fakeUsers.forEach(fu=>{
     if(!MOCK_USERS.find(u=>String(u.id)===String(fu.id))){
@@ -925,10 +929,10 @@ if(Array.isArray(store.fakeUsers)){
   })
 }
 
-// 启动时：若本地存在后端token，自动标记为已登录并拉一次用户信息
+// 启动时：若本地存在后端token，自动标记为已登录并拉一次用户信�?
 if(typeof window !== 'undefined' && window.starluckApi && window.starluckApi.auth.isLoggedIn()){
   store.loggedIn = true
-  // 异步同步后端用户信息（失败不影响）
+  // 异步同步后端用户信息（失败不影响�?
   window.starluckApi.auth.getUserInfo().then(info=>{
     if(info){
       if(info.diamonds !== undefined) store.diamonds = info.diamonds
@@ -960,7 +964,7 @@ window.addEventListener('storage', e=>{
         store[k] = incoming[k]
       }
     }
-    // admin.html / 后台推送过来的 fakeUsers 注入到 MOCK_USERS，修复会话中名字/头像错乱
+    // admin.html / 后台推送过来的 fakeUsers 注入�?MOCK_USERS，修复会话中名字/头像错乱
     if(Array.isArray(incoming.fakeUsers)){
       incoming.fakeUsers.forEach(fu=>{
         if(!MOCK_USERS.find(u=>String(u.id)===String(fu.id))){
@@ -988,11 +992,11 @@ window.addEventListener('storage', e=>{
   }catch(_){ }
 })
 
-/* === 智谱 GLM-4-Flash 客户端 === */
+/* === 智谱 GLM-4-Flash 客户�?=== */
 const glm = {
   async chat(messages, opts={}){
     const key = opts.key || store.csConfig.aiKey
-    if(!key) throw new Error('未配置 API Key')
+    if(!key) throw new Error('未配�?API Key')
     const res = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
@@ -1017,7 +1021,7 @@ const currentRoute = ref(location.hash.slice(1) || '/login')
 
 window.addEventListener('hashchange', ()=>{
   currentRoute.value = location.hash.slice(1) || '/login'
-  // 切换路由时关闭弹窗
+  // 切换路由时关闭弹�?
   uiState.giftPanel = false
   uiState.poster = false
   uiState.firstRecharge = false
@@ -1037,7 +1041,7 @@ const parseRoute = (route)=>{
   return {path: '/'+parts[0], param: parts[1]||''}
 }
 
-/* ===================== UI 状态（弹窗） ===================== */
+/* ===================== UI 状态（弹窗�?===================== */
 const uiState = reactive({
   giftPanel: false,
   poster: false,
@@ -1053,20 +1057,20 @@ const toast = (msg)=>{
 }
 
 /* ===================== 业务方法 =====================
- * 所有方法均同步返回 boolean（与旧 UI 兼容），
- * 内部触发的 API 调用是异步的：成功后通过 toast/Store 反向更新 UI。
- * 调用失败 / 后端不可达 时降级到原本地 Mock 逻辑。
+ * 所有方法均同步返回 boolean（与�?UI 兼容），
+ * 内部触发�?API 调用是异步的：成功后通过 toast/Store 反向更新 UI�?
+ * 调用失败 / 后端不可�?时降级到原本�?Mock 逻辑�?
  */
 const biz = {
-  // ---------- 充值 ----------
+  // ---------- 充�?----------
   recharge(rmb, diamond){
-    // 本地立即扣加，保证体验
+    // 本地立即扣加，保证体�?
     store.diamonds += diamond
-    store.transactions.unshift({id:'t'+Date.now(), type:'out', cat:'recharge', t1:`充值 ${diamond}💎`, t2:'刚刚', amt:rmb})
-    toast(`充值成功 +${diamond}💎`)
+    store.transactions.unshift({id:'t'+Date.now(), type:'out', cat:'recharge', t1:`充�?${diamond}💎`, t2:'刚刚', amt:rmb})
+    toast(`充值成�?+${diamond}💎`)
     if(!store.firstRechargeShown){ store.firstRechargeShown = true }
 
-    // 异步同步到后端：根据金额匹配套餐ID（60/300/680/1280/3280/6480 -> 1/2/3/4/5/6）
+    // 异步同步到后端：根据金额匹配套餐ID�?0/300/680/1280/3280/6480 -> 1/2/3/4/5/6�?
     if(apiOn()){
       const packageMap = {60:1, 300:2, 680:3, 1280:4, 3280:5, 6480:6}
       const pkgId = packageMap[rmb]
@@ -1079,35 +1083,36 @@ const biz = {
   },
 
   // ---------- 聊天消息 ----------
-  sendChatMsg(chatId, text){
+  sendChatMsg(chatId, text, isRetry){
     const chat = store.chats.find(c=>c.id===chatId)
     if(!chat) return false
-    let cost = 1
+    let cost = 30
     if(store.user.vip && store.chatFreeRemain>0){
       store.chatFreeRemain--
       cost = 0
-    }else if(store.diamonds < 1){
-      toast('你的星屑不够照亮这条消息')
-      go('/recharge')
+    }else if(store.diamonds < 30){
+      if(!isRetry){
+        chat.msgs.push({type:'failed', text, time:'刚刚', _retry:true})
+        chat.lastMsg = `[发送失败] ${text}`
+        chat.time = '刚刚'
+      }
       return false
     }else{
-      store.diamonds -= 1
+      store.diamonds -= 30
     }
     chat.msgs.push({type:'out', text, time:'刚刚', cost})
     chat.lastMsg = text
     chat.time = '刚刚'
 
-    // 异步同步到后端（仅当 chat.sessionId 已绑定后端会话时）
     if(apiOn() && chat.sessionId){
       API.chat.sendMessage(chat.sessionId, text).catch(err=>{
         console.warn('[api] sendMessage failed, kept local:', err.message)
       })
     }
 
-    // 本地模拟回复（无后端时维持原体验）
     if(!apiOn() || !chat.sessionId){
       setTimeout(()=>{
-        const replies = ['嗯嗯～','你说的对','哈哈～','是这样吗？','听你的','想见你了']
+        const replies = ['嗯嗯�?,'你说的对','哈哈�?,'是这样吗�?,'听你�?,'想见你了']
         const r = replies[Math.floor(Math.random()*replies.length)]
         chat.msgs.push({type:'in', text:r, time:'刚刚'})
         chat.lastMsg = r
@@ -1116,7 +1121,7 @@ const biz = {
     return true
   },
 
-  // ---------- 赠送礼物 ----------
+  // ---------- 赠送礼�?----------
   sendGift(chatId, gift, num){
     const total = gift.price * num
     if(store.diamonds < total){
@@ -1132,7 +1137,7 @@ const biz = {
     }
     toast(`已送出 ${gift.name} ×${num}`)
 
-    // 异步同步：将本地 gift.id 映射为后端 giftId（1-12按顺序对应）
+    // 异步同步：将本地 gift.id 映射为后�?giftId�?-12按顺序对应）
     if(apiOn() && chat && chat.peerUserId && gift.backendId){
       API.gift.send(chat.peerUserId, gift.backendId, num, chat.sessionId).catch(err=>{
         console.warn('[api] sendGift failed, kept local:', err.message)
@@ -1143,7 +1148,7 @@ const biz = {
 
   // ---------- 提现 ----------
   withdraw(amt){
-    if(amt < 10){ toast('单笔最低 ¥10'); return false }
+    if(amt < 10){ toast('单笔最�?¥10'); return false }
     if(amt > store.cash){ toast('余额不足'); return false }
     if(!store.isAuthed){ toast('请先完成实名认证'); go('/auth'); return false }
     const fee = Math.max(1, amt * 0.006).toFixed(2)
@@ -1159,12 +1164,12 @@ const biz = {
     return true
   },
 
-  // ---------- VIP 开通 ----------
+  // ---------- VIP 开�?----------
   openVip(plan){
     const days = {month:30, season:90, year:365}
     store.user.vip = true
     store.user.vipExpire = `${days[plan]}天后`
-    toast(`已开通 ${plan==='month'?'月':plan==='season'?'季':'年'}卡 VIP！`)
+    toast(`已开�?${plan==='month'?'�?:plan==='season'?'�?:'�?}�?VIP！`)
 
     if(apiOn()){
       const planTypeMap = {month:'month', season:'quarter', year:'year'}
@@ -1181,7 +1186,7 @@ const biz = {
     if(store.user.vip) rate = Math.ceil(rate*0.8)
     if(store.diamonds < rate) return false
     store.diamonds -= rate
-    // 视频通话扣费暂未提供独立后端接口，仅本地扣
+    // 视频通话扣费暂未提供独立后端接口，仅本地�?
     return rate
   },
 
@@ -1190,7 +1195,7 @@ const biz = {
     store.isAuthed = true
     store.diamonds += 100
     toast('实名认证成功 +100💎')
-    // 后端实名认证接口待补充（TODO）
+    // 后端实名认证接口待补充（TODO�?
   },
 
   // ---------- 新人资料 ----------
@@ -1204,7 +1209,7 @@ const biz = {
       API.user.updateProfile({
         nickname: data.name,
         avatarNo: data.av,
-        gender: data.gender === '男' ? 'M' : 'F',
+        gender: data.gender === '�? ? 'M' : 'F',
         age: data.age,
         city: data.city,
         height: data.height,
@@ -1223,9 +1228,9 @@ const biz = {
     toast('登录成功')
   },
 
-  // ---------- 真实后端登录（手机+验证码） ----------
+  // ---------- 真实后端登录（手�?验证码） ----------
   loginByApi(phone, code){
-    if(!apiOn()) return Promise.reject(new Error('后端未启用'))
+    if(!apiOn()) return Promise.reject(new Error('后端未启�?))
     return API.auth.login(phone, code).then(data=>{
       store.loggedIn = true
       if(data){
@@ -1235,7 +1240,7 @@ const biz = {
         if(data.onboarded) store.onboarded = true
       }
       toast('登录成功')
-      // 登录后建立 WebSocket
+      // 登录后建�?WebSocket
       try { API.ws.connect() } catch(e) {}
       return data
     })
@@ -1243,23 +1248,23 @@ const biz = {
 
   // ---------- 发送验证码 ----------
   sendCode(phone){
-    if(!apiOn()) { toast('验证码已发送（演示）'); return Promise.resolve() }
+    if(!apiOn()) { toast('验证码已发送（演示�?); return Promise.resolve() }
     return API.auth.sendCode(phone).then(()=>{
-      toast('验证码已发送（演示验证码：123456）')
+      toast('验证码已发送（演示验证码：123456�?)
     }).catch(err=>{
-      toast('发送失败：'+err.message+'，演示验证码：123456')
+      toast('发送失败：'+err.message+'，演示验证码�?23456')
     })
   },
 
-  // ---------- 退出登录 ----------
+  // ---------- 退出登�?----------
   logout(){
     if(apiOn()) { try { API.auth.logout() } catch(e){} try { API.ws.disconnect() } catch(e){} }
     Object.assign(store, JSON.parse(JSON.stringify(DEFAULT_STORE)))
-    toast('已退出登录')
+    toast('已退出登�?)
   }
 }
 
-// ===== WebSocket 推送：收到新消息时插入到对应会话 =====
+// ===== WebSocket 推送：收到新消息时插入到对应会�?=====
 if(apiOn()){
   API.ws.on(function(msg){
     if(!msg) return
@@ -1275,14 +1280,14 @@ if(apiOn()){
       toast(`收到 ${msg.giftIcon||'🎁'} ${msg.giftName||'礼物'} ×${msg.quantity||1}`)
     }
   })
-  // 若已登录则立即连接
+  // 若已登录则立即连�?
   if(API.auth.isLoggedIn()) { try { API.ws.connect() } catch(e){} }
 }
 
 /* ===================== 公共组件 ===================== */
 const StatusBar = {
   props:{dark:Boolean,time:{type:String,default:'9:41'}},
-  template:`<div class="status-bar" :class="{dark}"><div>{{time}}</div><div class="icons">●●● 5G 100%</div></div>`
+  template:`<div class="status-bar" :class="{dark}"><div>{{time}}</div><div class="icons">●●�?5G 100%</div></div>`
 }
 const NavBar = {
   props:{title:String, transparent:Boolean, dark:Boolean, showBack:{type:Boolean,default:true}, right:String, onRight:Function},
@@ -1290,7 +1295,7 @@ const NavBar = {
     return { back, props }
   },
   template:`<div class="nav-bar" :class="{transparent,dark}">
-    <div class="back" v-if="showBack" @click="back">‹</div><div class="back" v-else></div>
+    <div class="back" v-if="showBack" @click="back">�?/div><div class="back" v-else></div>
     <div class="title">{{title}}</div>
     <div class="right" @click="onRight && onRight()">{{right||''}}</div>
   </div>`
@@ -1304,7 +1309,7 @@ const TabBar = {
       <div class="ico">👥</div><div>发现</div>
     </div>
     <div class="tab-item" :class="{active:currentRoute==='/feed'}" @click="go('/feed')">
-      <div class="ico">📷</div><div>动态</div>
+      <div class="ico">📷</div><div>动�?/div>
     </div>
     <div class="tab-item" :class="{active:currentRoute==='/messages'}" @click="go('/messages')">
       <div class="ico">💬</div><div>消息</div>
@@ -1317,7 +1322,7 @@ const TabBar = {
 
 /* ===================== 页面组件 ===================== */
 
-/* ① 登录 */
+/* �?登录 */
 const PageLogin = {
   components:{StatusBar},
   setup(){
@@ -1334,11 +1339,11 @@ const PageLogin = {
       if(apiOn()){
         biz.sendCode(phone.value)
       }else{
-        toast('验证码已发送（演示：123456）')
+        toast('验证码已发送（演示�?23456�?)
       }
     }
     const doLogin = ()=>{
-      if(!agreed.value){ toast('请同意用户协议'); return }
+      if(!agreed.value){ toast('请同意用户协�?); return }
       if(!/^1\d{10}$/.test(phone.value)){ toast('请输入正确手机号'); return }
       if(!code.value){ toast('请输入验证码'); return }
 
@@ -1356,7 +1361,7 @@ const PageLogin = {
           loading.value = false
           // 后端失败 => 回落本地登录
           console.warn('[api] login failed, fallback local:', err.message)
-          toast('后端登录失败：'+err.message+'，已使用本地模式')
+          toast('后端登录失败�?+err.message+'，已使用本地模式')
           biz.login()
           afterLogin()
         })
@@ -1370,9 +1375,9 @@ const PageLogin = {
   template:`<div class="screen">
     <status-bar />
     <div class="login-page">
-      <div class="logo">✨</div>
+      <div class="logo">�?/div>
       <h1>Starluck</h1>
-      <div class="slogan">每颗星，都在等另一颗</div>
+      <div class="slogan">每颗星，都在等另一�?/div>
       <div class="form">
         <div class="input-row">
           <span class="prefix">+86</span>
@@ -1380,12 +1385,12 @@ const PageLogin = {
         </div>
         <div class="input-row">
           <input v-model="code" type="tel" maxlength="6" placeholder="6位验证码" />
-          <span class="send-code" :class="{disabled:cd>0}" @click="cd<=0 && sendCode()">{{cd>0?cd+'s 后重发':'获取验证码'}}</span>
+          <span class="send-code" :class="{disabled:cd>0}" @click="cd<=0 && sendCode()">{{cd>0?cd+'s 后重�?:'获取验证�?}}</span>
         </div>
         <button class="btn block" style="margin-top:18px" @click="doLogin">登录 / 注册</button>
         <div class="agree">
-          <div class="cb" :class="{on:agreed}" @click="agreed=!agreed">{{agreed?'✓':''}}</div>
-          <div>我已阅读并同意<a>《用户协议》</a>和<a>《隐私政策》</a></div>
+          <div class="cb" :class="{on:agreed}" @click="agreed=!agreed">{{agreed?'�?:''}}</div>
+          <div>我已阅读并同�?a>《用户协议�?/a>�?a>《隐私政策�?/a></div>
         </div>
       </div>
       <div class="third">
@@ -1400,7 +1405,7 @@ const PageLogin = {
   </div>`
 }
 
-/* ⑳ 新人资料填写 */
+/* �?新人资料填写 */
 const PageOnboard = {
   components:{StatusBar,NavBar},
   setup(){
@@ -1413,16 +1418,16 @@ const PageOnboard = {
       else if(data.interests.length<8) data.interests.push(i)
     }
     const next = ()=>{
-      if(step.value===1 && !data.av){ toast('请上传头像'); return }
+      if(step.value===1 && !data.av){ toast('请上传头�?); return }
       if(step.value===2 && !data.gender){ toast('请选择性别'); return }
       if(step.value===3 && (!data.name||!data.city)){ toast('请填写昵称和城市'); return }
-      if(step.value===5 && data.interests.length<3){ toast('至少选3个兴趣'); return }
+      if(step.value===5 && data.interests.length<3){ toast('至少�?个兴�?); return }
       if(step.value<5){ step.value++; return }
-      biz.finishOnboard({name:data.name||'我', av:data.av, city:data.city||'上海'})
+      biz.finishOnboard({name:data.name||'�?, av:data.av, city:data.city||'上海'})
       go('/discover')
     }
     const skip = ()=>{
-      biz.finishOnboard({name:'新用户', av:1, city:'上海'})
+      biz.finishOnboard({name:'新用�?, av:1, city:'上海'})
       go('/discover')
     }
     return {step,data,INTERESTS,toggleInt,next,skip}
@@ -1437,15 +1442,15 @@ const PageOnboard = {
     <div class="content">
       <div class="onboard-form" v-if="step===1">
         <h2>上传头像</h2>
-        <div class="sub">真实头像通过率提升 80%</div>
+        <div class="sub">真实头像通过率提�?80%</div>
         <div class="avatar-upload" :class="'av-'+data.av" @click="data.av=(data.av%8)+1">
           <div class="ai">{{data.av?'📷':'+'}}</div>
           <div class="at">点击切换示例</div>
         </div>
-        <div class="real-tip">⚠️ 头像需为本人真实照片</div>
+        <div class="real-tip">⚠️ 头像需为本人真实照�?/div>
       </div>
       <div class="onboard-form" v-if="step===2">
-        <h2>你的性别？</h2>
+        <h2>你的性别�?/h2>
         <div class="sub">性别决定推荐人群，请如实选择</div>
         <div class="gender-pick">
           <div class="g" :class="{on:data.gender==='male'}" @click="data.gender='male'">
@@ -1458,20 +1463,20 @@ const PageOnboard = {
       </div>
       <div class="onboard-form" v-if="step===3">
         <h2>基本信息</h2>
-        <div class="sub">让大家更了解你</div>
-        <div class="onboard-field"><div class="l">昵称</div><input v-model="data.name" placeholder="给自己起个名字" /></div>
+        <div class="sub">让大家更了解�?/div>
+        <div class="onboard-field"><div class="l">昵称</div><input v-model="data.name" placeholder="给自己起个名�? /></div>
         <div class="onboard-field"><div class="l">生日</div><input v-model="data.birth" placeholder="2000-01-01" /></div>
-        <div class="onboard-field"><div class="l">城市</div><input v-model="data.city" placeholder="所在城市" /></div>
+        <div class="onboard-field"><div class="l">城市</div><input v-model="data.city" placeholder="所在城�? /></div>
       </div>
       <div class="onboard-form" v-if="step===4">
         <h2>更多信息</h2>
-        <div class="sub">提升匹配精准度</div>
+        <div class="sub">提升匹配精准�?/div>
         <div class="onboard-field"><div class="l">身高</div><input v-model="data.height" placeholder="cm" /></div>
         <div class="onboard-field"><div class="l">职业</div><input v-model="data.job" placeholder="你的职业" /></div>
       </div>
       <div class="onboard-form" v-if="step===5">
         <h2>兴趣爱好</h2>
-        <div class="sub">选 3-8 个，匹配兴趣相投的TA</div>
+        <div class="sub">�?3-8 个，匹配兴趣相投的TA</div>
         <div class="interest-pick">
           <div v-for="i in INTERESTS" :key="i" class="ic" :class="{on:data.interests.includes(i)}" @click="toggleInt(i)">{{i}}</div>
         </div>
@@ -1479,20 +1484,43 @@ const PageOnboard = {
     </div>
     <div class="onboard-actions">
       <div class="skip" @click="skip" v-if="step<5">跳过</div>
-      <button class="btn" :class="{block:step===5}" style="flex:2" @click="next">{{step===5?'完成 +88💎':'下一步'}}</button>
+      <button class="btn" :class="{block:step===5}" style="flex:2" @click="next">{{step===5?'完成 +88💎':'下一�?}}</button>
     </div>
   </div>`
 }
 
-/* ② 发现/用户列表 */
+/* �?发现/用户列表 */
 const PageDiscover = {
   components:{StatusBar,TabBar},
   setup(){
     const tab = ref('推荐')
-    const TABS = ['推荐','附近','新人','在线','动态']
+    const TABS = ['推荐','附近','新人','在线','动�?]
     const filters = ref(['性别','年龄','同城','认证'])
     const goUser = (id)=>go('/user/'+id)
-    return {tab,TABS,filters,users:MOCK_USERS,goUser,store}
+    const users = ref(MOCK_USERS)
+
+    // 后端模式：从 API 拉取发现页用户列�?
+    if(apiOn()){
+      API.request('GET','/api/user/discover').then(list=>{
+        if(list && list.length>0){
+          users.value = list.map(u=>({
+            id:'u'+u.userId,
+            name:u.nickname||'神秘星人',
+            av:u.avatarNo||1,
+            age:u.age||20,
+            city:u.city||'',
+            dist:'',
+            tags:Array.isArray(u.tags)?u.tags:[],
+            sign:'',
+            gender:u.gender||'',
+            online:true,
+            vip:false
+          }))
+        }
+      }).catch(()=>{})
+    }
+
+    return {tab,TABS,filters,users,goUser,store}
   },
   template:`<div class="screen">
     <status-bar />
@@ -1502,26 +1530,29 @@ const PageDiscover = {
     <div class="discover-tabs">
       <div v-for="t in TABS" :key="t" class="tab" :class="{active:tab===t}" @click="tab=t">{{t}}</div>
     </div>
-    <div class="filter-bar">
-      <div class="chip active">综合</div>
-      <div class="chip">性别 ▾</div>
-      <div class="chip">年龄 ▾</div>
-      <div class="chip">同城</div>
-      <div class="chip" @click="!store.user.vip && go('/vip')">👑 高级筛选</div>
-    </div>
-    <div class="content">
-      <div class="user-grid">
-        <div v-for="u in users" :key="u.id" class="user-card" :class="'av-'+u.av" @click="goUser(u.id)">
-          <div class="cover">
-            <div class="top-flags">
-              <div class="flag online" v-if="u.online">● 在线</div>
-              <div class="flag vip" v-if="u.vip">VIP</div>
-            </div>
-            <div class="cover-inner">
-              <div style="font-size:13px;font-weight:700;">{{u.name}} · {{u.age}}</div>
-              <div style="font-size:11px;opacity:.9;">{{u.city}} · {{u.dist}}</div>
-            </div>
-          </div>
+      <div class="filter-bar">
+          <div class="chip active">综合</div>
+          <div class="chip">年龄 �?/div>
+          <div class="chip">同城</div>
+          <div class="chip" @click="!store.user.vip && go('/vip')">👑 高级筛�?/div>
+        </div>
+        <div class="content">
+          <div class="user-grid">
+            <div v-for="u in users" :key="u.id" class="user-card" :class="'av-'+u.av" @click="goUser(u.id)">
+              <div class="cover">
+                <div class="top-flags">
+                  <div class="flag online" v-if="u.online">�?在线</div>
+                  <div class="flag vip" v-if="u.vip">VIP</div>
+                </div>
+                <div class="cover-inner">
+                  <div style="font-size:13px;font-weight:700;">
+                    <span v-if="u.gender==='M'" style="color:#7ab5ff;margin-right:2px;">�?/span>
+                    <span v-else-if="u.gender==='F'" style="color:#ff8ad4;margin-right:2px;">♀</span>
+                    {{u.name}} · {{u.age}}
+                  </div>
+                  <div style="font-size:11px;opacity:.9;">{{u.city}} · {{u.dist}}</div>
+                </div>
+              </div>
           <div class="info">
             <div class="tags">
               <span v-for="t in u.tags.slice(0,2)" :key="t" class="tag">{{t}}</span>
@@ -1534,13 +1565,13 @@ const PageDiscover = {
   </div>`
 }
 
-/* ③ 消息列表 */
+/* �?消息列表 */
 const PageMessages = {
   components:{StatusBar,TabBar},
   setup(){
     const quicks = [
-      {ic:'❤️', cl:'c1', lbl:'喜欢我', bd:'99+', vip:true},
-      {ic:'👁️', cl:'c2', lbl:'访客', bd:'12', vip:true},
+      {ic:'❤️', cl:'c1', lbl:'喜欢�?, bd:'99+', vip:true},
+      {ic:'👁�?, cl:'c2', lbl:'访客', bd:'12', vip:true},
       {ic:'🎁', cl:'c3', lbl:'礼物', bd:'5', vip:false},
       {ic:'🔔', cl:'c4', lbl:'通知', bd:'', vip:false},
     ]
@@ -1585,20 +1616,20 @@ const PageMessages = {
   </div>`
 }
 
-/* ④ 个人中心 */
+/* �?个人中心 */
 const PageMe = {
   components:{StatusBar,TabBar},
   setup(){
     const menus = [
-      [{ic:'❤️',cl:'#ff8ab0',lbl:'我的喜欢',rt:'',path:''},{ic:'👁️',cl:'#a8c4ff',lbl:'谁看过我',rt:'12人',path:'/vip'},{ic:'🎁',cl:'#ff9a3c',lbl:'我的礼物',rt:'',path:''},{ic:'📷',cl:'#5eead4',lbl:'我的动态',rt:'',path:'/feed'}],
-      [{ic:'💎',cl:'#ff8ab0',lbl:'钱包',rt:'¥'+store.cash.toFixed(2),path:'/wallet'},{ic:'🆔',cl:'#a8c4ff',lbl:'实名认证',rt:store.isAuthed?'已认证':'未认证',path:'/auth'},{ic:'👑',cl:'#ffd966',lbl:'VIP会员',rt:store.user.vip?'已开通':'立即开通',path:'/vip'},{ic:'🎁',cl:'#ff5c8a',lbl:'邀请好友',rt:'赚¥3888',path:'/invite'}],
+      [{ic:'❤️',cl:'#a18cff',lbl:'我的喜欢',rt:'',path:''},{ic:'👁�?,cl:'#7ab5ff',lbl:'谁看过我',rt:'12�?,path:'/vip'},{ic:'🎁',cl:'#ff9a3c',lbl:'我的礼物',rt:'',path:''},{ic:'📷',cl:'#5eead4',lbl:'我的动�?,rt:'',path:'/feed'}],
+      [{ic:'💎',cl:'#a18cff',lbl:'钱包',rt:'¥'+store.cash.toFixed(2),path:'/wallet'},{ic:'🆔',cl:'#7ab5ff',lbl:'实名认证',rt:store.isAuthed?'已认�?:'未认�?,path:'/auth'},{ic:'👑',cl:'#ffd966',lbl:'VIP会员',rt:store.user.vip?'已开�?:'立即开�?,path:'/vip'},{ic:'🎁',cl:'#ff5c8a',lbl:'邀请好�?,rt:'赚�?888',path:'/invite'}],
       [{ic:'⚙️',cl:'#999',lbl:'设置',rt:'',path:'/settings'},{ic:'💬',cl:'#999',lbl:'帮助反馈',rt:'',path:'/settings'}]
     ]
     return {store, menus, go}
   },
   template:`<div class="screen">
     <status-bar dark />
-    <div class="content" style="background:linear-gradient(180deg,#23264c,#080a18);">
+    <div class="content" style="background:linear-gradient(180deg,#1f0d3a,#0a0418);">
       <div class="me-header">
         <div class="edit" @click="go('/onboard')">编辑资料</div>
         <div class="top-row">
@@ -1619,10 +1650,10 @@ const PageMe = {
       <div class="vip-banner" @click="go('/vip')" v-if="!store.user.vip">
         <div class="vip-i">👑</div>
         <div class="vt">
-          <div class="t1">开通 VIP 会员</div>
-          <div class="t2">解锁全部交友特权 / 限时5折</div>
+          <div class="t1">开�?VIP 会员</div>
+          <div class="t2">解锁全部交友特权 / 限时5�?/div>
         </div>
-        <div class="vb">立即开通</div>
+        <div class="vb">立即开�?/div>
       </div>
       <div class="vip-banner" v-else style="background:linear-gradient(135deg,#ffd966,#ff9a3c);color:#3a2a00;">
         <div class="vip-i">👑</div>
@@ -1637,7 +1668,7 @@ const PageMe = {
           <div class="ico" :style="{background:m.cl}">{{m.ic}}</div>
           <div class="lbl">{{m.lbl}}</div>
           <div class="rt">{{m.rt}}</div>
-          <div class="arr">›</div>
+          <div class="arr">�?/div>
         </div>
       </div>
     </div>
@@ -1645,7 +1676,7 @@ const PageMe = {
   </div>`
 }
 
-/* ⑤ 个人主页 */
+/* �?个人主页 */
 const PageUser = {
   components:{StatusBar},
   setup(){
@@ -1655,7 +1686,7 @@ const PageUser = {
       let chat = store.chats.find(c=>c.uid===user.value.id)
       if(!chat){
         chat = {id:'c'+Date.now(), uid:user.value.id, lastMsg:'', time:'刚刚', unread:0, msgs:[
-          {type:'sys', text:'你和 '+user.value.name+' 已建立联系，发起友善聊天吧'},
+          {type:'sys', text:'你和 '+user.value.name+' 已建立联系，发起友善聊天�?},
         ]}
         store.chats.unshift(chat)
       }
@@ -1675,13 +1706,13 @@ const PageUser = {
   template:`<div class="screen profile-page">
     <div class="profile-cover" :class="'av-'+user.av">
       <div class="top">
-        <div class="ic-btn" @click="back">‹</div>
+        <div class="ic-btn" @click="back">�?/div>
         <div class="ic-btn">···</div>
       </div>
       <div class="info">
         <div class="name">{{user.name}} <span v-if="user.vip" class="tag vip" style="font-size:11px;padding:2px 6px;">VIP</span></div>
         <div class="meta">
-          <span>{{user.age}}岁</span>
+          <span>{{user.age}}�?/span>
           <span>·</span>
           <span>{{user.city}}</span>
           <span>·</span>
@@ -1709,7 +1740,7 @@ const PageUser = {
         </div>
       </div>
       <div class="profile-section">
-        <h3>相册（6）</h3>
+        <h3>相册�?�?/h3>
         <div class="album-grid">
           <div class="photo p1"></div>
           <div class="photo p2"></div>
@@ -1728,7 +1759,7 @@ const PageUser = {
   </div>`
 }
 
-/* ⑦ 聊天对话 */
+/* �?聊天对话 */
 const PageChat = {
   components:{StatusBar,NavBar},
   setup(){
@@ -1742,18 +1773,28 @@ const PageChat = {
       {ic:'🎁',lbl:'礼物',act:()=>uiState.giftPanel=true},
       {ic:'📷',lbl:'照片',act:()=>toast('调起相机')},
       {ic:'📞',lbl:'视频',act:()=>go('/call/'+chat.value.uid)},
-      {ic:'📍',lbl:'位置',act:()=>toast('发送位置')},
+      {ic:'📍',lbl:'位置',act:()=>toast('发送位�?)},
       {ic:'🧧',lbl:'红包',act:()=>toast('打开红包')},
     ]
     const send = ()=>{
       if(!txt.value.trim()) return
       const ok = biz.sendChatMsg(chat.value.id, txt.value)
       if(ok){ txt.value=''; aiSuggest.value='' }
+      else toast('星屑不足，请充值后再发�?)
+    }
+    const retryMsg = (msg)=>{
+      const ok = biz.sendChatMsg(chat.value.id, msg.text, true)
+      if(ok){
+        const idx = chat.value.msgs.indexOf(msg)
+        if(idx>=0) chat.value.msgs.splice(idx,1)
+      }else{
+        toast('星屑仍不足，请充�?)
+      }
     }
     const goToRecharge = ()=>go('/recharge')
     const askAI = async ()=>{
       if(aiLoading.value) return
-      if(!store.csConfig.aiKey){ toast('未配置 AI Key（请在后台设置）'); return }
+      if(!store.csConfig.aiKey){ toast('未配�?AI Key（请在后台设置）'); return }
       aiLoading.value = true
       aiSuggest.value = ''
       try{
@@ -1762,7 +1803,7 @@ const PageChat = {
           role: m.type==='in'?'user':'assistant',
           content: m.text
         }))
-        const sys = `你是一位男性的恋爱沟通教练。对方（${user.value.name}, ${user.value.age}岁, ${user.value.city}, ${user.value.sign}）最近发来消息。请用第一人称（我）给出一个自然、有趣、不油腻、30字以内的回复，让对话更轻松推进。只输出回复本身，不要解释。`
+        const sys = `你是一位男性的恋爱沟通教练。对方（${user.value.name}, ${user.value.age}�? ${user.value.city}, ${user.value.sign}）最近发来消息。请用第一人称（我）给出一个自然、有趣、不油腻�?0字以内的回复，让对话更轻松推进。只输出回复本身，不要解释。`
         const txt2 = await glm.chat([
           {role:'system', content:sys},
           ...dialog
@@ -1772,21 +1813,21 @@ const PageChat = {
       aiLoading.value = false
     }
     const useAI = ()=>{ txt.value = aiSuggest.value; aiSuggest.value='' }
-    return {chat,user,txt,tools,send,store,goToRecharge,askAI,useAI,aiLoading,aiSuggest,back}
+    return {chat,user,txt,tools,send,store,goToRecharge,askAI,useAI,aiLoading,aiSuggest,back,retryMsg}
   },
   template:`<div class="screen chat-screen">
     <status-bar />
     <div class="nav-bar">
-      <div class="back" @click="back">‹</div>
+      <div class="back" @click="back">�?/div>
       <div class="chat-nav-info">
         <div class="av" :class="'av-'+user.av">{{user.name[0]}}</div>
-        <div class="ni"><div class="n">{{user.name}}</div><div class="st">● 在线</div></div>
+        <div class="ni"><div class="n">{{user.name}}</div><div class="st">�?在线</div></div>
       </div>
       <div class="right">···</div>
     </div>
     <div class="balance-bar">
-      <div class="bl">余额 <b>{{store.diamonds}}💎</b> · 文字 1💎/条<span v-if="store.user.vip"> · VIP 今日剩{{store.chatFreeRemain}}条免费</span></div>
-      <div class="br" @click="goToRecharge">充值 ›</div>
+      <div class="bl">余额 <b>{{store.diamonds}}💎</b> · 文字 30💎/�?span v-if="store.user.vip"> · VIP 今日剩{{store.chatFreeRemain}}条免�?/span></div>
+      <div class="br" @click="goToRecharge">充�?�?/div>
     </div>
     <div class="msg-flow">
       <template v-for="(m,i) in chat.msgs" :key="i">
@@ -1797,7 +1838,7 @@ const PageChat = {
         </div>
         <div v-else-if="m.type==='out'" style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
           <div class="bubble-row me">
-            <div class="av" :class="'av-'+store.user.av">我</div>
+            <div class="av" :class="'av-'+store.user.av">�?/div>
             <div class="bubble">{{m.text}}</div>
           </div>
           <div v-if="m.cost" class="cost-tip">- {{m.cost}}💎</div>
@@ -1805,8 +1846,13 @@ const PageChat = {
         <div v-else-if="m.type==='gift'" style="display:flex;flex-direction:column;align-items:center;gap:4px;">
           <div class="bubble gift">
             <div class="gi">{{m.em}}</div>
-            <div><div class="gt">{{m.from==='me'?'我送出了':'TA送出了'}} {{m.text}}</div><div class="gp">价值 {{m.price}}💎</div></div>
+            <div><div class="gt">{{m.from==='me'?'我送出�?:'TA送出�?}} {{m.text}}</div><div class="gp">价�?{{m.price}}💎</div></div>
           </div>
+        </div>
+        <div v-else-if="m.type==='failed'" class="failed-msg" @click="retryMsg(m)">
+          <span class="fm-icon">⚠️</span>
+          <span class="fm-text">{{m.text}}</span>
+          <span class="fm-tag">发送失败·点击重�?/span>
         </div>
       </template>
     </div>
@@ -1819,8 +1865,8 @@ const PageChat = {
       </div>
       <div class="chat-input-row">
         <button class="ai-btn" @click="askAI" :disabled="aiLoading">💡</button>
-        <input class="ib" v-model="txt" placeholder="说点什么..." @keyup.enter="send" />
-        <button class="sb" @click="send">发送</button>
+        <input class="ib" v-model="txt" placeholder="说点什�?.." @keyup.enter="send" />
+        <button class="sb" @click="send">发�?/button>
       </div>
       <div class="chat-tools">
         <div v-for="t in tools" :key="t.lbl" class="tl" @click="t.act()">
@@ -1831,7 +1877,7 @@ const PageChat = {
   </div>`
 }
 
-/* ⑧ 礼物面板（弹层） */
+/* �?礼物面板（弹层） */
 const GiftPanel = {
   setup(){
     const cat = ref('hot')
@@ -1867,7 +1913,7 @@ const GiftPanel = {
         <div class="gift-bottom">
           <div class="gift-bal">
             <div class="bl">余额 <b>{{store.diamonds}}💎</b></div>
-            <div class="br" @click="go('/recharge')">充值 ›</div>
+            <div class="br" @click="go('/recharge')">充�?�?/div>
           </div>
           <div class="gift-action-row">
             <div class="gift-num">
@@ -1881,20 +1927,20 @@ const GiftPanel = {
   </div>`
 }
 
-/* ⑥ 充值 */
+/* �?充�?*/
 const PageRecharge = {
   components:{StatusBar,NavBar},
   setup(){
     const PKGS = [
       {d:60, p:6, hot:false, ex:''},
       {d:300, p:30, hot:false, ex:''},
-      {d:680, p:68, hot:true, ex:'送 68'},
-      {d:1280, p:128, hot:false, ex:'送 128'},
-      {d:3280, p:328, hot:false, ex:'送 328'},
-      {d:6480, p:648, hot:false, ex:'送 648'},
+      {d:680, p:68, hot:true, ex:'�?68'},
+      {d:1280, p:128, hot:false, ex:'�?128'},
+      {d:3280, p:328, hot:false, ex:'�?328'},
+      {d:6480, p:648, hot:false, ex:'�?648'},
     ]
     const sel = ref(2)
-    const PAYS = [{k:'wx',n:'微信支付',ic:'💚',cl:'wx'},{k:'ap',n:'支付宝',ic:'🅰️',cl:'ap'},{k:'apple',n:'Apple Pay',ic:'',cl:'ap2'}]
+    const PAYS = [{k:'wx',n:'微信支付',ic:'💚',cl:'wx'},{k:'ap',n:'支付�?,ic:'🅰�?,cl:'ap'},{k:'apple',n:'Apple Pay',ic:'',cl:'ap2'}]
     const pay = ref('wx')
     const doPay = ()=>{
       const pkg = PKGS[sel.value]
@@ -1911,7 +1957,7 @@ const PageRecharge = {
       <div class="lbl">星屑余额</div>
       <div class="num"><span class="di">💎</span>{{store.diamonds}}</div>
     </div>
-    <div class="first-bonus">🎁 首充翻倍！充1得2，最高送 6480 钻石</div>
+    <div class="first-bonus">🎁 首充翻倍！�?�?，最高�?6480 钻石</div>
     <div class="pkg-grid">
       <div v-for="(p,i) in PKGS" :key="i" class="pkg-card" :class="{selected:sel===i,hot:p.hot}" @click="sel=i">
         <div class="di"><span class="ic">💎</span>{{p.d}}</div>
@@ -1924,13 +1970,13 @@ const PageRecharge = {
       <div v-for="m in PAYS" :key="m.k" class="pay-method" :class="{on:pay===m.k}" @click="pay=m.k">
         <div class="pi" :class="m.cl">{{m.ic}}</div>
         <div class="pn">{{m.n}}</div>
-        <div class="pr">{{pay===m.k?'✓':''}}</div>
+        <div class="pr">{{pay===m.k?'�?:''}}</div>
       </div>
     </div>
     <div class="recharge-tip">
-      钻石用于平台内消费（聊天/礼物/视频通话/解锁）<br>
+      钻石用于平台内消费（聊天/礼物/视频通话/解锁�?br>
       钻石不可提现、不可转赠，请按需购买<br>
-      支付即视为同意《充值协议》
+      支付即视为同意《充值协议�?
     </div>
     <div class="recharge-bottom">
       <button class="btn gold block" @click="doPay">立即支付 ¥{{PKGS[sel].p}}</button>
@@ -1938,7 +1984,7 @@ const PageRecharge = {
   </div>`
 }
 
-/* ⑨ 钱包 */
+/* �?钱包 */
 const PageWallet = {
   components:{StatusBar,NavBar},
   setup(){
@@ -1955,15 +2001,15 @@ const PageWallet = {
   template:`<div class="screen">
     <status-bar dark />
     <nav-bar title="钱包" dark right="明细" />
-    <div class="content" style="background:linear-gradient(180deg,#23264c,#080a18);">
+    <div class="content" style="background:linear-gradient(180deg,#1f0d3a,#0a0418);">
       <div class="wallet-top">
-        <div class="lbl">可提现余额</div>
-        <div class="amt">{{store.cash.toFixed(2)}}<span class="u">元</span></div>
+        <div class="lbl">可提现余�?/div>
+        <div class="amt">{{store.cash.toFixed(2)}}<span class="u">�?/span></div>
       </div>
       <div class="wallet-quick">
         <div class="qi" @click="go('/withdraw')"><div class="qic c1">💰</div><div class="ql">提现</div></div>
-        <div class="qi" @click="go('/recharge')"><div class="qic c2">💎</div><div class="ql">充值</div></div>
-        <div class="qi"><div class="qic c3">💳</div><div class="ql">银行卡</div></div>
+        <div class="qi" @click="go('/recharge')"><div class="qic c2">💎</div><div class="ql">充�?/div></div>
+        <div class="qi"><div class="qic c3">💳</div><div class="ql">银行�?/div></div>
         <div class="qi"><div class="qic c4">📋</div><div class="ql">明细</div></div>
       </div>
       <div class="month-income">
@@ -1978,7 +2024,7 @@ const PageWallet = {
         </div>
       </div>
       <div class="bill-section">
-        <h3>最近账单</h3>
+        <h3>最近账�?/h3>
         <div v-for="t in store.transactions.slice(0,8)" :key="t.id" class="bill-item">
           <div class="bi" :class="{in:t.type==='in'}">{{t.cat==='gift'?'🎁':t.cat==='call'?'📞':t.cat==='chat'?'💬':t.cat==='withdraw'?'💰':'💎'}}</div>
           <div class="bn">
@@ -1992,7 +2038,7 @@ const PageWallet = {
   </div>`
 }
 
-/* ⑩ 提现 */
+/* �?提现 */
 const PageWithdraw = {
   components:{StatusBar,NavBar},
   setup(){
@@ -2013,7 +2059,7 @@ const PageWithdraw = {
     }
     const submit = ()=>{
       const a = +amt.value
-      if(!a){ toast('请输入提现金额'); return }
+      if(!a){ toast('请输入提现金�?); return }
       biz.withdraw(a)
       if(a >= 10 && a <= store.cash){ back() }
     }
@@ -2024,9 +2070,9 @@ const PageWithdraw = {
     <nav-bar title="提现" right="规则" />
     <div class="content">
       <div class="withdraw-top">
-        <div class="lbl">可提现金额</div>
+        <div class="lbl">可提现金�?/div>
         <div class="amt">¥ {{store.cash.toFixed(2)}}</div>
-        <div class="all" @click="pickQuick('全部')">全部提现 ›</div>
+        <div class="all" @click="pickQuick('全部')">全部提现 �?/div>
       </div>
       <div class="withdraw-form">
         <div class="withdraw-amt-input">
@@ -2037,8 +2083,8 @@ const PageWithdraw = {
           <div v-for="q in QUICKS" :key="q" class="qa" :class="{on:String(amt)===String(q)||(q==='全部'&&+amt===store.cash)}" @click="pickQuick(q)">{{q==='全部'?q:'¥'+q}}</div>
         </div>
         <div class="withdraw-info">
-          <div class="row"><span>手续费 0.6%（最低¥1）</span><span class="v">¥{{fee}}</span></div>
-          <div class="row"><span>实际到账</span><span class="v" style="color:#ff8ab0;">¥{{arrive}}</span></div>
+          <div class="row"><span>手续�?0.6%（最低�?�?/span><span class="v">¥{{fee}}</span></div>
+          <div class="row"><span>实际到账</span><span class="v" style="color:#a18cff;">¥{{arrive}}</span></div>
           <div class="row"><span>到账时间</span><span class="v">1-3个工作日</span></div>
         </div>
       </div>
@@ -2046,20 +2092,20 @@ const PageWithdraw = {
         <h4>到账方式</h4>
         <div class="pay-method" :class="{on:method==='wx'}" @click="method='wx'" style="border-color:transparent;">
           <div class="pi wx">💚</div><div class="pn" style="color:#fff;">微信钱包</div>
-          <div class="pr" style="border-color:#ddd;">{{method==='wx'?'✓':''}}</div>
+          <div class="pr" style="border-color:#ddd;">{{method==='wx'?'�?:''}}</div>
         </div>
         <div class="pay-method" :class="{on:method==='ap'}" @click="method='ap'">
-          <div class="pi ap">🅰️</div><div class="pn" style="color:#fff;">支付宝</div>
-          <div class="pr" style="border-color:#ddd;">{{method==='ap'?'✓':''}}</div>
+          <div class="pi ap">🅰�?/div><div class="pn" style="color:#fff;">支付�?/div>
+          <div class="pr" style="border-color:#ddd;">{{method==='ap'?'�?:''}}</div>
         </div>
         <div class="pay-method" :class="{on:method==='bank'}" @click="method='bank'">
-          <div class="pi" style="background:#666;">💳</div><div class="pn" style="color:#fff;">银行卡</div>
-          <div class="pr" style="border-color:#ddd;">{{method==='bank'?'✓':''}}</div>
+          <div class="pi" style="background:#666;">💳</div><div class="pn" style="color:#fff;">银行�?/div>
+          <div class="pr" style="border-color:#ddd;">{{method==='bank'?'�?:''}}</div>
         </div>
       </div>
       <div style="padding:6px 18px;font-size:11px;color:rgba(255,255,255,0.55);line-height:1.6;">
-        · 单日最多 3 次，每日总额 ¥5000<br>
-        · 单笔 ≥ ¥10，钻石按 10:0.6 元换算<br>
+        · 单日最�?3 次，每日总额 ¥5000<br>
+        · 单笔 �?¥10，钻石按 10:0.6 元换�?br>
         · 首次提现需完成实名认证
       </div>
       <div style="padding:18px;">
@@ -2069,14 +2115,14 @@ const PageWithdraw = {
   </div>`
 }
 
-/* ⑮ VIP */
+/* �?VIP */
 const PageVip = {
   components:{StatusBar,NavBar},
   setup(){
     const PLANS = [
-      {k:'month',n:'月卡',p:30,o:60,d:'/月',hot:false},
-      {k:'season',n:'季卡',p:68,o:135,d:'/3月',hot:true},
-      {k:'year',n:'年卡',p:198,o:396,d:'/年',hot:false},
+      {k:'month',n:'月卡',p:30,o:60,d:'/�?,hot:false},
+      {k:'season',n:'季卡',p:68,o:135,d:'/3�?,hot:true},
+      {k:'year',n:'年卡',p:198,o:396,d:'/�?,hot:false},
     ]
     const sel = ref('season')
     const open = ()=>{
@@ -2090,13 +2136,13 @@ const PageVip = {
     <nav-bar title="VIP 会员" dark right="续费记录" />
     <div class="vip-header">
       <div class="crown">👑</div>
-      <h1>开通 VIP 享专属特权</h1>
-      <div class="sub">解锁全部交友能力 / 8大特权</div>
+      <h1>开�?VIP 享专属特�?/h1>
+      <div class="sub">解锁全部交友能力 / 8大特�?/div>
     </div>
     <div class="vip-status">
       <div class="vs-ic">{{store.user.vip?'👑':'🌟'}}</div>
       <div class="vs-i">
-        <div class="t1">{{store.user.vip?'尊贵 VIP 会员':'当前为普通用户'}}</div>
+        <div class="t1">{{store.user.vip?'尊贵 VIP 会员':'当前为普通用�?}}</div>
         <div class="t2">{{store.user.vip?store.user.vipExpire+'到期':'开通后立即享受全部特权'}}</div>
       </div>
     </div>
@@ -2109,7 +2155,7 @@ const PageVip = {
       </div>
     </div>
     <div class="vip-rights">
-      <h3>VIP 8 大特权</h3>
+      <h3>VIP 8 大特�?/h3>
       <div class="vip-rights-grid">
         <div v-for="r in rights" :key="r.nm" class="vr">
           <div class="ic">{{r.ic}}</div>
@@ -2120,23 +2166,23 @@ const PageVip = {
     <div class="vip-compare">
       <h3>权益对比</h3>
       <table>
-        <tr><th>权益</th><th>普通</th><th class="gold">VIP</th><th class="gold">至尊</th></tr>
+        <tr><th>权益</th><th>普�?/th><th class="gold">VIP</th><th class="gold">至尊</th></tr>
         <tr><td>每日聊天</td><td>5</td><td class="yes">100</td><td class="yes">无限</td></tr>
-        <tr><td>谁看过我</td><td class="no">×</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-        <tr><td>高级筛选</td><td class="no">×</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-        <tr><td>视频通话</td><td>原价</td><td class="yes">8折</td><td class="yes">5折</td></tr>
-        <tr><td>隐身访问</td><td class="no">×</td><td class="no">×</td><td class="yes">✓</td></tr>
-        <tr><td>每月赠送</td><td>—</td><td class="gold">300💎</td><td class="gold">1000💎</td></tr>
+        <tr><td>谁看过我</td><td class="no">×</td><td class="yes">�?/td><td class="yes">�?/td></tr>
+        <tr><td>高级筛�?/td><td class="no">×</td><td class="yes">�?/td><td class="yes">�?/td></tr>
+        <tr><td>视频通话</td><td>原价</td><td class="yes">8�?/td><td class="yes">5�?/td></tr>
+        <tr><td>隐身访问</td><td class="no">×</td><td class="no">×</td><td class="yes">�?/td></tr>
+        <tr><td>每月赠�?/td><td>�?/td><td class="gold">300💎</td><td class="gold">1000💎</td></tr>
       </table>
     </div>
     <div class="vip-bottom">
-      <button class="btn gold block" @click="open">立即开通 ¥{{PLANS.find(p=>p.k===sel).p}}</button>
-      <div class="vip-agree">开通即视为同意《VIP会员协议》自动续费</div>
+      <button class="btn gold block" @click="open">立即开�?¥{{PLANS.find(p=>p.k===sel).p}}</button>
+      <div class="vip-agree">开通即视为同意《VIP会员协议》自动续�?/div>
     </div>
   </div>`
 }
 
-/* ⑯ 视频通话 */
+/* �?视频通话 */
 const PageCall = {
   components:{StatusBar},
   setup(){
@@ -2162,7 +2208,7 @@ const PageCall = {
     })
     const hangup = ()=>{
       clearInterval(timer)
-      toast('通话结束，时长 '+fmt(sec.value))
+      toast('通话结束，时�?'+fmt(sec.value))
       back()
     }
     return {user,sec,min,fmt,rate,remainMin,store,hangup,go}
@@ -2170,19 +2216,19 @@ const PageCall = {
   template:`<div class="screen">
     <div class="call-page">
       <div class="call-bg" :class="'av-'+user.av">{{user.name[0]}}</div>
-      <div class="call-self">我</div>
+      <div class="call-self">�?/div>
       <div class="call-top">
         <div class="ct-l">
           <div class="nm">{{user.name}}</div>
-          <div class="tm">● {{fmt(sec)}}</div>
+          <div class="tm">�?{{fmt(sec)}}</div>
         </div>
-        <div class="ct-r">💎 {{rate}}/分</div>
+        <div class="ct-r">💎 {{rate}}/�?/div>
       </div>
-      <div v-if="remainMin<10" class="call-warning">⚠️ 余额仅剩 {{remainMin}} 分钟，请及时充值</div>
+      <div v-if="remainMin<10" class="call-warning">⚠️ 余额仅剩 {{remainMin}} 分钟，请及时充�?/div>
       <div class="call-bottom">
         <div class="call-balance">
-          <div class="bal">余额 <b>{{store.diamonds}}💎</b> · 已消耗 {{min*rate}}💎</div>
-          <div class="recharge" @click="go('/recharge')">充值</div>
+          <div class="bal">余额 <b>{{store.diamonds}}💎</b> · 已消�?{{min*rate}}💎</div>
+          <div class="recharge" @click="go('/recharge')">充�?/div>
         </div>
         <div class="call-controls">
           <div class="cb">🔇</div>
@@ -2196,15 +2242,15 @@ const PageCall = {
   </div>`
 }
 
-/* ⑰ 实名认证 */
+/* �?实名认证 */
 const PageAuth = {
   components:{StatusBar,NavBar},
   setup(){
     const step = ref(1)
-    const data = reactive({name:'', idType:'身份证', idno:'', birth:''})
+    const data = reactive({name:'', idType:'身份�?, idno:'', birth:''})
     const next = ()=>{
       if(step.value===1){
-        if(!data.name||!data.idno){ toast('请填写完整信息'); return }
+        if(!data.name||!data.idno){ toast('请填写完整信�?); return }
         step.value = 2
       }else if(step.value===2){
         step.value = 3
@@ -2228,53 +2274,53 @@ const PageAuth = {
       <template v-if="step===1">
         <div class="auth-form">
           <div class="field"><div class="l">真实姓名</div><input v-model="data.name" placeholder="请输入身份证上的姓名" /></div>
-          <div class="field"><div class="l">证件类型</div><select v-model="data.idType"><option>身份证</option><option>护照</option></select></div>
-          <div class="field"><div class="l">证件号</div><input v-model="data.idno" placeholder="18位证件号" /></div>
+          <div class="field"><div class="l">证件类型</div><select v-model="data.idType"><option>身份�?/option><option>护照</option></select></div>
+          <div class="field"><div class="l">证件�?/div><input v-model="data.idno" placeholder="18位证件号" /></div>
           <div class="field"><div class="l">出生日期</div><input v-model="data.birth" placeholder="YYYY-MM-DD" /></div>
         </div>
         <div class="id-upload">
           <div class="up"><div class="uic">📷</div>身份证人像面</div>
           <div class="up"><div class="uic">📷</div>身份证国徽面</div>
         </div>
-        <div class="auth-tip">温馨提示：信息将严格保密，仅用于身份核验和合规要求</div>
-        <div style="padding:18px;"><button class="btn block" @click="next">下一步</button></div>
+        <div class="auth-tip">温馨提示：信息将严格保密，仅用于身份核验和合规要�?/div>
+        <div style="padding:18px;"><button class="btn block" @click="next">下一�?/button></div>
       </template>
       <template v-if="step===2">
         <div class="face-frame">👤</div>
-        <div style="text-align:center;font-size:13px;color:rgba(255,255,255,0.7);margin-top:14px;">请将面部对准框内，保持光线良好</div>
-        <div style="padding:18px;"><button class="btn block" @click="next">开始识别</button></div>
+        <div style="text-align:center;font-size:13px;color:rgba(255,255,255,0.7);margin-top:14px;">请将面部对准框内，保持光线良�?/div>
+        <div style="padding:18px;"><button class="btn block" @click="next">开始识�?/button></div>
       </template>
       <template v-if="step===3">
         <div style="text-align:center;padding:48px 24px;">
-          <div style="font-size:64px;">✓</div>
+          <div style="font-size:64px;">�?/div>
           <h2 style="margin-top:14px;">认证成功</h2>
-          <div style="margin-top:8px;color:rgba(255,255,255,0.55);font-size:13px;">奖励 +100💎 已发放</div>
+          <div style="margin-top:8px;color:rgba(255,255,255,0.55);font-size:13px;">奖励 +100💎 已发�?/div>
         </div>
       </template>
     </div>
   </div>`
 }
 
-/* ⑪ 邀请主页 */
+/* �?邀请主�?*/
 const PageInvite = {
   components:{StatusBar,NavBar},
   setup(){
     const tasks = [
-      {ic:'1',t1:'邀请 1 人注册',t2:'+88💎',done:true},
-      {ic:'2',t1:'邀请 5 人实名',t2:'+500💎',done:true},
-      {ic:'3',t1:'邀请 10 人首充',t2:'+2000💎+VIP',done:false},
-      {ic:'4',t1:'邀请 50 人活跃',t2:'+¥888现金',done:false},
+      {ic:'1',t1:'邀�?1 人注�?,t2:'+88💎',done:true},
+      {ic:'2',t1:'邀�?5 人实�?,t2:'+500💎',done:true},
+      {ic:'3',t1:'邀�?10 人首�?,t2:'+2000💎+VIP',done:false},
+      {ic:'4',t1:'邀�?50 人活�?,t2:'+¥888现金',done:false},
     ]
     const SHARES = [
       {ic:'💚',n:'微信',cl:'#07c160'},
-      {ic:'🌐',n:'朋友圈',cl:'#07c160'},
+      {ic:'🌐',n:'朋友�?,cl:'#07c160'},
       {ic:'🐧',n:'QQ',cl:'#1677ff'},
-      {ic:'🖼️',n:'海报',cl:'#ff9a3c'},
+      {ic:'🖼�?,n:'海报',cl:'#ff9a3c'},
       {ic:'🔗',n:'链接',cl:'#999'},
     ]
     const copyCode = ()=>{
       navigator.clipboard?.writeText(store.inviteCode).catch(()=>{})
-      toast('邀请码已复制')
+      toast('邀请码已复�?)
     }
     const onShare = (s)=>{
       if(s.n==='海报'){ uiState.poster = true }
@@ -2285,14 +2331,14 @@ const PageInvite = {
   },
   template:`<div class="screen invite-page">
     <status-bar dark />
-    <nav-bar title="邀请好友" dark right="排行榜" :on-right="()=>go('/invite/rank')" />
+    <nav-bar title="邀请好�? dark right="排行�? :on-right="()=>go('/invite/rank')" />
     <div class="invite-hero">
-      <h1>邀好友赚 ¥3,888</h1>
+      <h1>邀好友�?¥3,888</h1>
       <div class="sub">双向奖励 / 30% 现金返佣 / VIP特权</div>
     </div>
     <div class="invite-stats">
-      <div class="is"><div class="n">{{store.invitedCount}}</div><div class="l">已邀请</div></div>
-      <div class="is"><div class="n">{{store.invitedPaid}}</div><div class="l">已充值</div></div>
+      <div class="is"><div class="n">{{store.invitedCount}}</div><div class="l">已邀�?/div></div>
+      <div class="is"><div class="n">{{store.invitedPaid}}</div><div class="l">已充�?/div></div>
       <div class="is"><div class="n">¥{{store.invitedReward.toFixed(0)}}</div><div class="l">累计收益</div></div>
     </div>
     <div class="invite-code-box">
@@ -2311,31 +2357,31 @@ const PageInvite = {
     <div class="reward-card">
       <h3>🎁 双向奖励</h3>
       <div class="reward-row">
-        <div class="rw"><div class="n">邀请人（你）</div><div class="v">388💎</div></div>
-        <div class="rw"><div class="n">被邀请人（TA）</div><div class="v">288💎+7天VIP</div></div>
+        <div class="rw"><div class="n">邀请人（你�?/div><div class="v">388💎</div></div>
+        <div class="rw"><div class="n">被邀请人（TA�?/div><div class="v">288💎+7天VIP</div></div>
       </div>
     </div>
     <div class="invite-tasks">
-      <h3>邀请任务</h3>
+      <h3>邀请任�?/h3>
       <div v-for="(t,i) in tasks" :key="i" class="task-item" :class="{done:t.done}">
         <div class="ti">{{t.ic}}</div>
         <div class="tn"><div class="t1">{{t.t1}}</div><div class="t2">奖励 {{t.t2}}</div></div>
-        <div class="tb">{{t.done?'已完成':'去邀请'}}</div>
+        <div class="tb">{{t.done?'已完�?:'去邀�?}}</div>
       </div>
     </div>
     <div class="privilege-bar">
       <h3>特权解锁（已邀{{store.invitedCount}}人）</h3>
       <div class="privilege-progress"><div class="pp" :style="{width:Math.min(100,store.invitedCount)+'%'}"></div></div>
-      <div class="privilege-levels"><span>3人</span><span>10人</span><span>20人</span><span>50人</span><span>100人</span></div>
+      <div class="privilege-levels"><span>3�?/span><span>10�?/span><span>20�?/span><span>50�?/span><span>100�?/span></div>
     </div>
     <div style="padding:0 14px 14px;display:flex;gap:10px;">
       <button class="btn ghost" style="flex:1;color:#ffd966;border-color:#ffd966;background:rgba(255,217,102,.1);" @click="go('/invite/stats')">我的战绩</button>
-      <button class="btn gold" style="flex:1;" @click="uiState.poster=true">立即邀请</button>
+      <button class="btn gold" style="flex:1;" @click="uiState.poster=true">立即邀�?/button>
     </div>
   </div>`
 }
 
-/* ⑫ 邀请排行榜 */
+/* �?邀请排行榜 */
 const PageInviteRank = {
   components:{StatusBar,NavBar},
   setup(){
@@ -2352,62 +2398,62 @@ const PageInviteRank = {
         <div class="rt" :class="{active:tab==='总榜'}" @click="tab='总榜'">总榜</div>
       </div>
       <div class="rank-pool">
-        <div class="pl">本期总奖池</div>
+        <div class="pl">本期总奖�?/div>
         <div class="pv">¥1,280,000</div>
-        <div class="pt">⏰ 距离结算 02天14:23:55</div>
+        <div class="pt">�?距离结算 02�?4:23:55</div>
       </div>
       <div class="podium">
         <div v-for="r in rank.slice(0,3)" :key="r.rank" class="p" :class="'p'+r.rank">
           <div class="rk">{{['🥇','🥈','🥉'][r.rank-1]}}</div>
           <div class="av" :class="'av-'+r.av">{{r.name[0]}}</div>
           <div class="nm">{{r.name}}</div>
-          <div class="pr">邀{{r.count}}人 ¥{{r.reward}}</div>
+          <div class="pr">邀{{r.count}}�?¥{{r.reward}}</div>
         </div>
       </div>
       <div class="rank-list">
         <div v-for="r in rank.slice(3)" :key="r.rank" class="rank-row">
           <div class="rn">{{r.rank}}</div>
           <div class="av" :class="'av-'+r.av">{{r.name[0]}}</div>
-          <div class="nb"><div class="n">{{r.name}}</div><div class="c">已邀请 {{r.count}} 人</div></div>
+          <div class="nb"><div class="n">{{r.name}}</div><div class="c">已邀�?{{r.count}} �?/div></div>
           <div class="rw">¥{{r.reward}}</div>
         </div>
       </div>
       <div style="height:80px;"></div>
     </div>
     <div class="my-rank">
-      <div class="av av-1">我</div>
+      <div class="av av-1">�?/div>
       <div class="mn">我的排名 <b>#{{store.myRank}}</b> · 再邀 4 人冲入前 20</div>
-      <button class="btn small gold" @click="go('/invite')">去邀请</button>
+      <button class="btn small gold" @click="go('/invite')">去邀�?/button>
     </div>
   </div>`
 }
 
-/* ⑬ 我的战绩 */
+/* �?我的战绩 */
 const PageInviteStats = {
   components:{StatusBar,NavBar},
   setup(){
     const filter = ref('全部')
-    const FILTERS = ['全部','已注册','已实名','已充值']
+    const FILTERS = ['全部','已注�?,'已实�?,'已充�?]
     const list = computed(()=>{
       if(filter.value==='全部') return MOCK_INVITEES
-      const map = {'已注册':'reg','已实名':'auth','已充值':'paid'}
+      const map = {'已注�?:'reg','已实�?:'auth','已充�?:'paid'}
       return MOCK_INVITEES.filter(i=>i.status===map[filter.value])
     })
-    const stTxt = {reg:'已注册', auth:'已实名', paid:'已首充'}
+    const stTxt = {reg:'已注�?, auth:'已实�?, paid:'已首�?}
     return {filter,FILTERS,list,store,stTxt}
   },
   template:`<div class="screen">
     <status-bar dark />
     <nav-bar title="我的战绩" dark right="规则" />
-    <div class="content" style="background:linear-gradient(180deg,#23264c,#080a18);">
+    <div class="content" style="background:linear-gradient(180deg,#1f0d3a,#0a0418);">
       <div class="stats-top">
         <div class="lbl">累计收益</div>
-        <div class="amt">{{store.invitedReward.toFixed(2)}}<span class="u">元</span></div>
+        <div class="amt">{{store.invitedReward.toFixed(2)}}<span class="u">�?/span></div>
       </div>
       <div class="stats-grid">
-        <div class="gi"><div class="n">{{store.invitedCount}}</div><div class="l">已邀请</div></div>
-        <div class="gi"><div class="n">8</div><div class="l">已实名</div></div>
-        <div class="gi"><div class="n">{{store.invitedPaid}}</div><div class="l">已充值</div></div>
+        <div class="gi"><div class="n">{{store.invitedCount}}</div><div class="l">已邀�?/div></div>
+        <div class="gi"><div class="n">8</div><div class="l">已实�?/div></div>
+        <div class="gi"><div class="n">{{store.invitedPaid}}</div><div class="l">已充�?/div></div>
         <div class="gi"><div class="n">2580</div><div class="l">钻石奖励</div></div>
         <div class="gi"><div class="n">¥386</div><div class="l">现金返佣</div></div>
         <div class="gi"><div class="n">¥300</div><div class="l">特权奖金</div></div>
@@ -2432,17 +2478,17 @@ const PageInviteStats = {
   </div>`
 }
 
-/* ⑭ 新人落地页 */
+/* �?新人落地�?*/
 const PageLanding = {
   components:{StatusBar},
   setup(){
     const PKG = [
       {em:'💎',n:'888钻石',v:'¥88'},
       {em:'👑',n:'7天VIP',v:'¥30'},
-      {em:'🌹',n:'10朵玫瑰',v:'¥6'},
-      {em:'💬',n:'免费聊天卡',v:'¥10'},
+      {em:'🌹',n:'10朵玫�?,v:'¥6'},
+      {em:'💬',n:'免费聊天�?,v:'¥10'},
       {em:'❤️',n:'5张心动卡',v:'¥20'},
-      {em:'🎫',n:'¥168优惠券',v:'¥14'},
+      {em:'🎫',n:'¥168优惠�?,v:'¥14'},
     ]
     const FEATS = [
       {em:'💕',n:'真人交友'},{em:'🎁',n:'缘分礼物'},{em:'📞',n:'视频通话'},
@@ -2456,10 +2502,10 @@ const PageLanding = {
     <status-bar dark />
     <div class="landing-hero">
       <div class="landing-inviter">
-        <div class="av av-1">小</div>
-        <div>小诗 邀请你加入「Starluck」</div>
+        <div class="av av-1">�?/div>
+        <div>小诗 邀请你加入「Starluck�?/div>
       </div>
-      <h1>价值 ¥168<br>等你来领</h1>
+      <h1>价�?¥168<br>等你来领</h1>
       <div class="sub">注册即享 6 件新人见面礼</div>
     </div>
     <div class="gift-package">
@@ -2472,7 +2518,7 @@ const PageLanding = {
         </div>
       </div>
     </div>
-    <div class="countdown">⏰ 限时 23:59:42 后失效</div>
+    <div class="countdown">�?限时 23:59:42 后失�?/div>
     <div class="landing-features">
       <div v-for="f in FEATS" :key="f.n" class="fi">
         <div class="fe">{{f.em}}</div>
@@ -2480,30 +2526,30 @@ const PageLanding = {
       </div>
     </div>
     <div class="landing-cta-wrap">
-      <button class="btn gold block" @click="claim">一键领取 立即注册</button>
-      <div style="text-align:center;font-size:11px;color:rgba(255,255,255,.7);margin-top:10px;">注册即视为同意《用户协议》和《隐私政策》</div>
+      <button class="btn gold block" @click="claim">一键领�?立即注册</button>
+      <div style="text-align:center;font-size:11px;color:rgba(255,255,255,.7);margin-top:10px;">注册即视为同意《用户协议》和《隐私政策�?/div>
     </div>
   </div>`
 }
 
-/* ⑱ 邀请海报弹层 */
+/* �?邀请海报弹�?*/
 const PosterModal = {
   setup(){
     const SHARES = [
-      {ic:'💚',n:'微信'},{ic:'🌐',n:'朋友圈'},{ic:'🐧',n:'QQ'},{ic:'🔗',n:'链接'},{ic:'💾',n:'保存'},
+      {ic:'💚',n:'微信'},{ic:'🌐',n:'朋友�?},{ic:'🐧',n:'QQ'},{ic:'🔗',n:'链接'},{ic:'💾',n:'保存'},
     ]
     const onShare = (s)=>{
-      toast(s.n+'：'+(s.n==='保存'?'图片已保存':'调起分享（演示）'))
+      toast(s.n+'�?+(s.n==='保存'?'图片已保�?:'调起分享（演示）'))
     }
     return {store, SHARES, onShare}
   },
   template:`<div class="poster-modal" @click.self="uiState.poster=false">
     <div class="poster-close" @click="uiState.poster=false">×</div>
     <div class="poster-card">
-      <div class="pti">送你 ¥168 见面礼</div>
-      <div class="av av-1">我</div>
+      <div class="pti">送你 ¥168 见面�?/div>
+      <div class="av av-1">�?/div>
       <div class="nm">{{store.user.name}}</div>
-      <div class="sl">每颗星，都在等另一颗<br>就差你了！</div>
+      <div class="sl">每颗星，都在等另一�?br>就差你了�?/div>
       <div class="pkg">
         <div class="pgt">免费领取</div>
         <div class="pg">💎 👑 🌹 💬</div>
@@ -2520,7 +2566,7 @@ const PosterModal = {
   </div>`
 }
 
-/* ㉑ 首充弹窗 */
+/* �?首充弹窗 */
 const FirstRechargeModal = {
   setup(){
     const sel = ref(0)
@@ -2541,26 +2587,26 @@ const FirstRechargeModal = {
     <div class="fr-card">
       <div class="fr-close" @click="close">×</div>
       <div class="deco">🎉</div>
-      <div class="ct">⏰ 23:59:42 后失效</div>
+      <div class="ct">�?23:59:42 后失�?/div>
       <h2>首充礼包</h2>
-      <div class="sub">钻石翻倍 + 豪华大礼</div>
+      <div class="sub">钻石翻�?+ 豪华大礼</div>
       <div class="fr-pkgs">
         <div v-for="(p,i) in PKGS" :key="i" class="fr-pkg" :style="sel===i?'box-shadow:0 0 0 3px #ffd966;':''" @click="sel=i">
           <div class="di">💎 {{p.d}}</div>
-          <div class="ex">送 {{p.b}}</div>
+          <div class="ex">�?{{p.b}}</div>
           <div class="pr">¥{{p.p}}</div>
         </div>
       </div>
       <div class="fr-bonus">
-        <div class="bt">额外赠送</div>
-        ✨ 7天VIP · 10朵玫瑰 · 心动卡×3 · 优先曝光7天
+        <div class="bt">额外赠�?/div>
+        �?7天VIP · 10朵玫�?· 心动卡�? · 优先曝光7�?
       </div>
       <button class="btn gold block" style="margin-top:14px;" @click="buy">立即领取 ¥{{PKGS[sel].p}}</button>
     </div>
   </div>`
 }
 
-/* ㉒ 设置 */
+/* �?设置 */
 const PageSettings = {
   components:{StatusBar,NavBar},
   setup(){
@@ -2576,17 +2622,17 @@ const PageSettings = {
     <div class="content settings-page">
       <div class="settings-group">
         <h4>账号安全</h4>
-        <div class="settings-item"><div class="lbl">手机号</div><div class="val">138****8888</div><div class="arr">›</div></div>
-        <div class="settings-item" @click="go('/auth')"><div class="lbl">实名认证</div><div class="val">{{store.isAuthed?'已认证':'未认证'}}</div><div class="arr">›</div></div>
-        <div class="settings-item"><div class="lbl">登录密码</div><div class="arr">›</div></div>
-        <div class="settings-item"><div class="lbl">设备管理</div><div class="arr">›</div></div>
+        <div class="settings-item"><div class="lbl">手机�?/div><div class="val">138****8888</div><div class="arr">�?/div></div>
+        <div class="settings-item" @click="go('/auth')"><div class="lbl">实名认证</div><div class="val">{{store.isAuthed?'已认�?:'未认�?}}</div><div class="arr">�?/div></div>
+        <div class="settings-item"><div class="lbl">登录密码</div><div class="arr">�?/div></div>
+        <div class="settings-item"><div class="lbl">设备管理</div><div class="arr">�?/div></div>
       </div>
       <div class="settings-group">
         <h4>隐私设置</h4>
-        <div class="settings-item"><div class="lbl">隐身访问（VIP）</div><div class="sw" :class="{on:store.settings.invisible}" @click="store.settings.invisible=!store.settings.invisible"></div></div>
+        <div class="settings-item"><div class="lbl">隐身访问（VIP�?/div><div class="sw" :class="{on:store.settings.invisible}" @click="store.settings.invisible=!store.settings.invisible"></div></div>
         <div class="settings-item"><div class="lbl">隐藏位置</div><div class="sw" :class="{on:store.settings.hideLoc}" @click="store.settings.hideLoc=!store.settings.hideLoc"></div></div>
         <div class="settings-item"><div class="lbl">仅VIP可联系我</div><div class="sw" :class="{on:store.settings.vipOnly}" @click="store.settings.vipOnly=!store.settings.vipOnly"></div></div>
-        <div class="settings-item"><div class="lbl">黑名单</div><div class="arr">›</div></div>
+        <div class="settings-item"><div class="lbl">黑名�?/div><div class="arr">�?/div></div>
       </div>
       <div class="settings-group">
         <h4>消息通知</h4>
@@ -2594,34 +2640,34 @@ const PageSettings = {
         <div class="settings-item"><div class="lbl">震动</div><div class="sw" :class="{on:store.settings.vibrate}" @click="store.settings.vibrate=!store.settings.vibrate"></div></div>
       </div>
       <div class="settings-group">
-        <h4>服务与帮助</h4>
-        <div class="settings-item"><div class="lbl">在线客服</div><div class="val">7×24</div><div class="arr">›</div></div>
-        <div class="settings-item"><div class="lbl">举报</div><div class="arr">›</div></div>
-        <div class="settings-item"><div class="lbl">意见反馈</div><div class="arr">›</div></div>
-        <div class="settings-item"><div class="lbl">用户协议</div><div class="arr">›</div></div>
-        <div class="settings-item"><div class="lbl">隐私政策</div><div class="arr">›</div></div>
-        <div class="settings-item"><div class="lbl">关于我们</div><div class="val">v1.0.0</div><div class="arr">›</div></div>
+        <h4>服务与帮�?/h4>
+        <div class="settings-item"><div class="lbl">在线客服</div><div class="val">7×24</div><div class="arr">�?/div></div>
+        <div class="settings-item"><div class="lbl">举报</div><div class="arr">�?/div></div>
+        <div class="settings-item"><div class="lbl">意见反馈</div><div class="arr">�?/div></div>
+        <div class="settings-item"><div class="lbl">用户协议</div><div class="arr">�?/div></div>
+        <div class="settings-item"><div class="lbl">隐私政策</div><div class="arr">�?/div></div>
+        <div class="settings-item"><div class="lbl">关于我们</div><div class="val">v1.0.0</div><div class="arr">�?/div></div>
       </div>
-      <div class="logout-btn" @click="logout">退出登录</div>
+      <div class="logout-btn" @click="logout">退出登�?/div>
       <div class="delete-acc">注销账号</div>
     </div>
   </div>`
 }
 
-/* ⑲ 动态广场 */
+/* �?动态广�?*/
 const PageFeed = {
   components:{StatusBar,TabBar},
   setup(){
     const tab = ref('推荐')
     const TABS = ['关注','推荐','附近','话题']
-    const TOPICS = ['#周末分享','#情感问答','#异地恋','#减肥日记','#养宠日常']
-    const like = (f)=>{ f.likes++; toast('已点赞') }
+    const TOPICS = ['#周末分享','#情感问答','#异地�?,'#减肥日记','#养宠日常']
+    const like = (f)=>{ f.likes++; toast('已点�?) }
     const sendGift = (uid)=>{ go('/user/'+uid) }
     return {tab,TABS,TOPICS,feed:MOCK_FEED,findUser,like,sendGift}
   },
   template:`<div class="screen">
     <status-bar />
-    <div class="page-top"><h1>动态</h1></div>
+    <div class="page-top"><h1>动�?/h1></div>
     <div class="feed-tabs">
       <div v-for="t in TABS" :key="t" class="ft" :class="{active:tab===t}" @click="tab=t">{{t}}</div>
     </div>
@@ -2646,10 +2692,10 @@ const PageFeed = {
           <span v-for="t in f.tags" :key="t" class="tag purple">{{t}}</span>
         </div>
         <div class="fc-tools">
-          <div class="ft" @click="like(f)">❤ {{f.likes}}</div>
+          <div class="ft" @click="like(f)">�?{{f.likes}}</div>
           <div class="ft">💬 {{f.comments}}</div>
           <div class="ft" style="color:#ff9a3c" @click="sendGift(f.uid)">🎁 送礼</div>
-          <div class="ft">↗ 分享</div>
+          <div class="ft">�?分享</div>
         </div>
       </div>
     </div>
@@ -2657,7 +2703,7 @@ const PageFeed = {
   </div>`
 }
 
-/* ===================== 根组件 + 路由分发 ===================== */
+/* ===================== 根组�?+ 路由分发 ===================== */
 const App = {
   components:{
     PageLogin, PageOnboard, PageDiscover, PageMessages, PageMe, PageUser,
@@ -2728,10 +2774,10 @@ document.addEventListener('touchend', function(e){
   lastTouchEnd = now
 },{passive:false})
 
-// 屏蔽微信内置 X5 浏览器长按菜单（图片）
+// 屏蔽微信内置 X5 浏览器长按菜单（图片�?
 document.addEventListener('contextmenu', e => e.preventDefault())
 
-// 微信 JSSDK 桩（实际上线需后端签名）
+// 微信 JSSDK 桩（实际上线需后端签名�?
 window.wxBridge = {
   ready(){ console.log('[wx] ready, isWeixin=', isWeixin) },
   shareWeChat(opts){
@@ -2759,8 +2805,8 @@ setTimeout(()=>{
   }
 },2500)
 
-/* ===================== 推送 Worker ===================== */
-// 由 admin 配置的 pushRules 驱动；按时段从 fakeUsers 池中挑人，给当前男用户发"发出星语"
+/* ===================== 推�?Worker ===================== */
+// �?admin 配置�?pushRules 驱动；按时段�?fakeUsers 池中挑人，给当前男用户发"发出星语"
 const PushWorker = {
   greetings: [
     '你好呀～看你头像感觉好亲切',
@@ -2768,8 +2814,8 @@ const PushWorker = {
     '在吗？刚刷到你～',
     '你好，能聊聊吗？',
     '哈喽～看了你的资料感觉很合得来诶',
-    '突然好想找人聊聊天',
-    '看你也在线，打个招呼～',
+    '突然好想找人聊聊�?,
+    '看你也在线，打个招呼�?,
     '感觉我们好像挺投缘的',
   ],
   inTimeSlot(){
@@ -2780,7 +2826,7 @@ const PushWorker = {
   },
   pickFakeUser(){
     if(!store.fakeUsers.length) return null
-    // 过滤掉冷却中的
+    // 过滤掉冷却中�?
     const now = Date.now()
     const cooldown = (store.pushRules.cooldownMin||30) * 60000
     const eligible = store.fakeUsers.filter(fu=>{
@@ -2805,11 +2851,11 @@ const PushWorker = {
     const fu = this.pickFakeUser()
     if(!fu) return
     const greet = this.greetings[Math.floor(Math.random()*this.greetings.length)]
-    // 找/建会话
+    // �?建会�?
     let chat = store.chats.find(c=>c.uid===fu.id)
     if(!chat){
       chat = {id:'c'+Date.now()+Math.floor(Math.random()*999), uid:fu.id, lastMsg:'', time:'刚刚', unread:0, msgs:[
-        {type:'sys', text:'TA向你发起了发出星语'}
+        {type:'sys', text:'TA向你发起了发出星�?}
       ]}
       store.chats.unshift(chat)
     }
@@ -2819,22 +2865,22 @@ const PushWorker = {
     chat.unread = (chat.unread||0) + 1
     store.pushLog.push({ts:Date.now(), fakeUid:fu.id, toUid:store.user.id, slot:slot.start, opened:false, replied:false})
     store.adminAnalytics.pushed = (store.adminAnalytics.pushed||0) + 1
-    // 全局 fakeUsers 池没有真实头像，注入到 MOCK_USERS 以便其它页面渲染
+    // 全局 fakeUsers 池没有真实头像，注入�?MOCK_USERS 以便其它页面渲染
     if(!MOCK_USERS.find(u=>u.id===fu.id)) MOCK_USERS.push(fu)
     if(currentRoute.value !== '/messages' && currentRoute.value !== '/chat/'+chat.id){
       toast('💌 '+fu.name+' 向你发出星语')
     }
   },
   start(){
-    // 1-3 分钟检查一次时段
+    // 1-3 分钟检查一次时�?
     this._t = setInterval(()=>this.trigger(), 60000 + Math.random()*120000)
-    // 启动后 8s 触发一次（演示用）
+    // 启动�?8s 触发一次（演示用）
     setTimeout(()=>this.trigger(), 8000)
   }
 }
 PushWorker.start()
 
-// 调试入口：window.yqyr.* 方便控制台测试
+// 调试入口：window.yqyr.* 方便控制台测�?
 window.yqyr = { store, go, biz, uiState, toast }
 </script>
 </body>

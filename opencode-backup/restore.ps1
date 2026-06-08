@@ -15,6 +15,10 @@ $TARGET_CFG  = "$env:APPDATA\opencode"
 Write-Host ">>> 恢复 opencode 对话数据库..."
 if (!(Test-Path "$TARGET_DATA")) { New-Item -ItemType Directory -Path "$TARGET_DATA" -Force | Out-Null }
 
+Write-Host "  清理旧的 WAL 文件（避免数据库冲突黑屏）..."
+Remove-Item "$TARGET_DATA\opencode.db-shm" -Force -ErrorAction SilentlyContinue
+Remove-Item "$TARGET_DATA\opencode.db-wal" -Force -ErrorAction SilentlyContinue
+
 Copy-Item "$BACKUP\opencode.db"  "$TARGET_DATA\opencode.db" -Force
 Copy-Item "$BACKUP\auth.json"    "$TARGET_DATA\auth.json" -Force
 

@@ -16,6 +16,7 @@ public class LoginVO {
     private Boolean onboarded;
     private Integer diamonds;
     private Boolean isVip;
+    private String role;
     private String vipExpireTime;
 
     public static Builder builder() { return new Builder(); }
@@ -30,6 +31,7 @@ public class LoginVO {
         public Builder onboarded(Boolean v) { vo.onboarded = v; return this; }
         public Builder diamonds(Integer v) { vo.diamonds = v; return this; }
         public Builder isVip(Boolean v) { vo.isVip = v; return this; }
+        public Builder role(String v) { vo.role = v; return this; }
         public Builder vipExpireTime(String v) { vo.vipExpireTime = v; return this; }
         public LoginVO build() { return vo; }
     }
@@ -50,6 +52,8 @@ public class LoginVO {
     public void setDiamonds(Integer diamonds) { this.diamonds = diamonds; }
     public Boolean getIsVip() { return isVip; }
     public void setIsVip(Boolean isVip) { this.isVip = isVip; }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
     public String getVipExpireTime() { return vipExpireTime; }
     public void setVipExpireTime(String vipExpireTime) { this.vipExpireTime = vipExpireTime; }
 }

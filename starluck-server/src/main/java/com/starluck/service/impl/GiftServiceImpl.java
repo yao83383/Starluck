@@ -74,7 +74,7 @@ public class GiftServiceImpl implements GiftService {
         UserBalance balance = balanceMapper.selectOne(
                 new LambdaQueryWrapper<UserBalance>().eq(UserBalance::getUserId, senderId));
         if (balance == null || balance.getDiamonds() < totalCost) {
-            throw new BusinessException("钻石余额不足");
+            throw new BusinessException("星光余额不足");
         }
         balance.setDiamonds(balance.getDiamonds() - totalCost);
         balanceMapper.updateById(balance);

@@ -20,6 +20,7 @@ import com.starluck.mapper.UserProfileMapper;
 import com.starluck.service.ChatService;
 import com.starluck.vo.ChatMessageVO;
 import com.starluck.vo.ChatSessionVO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +48,12 @@ public class ChatServiceImpl implements ChatService {
     private final DiamondRecordMapper diamondRecordMapper;
     private final FakeUserMapper fakeUserMapper;
     private final UserProfileMapper userProfileMapper;
+
+    @Value("${app.chat-price:30}")
+    private int chatPrice;
+
+    @Value("${app.pink-diamond-reward:10}")
+    private int pinkDiamondReward;
 
     public ChatServiceImpl(ChatSessionMapper sessionMapper, ChatMessageMapper messageMapper,
                            UserBalanceMapper balanceMapper, DiamondRecordMapper diamondRecordMapper,
@@ -168,31 +175,64 @@ public class ChatServiceImpl implements ChatService {
 
         String now = LocalDateTime.now().format(TIME_FMT);
         int costDiamond = 0;
+        int pinkEarned = 0;
 
-        if (isMale && !Boolean.TRUE.equals(session.getIsFake())) {
-            UserBalance balance = balanceMapper.selectOne(
+        boolean isRealSession = !Boolean.TRUE.equals(session.getIsFake());
+
+        if (isRealSession) {
+            UserBalance senderBalance = balanceMapper.selectOne(
                     new LambdaQueryWrapper<UserBalance>().eq(UserBalance::getUserId, senderId));
-            if (balance == null || balance.getDiamonds() < 1) {
-                throw new BusinessException("钻石余额不足，请充值");
+            if (senderBalance == null || senderBalance.getDiamonds() < chatPrice) {
+                throw new BusinessException("星光余额不足，请充值");
             }
 
-            if (balance.getIsVip() != null && balance.getIsVip() == 1
-                    && balance.getDailyFreeChat() != null && balance.getDailyFreeChat() > 0) {
-                balance.setDailyFreeChat(balance.getDailyFreeChat() - 1);
+            boolean hasFreeChat = senderBalance.getIsVip() != null && senderBalance.getIsVip() == 1
+                    && senderBalance.getDailyFreeChat() != null && senderBalance.getDailyFreeChat() > 0;
+
+            if (hasFreeChat) {
+                senderBalance.setDailyFreeChat(senderBalance.getDailyFreeChat() - 1);
             } else {
-                costDiamond = 1;
-                balance.setDiamonds(balance.getDiamonds() - 1);
+                costDiamond = chatPrice;
+                senderBalance.setDiamonds(senderBalance.getDiamonds() - chatPrice);
 
                 DiamondRecord dr = new DiamondRecord();
                 dr.setUserId(senderId);
                 dr.setType("out");
-                dr.setAmount(-1);
-                dr.setBalanceAfter(balance.getDiamonds());
+                dr.setAmount(-chatPrice);
+                dr.setBalanceAfter(senderBalance.getDiamonds());
                 dr.setBizType("chat");
-                dr.setRemark("聊天扣费");
+                dr.setRemark("聊天扣费·星光");
                 diamondRecordMapper.insert(dr);
             }
-            balanceMapper.updateById(balance);
+
+            ChatMessage lastMsg = messageMapper.selectOne(
+                    new LambdaQueryWrapper<ChatMessage>()
+                            .eq(ChatMessage::getSessionId, session.getId())
+                            .eq(ChatMessage::getMsgType, "text")
+                            .ne(ChatMessage::getSenderId, senderId)
+                            .eq(ChatMessage::getReplied, 0)
+                            .orderByDesc(ChatMessage::getId)
+                            .last("LIMIT 1"));
+
+            if (lastMsg != null) {
+                lastMsg.setReplied(1);
+                messageMapper.updateById(lastMsg);
+
+                pinkEarned = pinkDiamondReward;
+                int currentPink = senderBalance.getPinkDiamonds() != null ? senderBalance.getPinkDiamonds() : 0;
+                senderBalance.setPinkDiamonds(currentPink + pinkDiamondReward);
+
+                DiamondRecord pr = new DiamondRecord();
+                pr.setUserId(senderId);
+                pr.setType("in");
+                pr.setAmount(pinkDiamondReward);
+                pr.setBalanceAfter(senderBalance.getPinkDiamonds());
+                pr.setBizType("chat_reply");
+                pr.setRemark("回复奖励·星尘");
+                diamondRecordMapper.insert(pr);
+            }
+
+            balanceMapper.updateById(senderBalance);
         }
 
         ChatMessage msg = new ChatMessage();
@@ -204,6 +244,7 @@ public class ChatServiceImpl implements ChatService {
         msg.setCostDiamond(costDiamond);
         msg.setMsgTime(now);
         msg.setIsRead(0);
+        msg.setReplied(0);
         messageMapper.insert(msg);
 
         session.setLastMsg(request.getContent());

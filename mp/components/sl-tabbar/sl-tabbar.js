@@ -7,13 +7,20 @@ Component({
     active: { type: String, value: 'discover' }
   },
   data: {
-    themeStyle: ''
+    themeStyle: '',
+    unread: 0
   },
   lifetimes: {
     attached() {
       store.init()
       this._applyTheme()
-      this._unsub = store.subscribe(() => this._applyTheme())
+      this._unsub = store.subscribe(() => {
+        this._applyTheme()
+        const s = store.get()
+        this.setData({ unread: s.totalUnread || 0 })
+      })
+      const s = store.get()
+      this.setData({ unread: s.totalUnread || 0 })
     },
     detached() {
       if (this._unsub) this._unsub()

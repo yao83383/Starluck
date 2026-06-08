@@ -8,7 +8,6 @@ App({
   onLaunch() {
     store.init()
 
-    // 初始化系统信息
     try {
       const info = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()
       this.globalData.statusBarHeight = info.statusBarHeight || 20
@@ -18,7 +17,16 @@ App({
       this.globalData.statusBarHeight = 20
     }
 
-    // 已登录则恢复 WebSocket
+    // 网络连通性测试
+    wx.request({
+      url: 'http://8.140.249.127:8080/api/auth/send-code',
+      method: 'POST',
+      header: { 'Content-Type': 'application/json' },
+      data: { phone: '10000000000' },
+      success(res) { console.log('[网络测试] 成功 status=' + res.statusCode, res.data) },
+      fail(err) { console.log('[网络测试] 失败', err.errMsg) }
+    })
+
     if (API.getToken()) {
       setTimeout(() => API.ws.connect(), 500)
     }

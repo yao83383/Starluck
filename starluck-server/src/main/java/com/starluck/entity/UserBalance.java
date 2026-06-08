@@ -24,6 +24,7 @@ public class UserBalance {
     private LocalDateTime vipExpireTime;
     private Integer dailyFreeChat;
     private Integer isAuthed;
+    private Integer pinkDiamonds;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
@@ -51,6 +52,8 @@ public class UserBalance {
     public void setDailyFreeChat(Integer dailyFreeChat) { this.dailyFreeChat = dailyFreeChat; }
     public Integer getIsAuthed() { return isAuthed; }
     public void setIsAuthed(Integer isAuthed) { this.isAuthed = isAuthed; }
+    public Integer getPinkDiamonds() { return pinkDiamonds; }
+    public void setPinkDiamonds(Integer pinkDiamonds) { this.pinkDiamonds = pinkDiamonds; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }

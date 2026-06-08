@@ -6,6 +6,7 @@ import java.util.List;
 public class WalletVO {
 
     private Integer diamonds;
+    private Integer pinkDiamonds;
     private BigDecimal cash;
     private BigDecimal monthGiftIncome;
     private BigDecimal monthChatIncome;
@@ -17,6 +18,7 @@ public class WalletVO {
     public static class Builder {
         private WalletVO vo = new WalletVO();
         public Builder diamonds(Integer v) { vo.diamonds = v; return this; }
+        public Builder pinkDiamonds(Integer v) { vo.pinkDiamonds = v; return this; }
         public Builder cash(BigDecimal v) { vo.cash = v; return this; }
         public Builder monthGiftIncome(BigDecimal v) { vo.monthGiftIncome = v; return this; }
         public Builder monthChatIncome(BigDecimal v) { vo.monthChatIncome = v; return this; }
@@ -27,6 +29,8 @@ public class WalletVO {
 
     public Integer getDiamonds() { return diamonds; }
     public void setDiamonds(Integer diamonds) { this.diamonds = diamonds; }
+    public Integer getPinkDiamonds() { return pinkDiamonds; }
+    public void setPinkDiamonds(Integer pinkDiamonds) { this.pinkDiamonds = pinkDiamonds; }
     public BigDecimal getCash() { return cash; }
     public void setCash(BigDecimal cash) { this.cash = cash; }
     public BigDecimal getMonthGiftIncome() { return monthGiftIncome; }
