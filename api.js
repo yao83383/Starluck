@@ -270,6 +270,14 @@
     getSessions: function () {
       return request('GET', '/api/admin/sessions')
     },
+    /** 管理员加载会话消息（不更改已读状态） */
+    getChatMessages: function (sessionId) {
+      return request('GET', '/api/admin/chat/messages/' + sessionId)
+    },
+    /** 管理员标记会话已读 */
+    markRead: function (sessionId) {
+      return request('POST', '/api/admin/chat/mark-read/' + sessionId)
+    },
     /** 以假用户身份发送消息 */
     chatSend: function (sessionId, content) {
       return request('POST', '/api/admin/chat/send', { body: { sessionId: sessionId, content: content } })

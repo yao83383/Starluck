@@ -1,6 +1,10 @@
 package com.starluck.config;
 
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
+import com.starluck.dto.ChatSendRequest;
 import com.starluck.security.JwtUtil;
+import com.starluck.service.ChatService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -18,12 +22,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     private final JwtUtil jwtUtil;
+    private final ChatService chatService;
 
-    /** 用户ID -> WebSocket会话 */
     private static final Map<Long, WebSocketSession> USER_SESSIONS = new ConcurrentHashMap<>();
 
-    public ChatWebSocketHandler(JwtUtil jwtUtil) {
+    public ChatWebSocketHandler(JwtUtil jwtUtil, ChatService chatService) {
         this.jwtUtil = jwtUtil;
+        this.chatService = chatService;
     }
 
     @Override
@@ -38,6 +43,23 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        Long userId = (Long) session.getAttributes().get("userId");
+        if (userId == null) return;
+        try {
+            JSONObject json = JSONUtil.parseObj(message.getPayload());
+            String type = json.getStr("type");
+            if ("chat_send".equals(type)) {
+                long sessionId = json.getLong("sessionId");
+                String content = json.getStr("content");
+                if (content == null || content.trim().isEmpty()) return;
+                ChatSendRequest req = new ChatSendRequest();
+                req.setSessionId(sessionId);
+                req.setContent(content.trim());
+                chatService.sendMessage(userId, req);
+            }
+        } catch (Exception e) {
+            sendToUser(userId, JSONUtil.toJsonStr(Map.of("type", "error", "msg", e.getMessage())));
+        }
     }
 
     @Override

@@ -82,7 +82,7 @@ slPage({
     API.ws.on(this._wsHandler)
     if (!API.ws.connected) API.ws.connect()
 
-    this._pollTimer = setInterval(() => this._pollMessages(), 6000)
+    this._pollTimer = setInterval(() => this._pollMessages(), 3000)
   },
 
   onUnload() {
@@ -93,7 +93,7 @@ slPage({
   _pollMessages() {
     if (!this.data.sessionId) return
     API.chat.getMessages(this.data.sessionId).then(raw => {
-      if (!raw || raw.length === this.data.msgs.length) return
+      if (!raw) return
       const msgs = raw.map(m => ({
         type: m.senderId === this.data.peerId ? 'in' : (m.senderRole === 'system' ? 'sys' : 'out'),
         text: m.content,
@@ -105,16 +105,24 @@ slPage({
   },
 
   onWsMessage(data) {
-    if (!data || data.type !== 'new_message') return
-    // 只处理当前会话的消息
+    if (!data) return
     if (String(data.sessionId) !== String(this.data.sessionId)) return
-    // 自己发的不重复添加（已在 send 时乐观更新）
-    const meId = store.get().user && store.get().user.dbId
-    if (meId && String(data.senderId) === String(meId)) return
 
-    const msgs = this.data.msgs.slice()
-    msgs.push({ type:'in', text: data.content, cost: 0, isRead: true })
-    this.setData({ msgs, scrollIntoView: 'msg-end' })
+    if (data.type === 'messages_read') {
+      const msgs = this.data.msgs.map(m =>
+        m.type === 'out' ? { ...m, isRead: true } : m
+      )
+      this.setData({ msgs })
+      return
+    }
+
+    if (data.type === 'new_message') {
+      const meId = store.get().user && store.get().user.dbId
+      if (meId && String(data.senderId) === String(meId)) return
+      const msgs = this.data.msgs.slice()
+      msgs.push({ type:'in', text: data.content, cost: 0, isRead: true })
+      this.setData({ msgs, scrollIntoView: 'msg-end' })
+    }
   },
 
   onInput(e) { this.setData({ text: e.detail.value }) },
@@ -146,6 +154,7 @@ slPage({
     msgs.push({ type:'out', text:t, cost, isRead: false })
     this.setData({ msgs, text:'', scrollIntoView: 'msg-end' })
 
+    API.ws.send({ type: 'chat_send', sessionId: this.data.sessionId, content: t }) ||
     API.chat.send(this.data.sessionId, t).catch(err => {
       const idx = msgs.findIndex(m => m.text === t && m.type === 'out')
       if (idx > -1) msgs.splice(idx, 1)

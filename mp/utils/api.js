@@ -190,6 +190,17 @@ const ws = {
     if (i > -1) this.listeners.splice(i, 1)
   },
 
+  /** 通过 WebSocket 发送消息，返回 true 表示发送成功 */
+  send(data) {
+    if (this.connected) {
+      try {
+        wx.sendSocketMessage({ data: JSON.stringify(data) })
+        return true
+      } catch (e) { return false }
+    }
+    return false
+  },
+
   /** 断开连接 */
   disconnect() {
     if (this.socket) {

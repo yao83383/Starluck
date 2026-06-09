@@ -843,69 +843,89 @@ const ViewFakes = {
 /* 客服工作台 */
 const ViewWorkbench = {
   setup(){
-    const allSessions = ref([])
+    const males = ref([])
     const loading = ref(true)
-    const filterMale = ref('')
-    const filterFemale = ref('')
+    const search = ref('')
+    const tab = ref('all')       // all | unread | nosession
     const activeSession = ref(null)
+    const activeMale = ref(null)
     const msgs = ref([])
     const reply = ref('')
     const aiLoading = ref(false)
     const aiSuggest = ref('')
     const msgFlowRef = ref(null)
+    const showFakePicker = ref(false)
+    const pickerMaleId = ref(null)
+    const pickerFakeId = ref(null)
     let _chatPoll = null
+    let _workPoll = null
 
-    const loadSessions = async ()=>{
+    const loadMales = async (silent)=>{
       if(!API) return
-      loading.value = true
-      try{ allSessions.value = await API.admin.getSessions() || [] }catch(e){ toast('加载会话失败: '+e.message) }
+      if(!silent) loading.value = true
+      try{ males.value = await API.admin.getSessions() || [] }catch(e){ if(!silent) toast('加载失败: '+e.message) }
       loading.value = false
     }
-    onMounted(loadSessions)
+    onMounted(()=>{
+      loadMales()
+      _workPoll = setInterval(()=>{ if(!activeSession.value) loadMales(true) }, 2000)
+    })
 
-    const maleOptions = computed(()=>{
-      const map = {}
-      allSessions.value.forEach(s=>{ map[s.maleId] = s.maleName || s.malePhone })
-      return Object.entries(map).map(([id,name])=>({id:Number(id), name}))
-    })
-    const femaleOptions = computed(()=>{
-      const map = {}
-      allSessions.value.forEach(s=>{ map[s.femaleId] = s.femaleName })
-      return Object.entries(map).map(([id,name])=>({id:Number(id), name}))
-    })
-    const filteredSessions = computed(()=>{
-      let list = allSessions.value
-      if(filterMale.value) list = list.filter(s=>s.maleId===Number(filterMale.value))
-      if(filterFemale.value) list = list.filter(s=>s.femaleId===Number(filterFemale.value))
+    const filteredMales = computed(()=>{
+      let list = males.value
+      const q = search.value.trim().toLowerCase()
+      if(q){
+        list = list.filter(m=>
+          (m.nickname||'').toLowerCase().includes(q) ||
+          (m.phone||'').includes(q) ||
+          (m.city||'').toLowerCase().includes(q)
+        )
+      }
+      if(tab.value==='unread')  list = list.filter(m=>(m.activeSessions||[]).some(s=>s.femaleUnread>0))
+      if(tab.value==='nosession') list = list.filter(m=>!(m.activeSessions||[]).length)
       return list
     })
 
-    const openChat = async (s)=>{
-      activeSession.value = s
+    const totalUnread = computed(()=>{
+      return males.value.reduce((s,m)=>s+(m.activeSessions||[]).reduce((a,x)=>a+(x.femaleUnread||0),0),0)
+    })
+
+    const openChat = async (male, session)=>{
+      activeMale.value = male
+      activeSession.value = session
       msgs.value = []
       try{
-        const raw = await API.chat.getMessages(s.sessionId)
+        const raw = await API.admin.getChatMessages(session.sessionId)
         msgs.value = (raw||[]).map(m=>({
           type: m.senderRole==='male'?'out': m.senderRole==='system'?'sys':'in',
-          text: m.content, time: m.msgTime, cost: m.costDiamond||0
+          text: m.content, time: m.msgTime, cost: m.costDiamond||0, isRead: m.isRead === 1
         }))
         await nextTick()
         if(msgFlowRef.value) msgFlowRef.value.scrollTop = msgFlowRef.value.scrollHeight
+
+        API.admin.markRead(session.sessionId).catch(()=>{})
+        const m = males.value.find(x=>x.userId===male.userId)
+        if(m){
+          const as = (m.activeSessions||[]).find(x=>x.sessionId===session.sessionId)
+          if(as) as.femaleUnread = 0
+        }
       }catch(e){ toast('加载消息失败: '+e.message) }
       if(_chatPoll) clearInterval(_chatPoll)
       _chatPoll = setInterval(async ()=>{
         if(!activeSession.value) return
         try{
-          const raw = await API.chat.getMessages(activeSession.value.sessionId)
+          const raw = await API.admin.getChatMessages(activeSession.value.sessionId)
           const newMsgs = (raw||[]).map(m=>({
             type: m.senderRole==='male'?'out': m.senderRole==='system'?'sys':'in',
-            text: m.content, time: m.msgTime, cost: m.costDiamond||0
+            text: m.content, time: m.msgTime, cost: m.costDiamond||0, isRead: m.isRead === 1
           }))
-          if(newMsgs.length !== msgs.value.length){ msgs.value = newMsgs; await nextTick(); if(msgFlowRef.value) msgFlowRef.value.scrollTop = msgFlowRef.value.scrollHeight }
+          const hasNew = newMsgs.length !== msgs.value.length
+          msgs.value = newMsgs; await nextTick(); if(msgFlowRef.value && hasNew) msgFlowRef.value.scrollTop = msgFlowRef.value.scrollHeight
+          if(hasNew) API.admin.markRead(activeSession.value.sessionId).catch(()=>{})
         }catch(e){}
-      }, 5000)
+      }, 3000)
     }
-    const closeChat = ()=>{ activeSession.value = null; msgs.value = []; if(_chatPoll){ clearInterval(_chatPoll); _chatPoll=null } }
+    const closeChat = ()=>{ activeSession.value = null; activeMale.value = null; msgs.value = []; if(_chatPoll){ clearInterval(_chatPoll); _chatPoll=null } }
 
     const send = async ()=>{
       if(!reply.value.trim() || !activeSession.value) return
@@ -915,8 +935,12 @@ const ViewWorkbench = {
       aiSuggest.value = ''
       try{
         await API.admin.chatSend(activeSession.value.sessionId, text)
-        const idx = allSessions.value.findIndex(s=>s.sessionId===activeSession.value.sessionId)
-        if(idx>=0){ allSessions.value[idx].lastMsg = text; allSessions.value[idx].lastTime='刚刚' }
+        const s = activeSession.value
+        const m = males.value.find(x=>x.userId===activeMale.value.userId)
+        if(m){
+          const as = (m.activeSessions||[]).find(x=>x.sessionId===s.sessionId)
+          if(as){ as.lastMsg = text; as.lastTime = '刚刚'; as.femaleUnread = 0 }
+        }
       }catch(e){ toast('发送失败: '+e.message) }
       await nextTick()
       if(msgFlowRef.value) msgFlowRef.value.scrollTop = msgFlowRef.value.scrollHeight
@@ -931,98 +955,143 @@ const ViewWorkbench = {
     }
     const useAI = ()=>{ reply.value = aiSuggest.value; aiSuggest.value='' }
 
-    return {allSessions, loading, filterMale, filterFemale, filteredSessions, maleOptions, femaleOptions,
-            activeSession, msgs, reply, aiLoading, aiSuggest, openChat, closeChat, send, askAI, useAI, msgFlowRef, loadSessions}
+    const openFakePicker = (maleId)=>{
+      pickerMaleId.value = maleId
+      pickerFakeId.value = null
+      showFakePicker.value = true
+    }
+    const startNewChat = async ()=>{
+      if(!pickerMaleId.value || !pickerFakeId.value) return
+      try{
+        await API.admin.manualPush(pickerFakeId.value, pickerMaleId.value)
+        showFakePicker.value = false
+        toast('会话已创建')
+        loadMales()
+      }catch(e){ toast('创建失败: '+e.message) }
+    }
+
+    return {males, loading, search, tab, filteredMales, totalUnread, activeSession, activeMale, msgs,
+            reply, aiLoading, aiSuggest, msgFlowRef, showFakePicker, pickerFakeId,
+            openChat, closeChat, send, askAI, useAI, openFakePicker, startNewChat, loadMales, store, view}
   },
   template:`<div>
     <div v-if="!activeSession">
-      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
-        <div style="font-size:13px;color:rgba(255,255,255,0.5);">筛选：</div>
-        <select v-model="filterMale" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(180,140,255,0.25);background:#1f0d3a;color:#fff;font-size:12px;">
-          <option value="">全部男用户</option>
-          <option v-for="o in maleOptions" :key="o.id" :value="o.id">{{o.name}}</option>
-        </select>
-        <select v-model="filterFemale" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(180,140,255,0.25);background:#1f0d3a;color:#fff;font-size:12px;">
-          <option value="">全部女用户</option>
-          <option v-for="o in femaleOptions" :key="o.id" :value="o.id">{{o.name}}</option>
-        </select>
-        <span style="font-size:12px;color:rgba(255,255,255,0.3);">共 {{filteredSessions.length}} 个会话</span>
-        <button class="btn small ghost" @click="loadSessions" style="margin-left:auto;">🔄 刷新</button>
+      <div class="toolbar">
+        <div class="left">
+          <input class="input" v-model="search" placeholder="搜索手机/昵称..." style="width:220px;" />
+          <div style="display:flex;gap:4px;">
+            <button class="btn tiny" :class="tab==='all'?'':'ghost'" @click="tab='all'">全部</button>
+            <button class="btn tiny" :class="tab==='unread'?'':'ghost'" @click="tab='unread'">🔴 未读</button>
+            <button class="btn tiny" :class="tab==='nosession'?'':'ghost'" @click="tab='nosession'">无会话</button>
+          </div>
+          <span class="tag">共 {{filteredMales.length}} 人</span>
+          <span v-if="totalUnread" class="tag red">{{totalUnread}} 条未读</span>
+        </div>
+        <div class="right">
+          <button class="btn small ghost" @click="loadMales">🔄 刷新</button>
+        </div>
       </div>
-      <div v-if="loading" style="text-align:center;padding:40px;color:rgba(255,255,255,0.4);">加载中...</div>
-      <div v-else-if="!filteredSessions.length" class="empty" style="padding:40px;"><div class="ei">📭</div>暂无会话</div>
-      <div v-else class="card" style="overflow:hidden;">
-        <table style="width:100%;border-collapse:collapse;font-size:13px;">
-          <thead><tr style="background:rgba(180,140,255,0.06);color:rgba(255,255,255,0.5);">
-            <th style="padding:10px 14px;text-align:left;">男用户</th>
-            <th style="padding:10px 14px;text-align:left;">扮演女用户</th>
-            <th style="padding:10px 14px;text-align:left;">最后消息</th>
-            <th style="padding:10px 14px;text-align:left;">时间</th>
-            <th style="padding:10px 14px;text-align:left;">未读</th>
-            <th style="padding:10px 14px;text-align:left;">操作</th>
-          </tr></thead>
-          <tbody><tr v-for="s in filteredSessions" :key="s.sessionId" style="border-bottom:1px solid rgba(180,140,255,0.08);cursor:pointer;" @click="openChat(s)">
-            <td style="padding:10px 14px;">
-              <div style="display:flex;align-items:center;gap:8px;">
-                <div class="av av-sm" :class="'av-'+(s.maleAv||1)">{{(s.maleName||'?')[0]}}</div>
-                <div><div>{{s.maleName}}</div><div style="font-size:11px;color:rgba(255,255,255,0.4);">{{s.malePhone}}</div></div>
-              </div>
-            </td>
-            <td style="padding:10px 14px;">
-              <div style="display:flex;align-items:center;gap:8px;">
-                <div class="av av-sm" :class="'av-'+(s.femaleAv||1)">{{(s.femaleName||'?')[0]}}</div>
-                <span>{{s.femaleName}}</span>
-              </div>
-            </td>
-            <td style="padding:10px 14px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:rgba(255,255,255,0.6);">{{s.lastMsg||'—'}}</td>
-            <td style="padding:10px 14px;color:rgba(255,255,255,0.4);font-size:12px;">{{s.lastTime||'—'}}</td>
-            <td style="padding:10px 14px;"><span v-if="s.femaleUnread" class="tag red">{{s.femaleUnread}}</span></td>
-            <td style="padding:10px 14px;"><button class="btn small ghost" @click.stop="openChat(s)">💬 接入</button></td>
-          </tr></tbody>
-        </table>
+      <div v-if="loading" style="text-align:center;padding:60px;color:#999;">加载中...</div>
+      <div v-else-if="!filteredMales.length" class="empty"><div class="ei">📭</div>暂无匹配的男客户</div>
+      <div v-else style="display:flex;flex-direction:column;gap:12px;">
+        <div v-for="m in filteredMales" :key="m.userId" class="card" :style="{background:(m.activeSessions||[]).some(s=>s.femaleUnread>0)?'#fef0f5':'#fff'}">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+            <div class="av" :class="'av-'+(m.avatarNo||1)" style="width:40px;height:40px;font-size:16px;">{{(m.nickname||'?')[0]}}</div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:14px;">{{m.nickname}}</div>
+              <div style="font-size:11px;color:#888;">{{m.phone}} <span v-if="m.city" style="margin-left:8px;">📍{{m.city}}</span></div>
+            </div>
+            <div style="text-align:right;">
+              <div><span class="tag gold">✨ {{m.diamonds||0}}</span></div>
+              <div style="font-size:10px;color:#bbb;margin-top:2px;">{{m.lastLoginTime||'从未登录'}}</div>
+            </div>
+          </div>
+          <div v-if="(m.activeSessions||[]).length" style="display:flex;flex-direction:column;gap:6px;padding:8px 0 8px 52px;border-top:1px solid #f0f0f5;">
+            <div v-for="as in m.activeSessions" :key="as.sessionId" style="display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:6px;cursor:pointer;"
+                 :style="{background:as.femaleUnread?'#fff0f5':'#fafafd'}" @click="openChat(m, as)">
+              <div class="av" :class="'av-'+(as.fakeAv||1)" style="width:28px;height:28px;font-size:11px;">{{as.fakeName[0]}}</div>
+              <span style="font-weight:600;font-size:13px;min-width:50px;">{{as.fakeName}}</span>
+              <span style="flex:1;font-size:12px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{as.lastMsg||'—'}}</span>
+              <span v-if="as.femaleUnread" class="tag red" style="font-weight:700;">{{as.femaleUnread}}</span>
+              <span style="font-size:11px;color:#bbb;min-width:40px;">{{as.lastTime||''}}</span>
+              <button class="btn tiny" @click.stop="openChat(m, as)">💬 接入</button>
+            </div>
+          </div>
+          <div v-else style="padding:10px 0 6px 52px;border-top:1px solid #f0f0f5;color:#ccc;font-size:12px;">暂无会话</div>
+          <div style="padding:4px 0 0 52px;">
+            <button class="btn tiny ghost" @click="openFakePicker(m.userId)">＋ 为新用户新建会话</button>
+          </div>
+        </div>
       </div>
     </div>
 
     <div v-else>
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
         <button class="btn small ghost" @click="closeChat">← 返回列表</button>
-        <div style="font-size:14px;font-weight:600;">扮演「{{activeSession.femaleName}}」与「{{activeSession.maleName}}」对话</div>
+        <div style="font-size:14px;font-weight:600;">扮演「{{activeSession.fakeName}}」↔「{{activeMale.nickname}}」</div>
       </div>
-      <div class="cs-layout" style="height:calc(100vh - 200px);">
-        <div class="cs-col cs-chat" style="flex:2;">
-          <div class="cs-msg-flow" ref="msgFlowRef">
-            <template v-for="(m,i) in msgs" :key="i">
-              <div v-if="m.type==='sys'" class="cs-sys">{{m.text}}</div>
-              <div v-else-if="m.type==='out'" class="cs-bubble-row">
-                <div class="av av-sm" :class="'av-'+(activeSession.maleAv||1)">{{(activeSession.maleName||'?')[0]}}</div>
-                <div>
-                  <div class="cs-bubble">{{m.text}}</div>
-                  <div class="meta">男用户 · {{m.time}}{{m.cost?' · -'+m.cost+'✨':''}}</div>
-                </div>
-              </div>
-              <div v-else-if="m.type==='in'" class="cs-bubble-row fake">
-                <div class="av av-sm" :class="'av-'+(activeSession.femaleAv||1)">{{(activeSession.femaleName||'?')[0]}}</div>
-                <div>
-                  <div class="cs-bubble">{{m.text}}</div>
-                  <div class="meta" style="text-align:right;">客服回复 · {{m.time}}</div>
-                </div>
-              </div>
-            </template>
+      <div class="cs-chat" style="height:calc(100vh - 200px);display:flex;flex-direction:column;border-radius:8px;overflow:hidden;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+        <div class="cs-chat-head">
+          <div class="av" :class="'av-'+(activeMale.avatarNo||1)">{{(activeMale.nickname||'?')[0]}}</div>
+          <div class="iv">
+            <div class="n">{{activeMale.nickname}}</div>
+            <div class="m">{{activeMale.phone}} · ✨{{activeMale.diamonds||0}}</div>
           </div>
-          <div class="cs-input-bar">
-            <div class="cs-input-row">
-              <textarea v-model="reply" :placeholder="'作为 '+activeSession.femaleName+' 回复...'" @keydown.ctrl.enter="send"></textarea>
-              <div style="display:flex;flex-direction:column;gap:6px;">
-                <button class="btn" @click="send" :disabled="!reply.trim()">发送</button>
-                <button class="btn ghost small" @click="askAI" :disabled="aiLoading">{{aiLoading?'思考中...':'💡 AI'}}</button>
+        </div>
+        <div class="cs-msg-flow" ref="msgFlowRef">
+          <template v-for="(m,i) in msgs" :key="i">
+            <div v-if="m.type==='sys'" class="cs-sys">{{m.text}}</div>
+            <div v-else-if="m.type==='out'" class="cs-bubble-row">
+              <div class="av av-sm" :class="'av-'+(activeMale.avatarNo||1)">{{(activeMale.nickname||'?')[0]}}</div>
+              <div>
+                <div class="cs-bubble">{{m.text}}</div>
+                <div class="meta">{{m.time}}{{m.cost?' · -'+m.cost+'✨':''}}</div>
               </div>
             </div>
-            <div v-if="aiSuggest" style="margin-top:8px;padding:8px 12px;background:rgba(255,217,102,0.08);border:1px solid rgba(255,217,102,0.2);border-radius:8px;font-size:13px;display:flex;align-items:center;gap:8px;">
-              <span style="flex:1;color:rgba(255,255,255,0.8);">{{aiSuggest}}</span>
-              <button class="btn tiny gold" @click="useAI">采用</button>
+            <div v-else-if="m.type==='in'" class="cs-bubble-row fake">
+              <div class="av av-sm" :class="'av-'+(activeSession.fakeAv||1)">{{(activeSession.fakeName||'?')[0]}}</div>
+              <div>
+                <div class="cs-bubble">{{m.text}}</div>
+                <div class="meta" style="text-align:right;">客服 · {{m.time}}<span v-if="m.isRead" style="color:#5eead4;margin-left:6px;">✓已读</span></div>
+              </div>
             </div>
-            <div style="margin-top:6px;font-size:10px;color:rgba(255,255,255,0.3);">Ctrl+Enter 发送</div>
+          </template>
+        </div>
+        <div class="cs-input-bar">
+          <div class="cs-input-row">
+            <textarea v-model="reply" :placeholder="'作为 '+activeSession.fakeName+' 回复...'" @keydown.ctrl.enter="send"></textarea>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <button class="btn" @click="send" :disabled="!reply.trim()">发送</button>
+              <button class="btn ghost small" @click="askAI" :disabled="aiLoading">{{aiLoading?'...':'💡 AI'}}</button>
+            </div>
           </div>
+          <div v-if="aiSuggest" style="margin-top:8px;padding:8px 12px;background:rgba(255,217,102,.08);border:1px solid rgba(255,217,102,.2);border-radius:8px;font-size:13px;display:flex;align-items:center;gap:8px;">
+            <span style="flex:1;color:#555;">{{aiSuggest}}</span>
+            <button class="btn tiny gold" @click="useAI">采用</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showFakePicker" class="modal" @click.self="showFakePicker=false">
+      <div class="modal-card" style="max-width:460px;">
+        <div class="modal-head">
+          <div class="t">选择假用户</div>
+          <div class="x" @click="showFakePicker=false">×</div>
+        </div>
+        <div class="modal-body" style="max-height:360px;overflow-y:auto;">
+          <div v-if="!store.fakeUsers.length" class="empty" style="padding:20px;">暂无假用户</div>
+          <div v-for="f in store.fakeUsers.filter(x=>x.online)" :key="f.id" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;cursor:pointer;margin-bottom:6px;"
+               :style="{background:pickerFakeId===f.id?'rgba(161,140,255,.08)':'#fafafd',border:pickerFakeId===f.id?'1px solid #a18cff':'1px solid transparent'}"
+               @click="pickerFakeId=f.id">
+            <div class="av" :class="'av-'+(f.av||1)" style="width:32px;height:32px;font-size:12px;">{{f.name[0]}}</div>
+            <div style="flex:1;"><div style="font-weight:600;">{{f.name}}</div><div style="font-size:11px;color:#888;">{{f.age}}岁 · {{f.city}}</div></div>
+            <span class="tag green">在线</span>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn ghost" @click="showFakePicker=false">取消</button>
+          <button class="btn" :disabled="!pickerFakeId" @click="startNewChat">确认发起</button>
         </div>
       </div>
     </div>
@@ -1377,8 +1446,8 @@ const App = {
     const pollUnread = async ()=>{
       if(!API || !adminAuth.loggedIn) return
       try{
-        const sessions = await API.admin.getSessions()
-        const total = (sessions||[]).reduce((s,x)=>(s+(x.femaleUnread||0)),0)
+        const maleUsers = await API.admin.getSessions()
+        const total = (maleUsers||[]).reduce((s,m)=>(s+(m.activeSessions||[]).reduce((a,x)=>(a+(x.femaleUnread||0)),0)),0)
         if(total > adminUnread.value && adminUnread.value >= 0){
           toast('收到新消息 (' + total + ' 条未读)')
         }

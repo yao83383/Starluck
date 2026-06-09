@@ -17,9 +17,10 @@ import com.starluck.mapper.PushLogMapper;
 import com.starluck.mapper.PushRuleMapper;
 import com.starluck.mapper.UserMapper;
 import com.starluck.mapper.UserProfileMapper;
+import com.starluck.mapper.UserBalanceMapper;
 import com.starluck.entity.UserProfile;
+import com.starluck.entity.UserBalance;
 import com.starluck.service.AdminService;
-import com.starluck.vo.AdminSessionVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -55,12 +58,14 @@ public class AdminServiceImpl implements AdminService {
     private final ChatMessageMapper messageMapper;
     private final UserMapper userMapper;
     private final UserProfileMapper userProfileMapper;
+    private final UserBalanceMapper userBalanceMapper;
     private final GlmClient glmClient;
 
     public AdminServiceImpl(FakeUserMapper fakeUserMapper, PushRuleMapper pushRuleMapper,
                             PushLogMapper pushLogMapper, ChatSessionMapper sessionMapper,
                             ChatMessageMapper messageMapper, UserMapper userMapper,
-                            UserProfileMapper userProfileMapper, GlmClient glmClient) {
+                            UserProfileMapper userProfileMapper, UserBalanceMapper userBalanceMapper,
+                            GlmClient glmClient) {
         this.fakeUserMapper = fakeUserMapper;
         this.pushRuleMapper = pushRuleMapper;
         this.pushLogMapper = pushLogMapper;
@@ -68,6 +73,7 @@ public class AdminServiceImpl implements AdminService {
         this.messageMapper = messageMapper;
         this.userMapper = userMapper;
         this.userProfileMapper = userProfileMapper;
+        this.userBalanceMapper = userBalanceMapper;
         this.glmClient = glmClient;
     }
 
@@ -317,58 +323,6 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<AdminSessionVO> getAdminSessions(Long csUserId) {
-        List<ChatSession> sessions = sessionMapper.selectList(
-                new LambdaQueryWrapper<ChatSession>()
-                        .eq(ChatSession::getIsFake, true)
-                        .orderByDesc(ChatSession::getUpdatedAt));
-
-        List<Long> fakeIds = sessions.stream().map(ChatSession::getFemaleUserId).distinct().collect(java.util.stream.Collectors.toList());
-        List<FakeUser> fakes = fakeIds.isEmpty() ? Collections.emptyList() :
-                fakeUserMapper.selectBatchIds(fakeIds);
-        Map<Long, FakeUser> fakeMap = fakes.stream().collect(java.util.stream.Collectors.toMap(FakeUser::getId, f -> f, (a, b) -> a));
-
-        if (csUserId != null) {
-            String csStr = String.valueOf(csUserId);
-            sessions = sessions.stream().filter(s -> {
-                FakeUser f = fakeMap.get(s.getFemaleUserId());
-                return f != null && csStr.equals(f.getCsOwner());
-            }).collect(java.util.stream.Collectors.toList());
-        }
-
-        List<Long> maleIds = sessions.stream().map(ChatSession::getMaleUserId).distinct().collect(java.util.stream.Collectors.toList());
-        List<User> males = maleIds.isEmpty() ? Collections.emptyList() : userMapper.selectBatchIds(maleIds);
-        Map<Long, User> maleMap = males.stream().collect(java.util.stream.Collectors.toMap(User::getId, u -> u, (a, b) -> a));
-
-        List<UserProfile> profiles = maleIds.isEmpty() ? Collections.emptyList() :
-                userProfileMapper.selectList(new LambdaQueryWrapper<UserProfile>().in(UserProfile::getUserId, maleIds));
-        Map<Long, UserProfile> profileMap = profiles.stream().collect(java.util.stream.Collectors.toMap(UserProfile::getUserId, p -> p, (a, b) -> a));
-
-        List<AdminSessionVO> result = new ArrayList<>();
-        for (ChatSession s : sessions) {
-            FakeUser fake = fakeMap.get(s.getFemaleUserId());
-            User male = maleMap.get(s.getMaleUserId());
-            UserProfile profile = profileMap.get(s.getMaleUserId());
-
-            result.add(AdminSessionVO.builder()
-                    .sessionId(s.getId())
-                    .maleId(s.getMaleUserId())
-                    .maleName(profile != null && profile.getNickname() != null ? profile.getNickname() : (male != null ? male.getPhone() : "未知"))
-                    .malePhone(male != null ? male.getPhone() : "")
-                    .maleAv(profile != null ? profile.getAvatarNo() : 1)
-                    .femaleId(s.getFemaleUserId())
-                    .femaleName(fake != null ? fake.getName() : "已删除")
-                    .femaleAv(fake != null ? fake.getAvatarNo() : 1)
-                    .lastMsg(s.getLastMsg())
-                    .lastTime(s.getLastTime())
-                    .maleUnread(s.getMaleUnread() != null ? s.getMaleUnread() : 0)
-                    .femaleUnread(s.getFemaleUnread() != null ? s.getFemaleUnread() : 0)
-                    .build());
-        }
-        return result;
-    }
-
-    @Override
     public void sendAsCs(Long sessionId, String content) {
         ChatSession session = sessionMapper.selectById(sessionId);
         if (session == null) throw new BusinessException("会话不存在");
@@ -399,5 +353,95 @@ public class AdminServiceImpl implements AdminService {
         pushData.put("content", content);
         pushData.put("senderId", fakeUserId);
         com.starluck.config.ChatWebSocketHandler.sendToUser(maleUserId, JSONUtil.toJsonStr(pushData));
+    }
+
+    @Override
+    public List<com.starluck.vo.MaleUserVO> getMaleUsers(Long csUserId) {
+        List<User> males = userMapper.selectList(
+                new LambdaQueryWrapper<User>()
+                        .eq(User::getRole, "USER")
+                        .eq(User::getStatus, 1)
+                        .orderByDesc(User::getLastLoginTime));
+
+        if (males.isEmpty()) return Collections.emptyList();
+
+        List<Long> maleIds = males.stream().map(User::getId).collect(Collectors.toList());
+
+        Map<Long, UserProfile> profileMap = userProfileMapper.selectList(
+                new LambdaQueryWrapper<UserProfile>().in(UserProfile::getUserId, maleIds))
+                .stream().collect(Collectors.toMap(UserProfile::getUserId, p -> p, (a, b) -> a));
+
+        Map<Long, UserBalance> balanceMap = userBalanceMapper.selectList(
+                new LambdaQueryWrapper<UserBalance>().in(UserBalance::getUserId, maleIds))
+                .stream().collect(Collectors.toMap(UserBalance::getUserId, b -> b, (a, b) -> a));
+
+        List<ChatSession> allSessions = sessionMapper.selectList(
+                new LambdaQueryWrapper<ChatSession>()
+                        .in(ChatSession::getMaleUserId, maleIds)
+                        .eq(ChatSession::getIsFake, true));
+
+        Map<Long, List<ChatSession>> sessionMap = allSessions.stream()
+                .collect(Collectors.groupingBy(ChatSession::getMaleUserId));
+
+        Set<Long> allFakeIds = allSessions.stream().map(ChatSession::getFemaleUserId).collect(Collectors.toSet());
+        Map<Long, FakeUser> fakeMap = allFakeIds.isEmpty() ? Collections.emptyMap() :
+                fakeUserMapper.selectBatchIds(allFakeIds).stream()
+                        .collect(Collectors.toMap(FakeUser::getId, f -> f, (a, b) -> a));
+
+        List<com.starluck.vo.MaleUserVO> result = new ArrayList<>();
+        for (User male : males) {
+            UserProfile profile = profileMap.get(male.getId());
+            UserBalance balance = balanceMap.get(male.getId());
+            List<ChatSession> mySessions = sessionMap.getOrDefault(male.getId(), Collections.emptyList());
+
+            List<com.starluck.vo.MaleUserVO.ActiveSession> activeSessions = new ArrayList<>();
+            for (ChatSession s : mySessions) {
+                FakeUser fake = fakeMap.get(s.getFemaleUserId());
+                if (fake != null) {
+                    com.starluck.vo.MaleUserVO.ActiveSession as = new com.starluck.vo.MaleUserVO.ActiveSession();
+                    as.sessionId = s.getId();
+                    as.fakeId = fake.getId();
+                    as.fakeName = fake.getName();
+                    as.fakeAv = fake.getAvatarNo() != null ? fake.getAvatarNo() : 1;
+                    as.lastMsg = s.getLastMsg();
+                    as.lastTime = s.getLastTime();
+                    as.femaleUnread = s.getFemaleUnread() != null ? s.getFemaleUnread() : 0;
+                    activeSessions.add(as);
+                }
+            }
+
+            if (csUserId != null) {
+                String csStr = String.valueOf(csUserId);
+                activeSessions = activeSessions.stream().filter(as -> {
+                    FakeUser f = fakeMap.get(as.fakeId);
+                    return f != null && csStr.equals(f.getCsOwner());
+                }).collect(Collectors.toList());
+            }
+
+            result.add(com.starluck.vo.MaleUserVO.builder()
+                    .userId(male.getId())
+                    .phone(male.getPhone())
+                    .nickname(profile != null && profile.getNickname() != null ? profile.getNickname() : male.getPhone())
+                    .avatarNo(profile != null && profile.getAvatarNo() != null ? profile.getAvatarNo() : 1)
+                    .age(profile != null ? profile.getAge() : null)
+                    .city(profile != null ? profile.getCity() : "")
+                    .diamonds(balance != null ? balance.getDiamonds() : 0)
+                    .lastLoginTime(male.getLastLoginTime() != null ? male.getLastLoginTime().format(TIME_FMT) : null)
+                    .sessionCount(activeSessions.size())
+                    .activeSessions(activeSessions)
+                    .build());
+        }
+
+        result.sort((a, b) -> {
+            int aUnread = a.getActiveSessions().stream().mapToInt(s -> s.femaleUnread != null ? s.femaleUnread : 0).sum();
+            int bUnread = b.getActiveSessions().stream().mapToInt(s -> s.femaleUnread != null ? s.femaleUnread : 0).sum();
+            if (aUnread > 0 && bUnread == 0) return -1;
+            if (aUnread == 0 && bUnread > 0) return 1;
+            if (a.getActiveSessions().size() > 0 && b.getActiveSessions().size() == 0) return -1;
+            if (a.getActiveSessions().size() == 0 && b.getActiveSessions().size() > 0) return 1;
+            return 0;
+        });
+
+        return result;
     }
 }

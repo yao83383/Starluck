@@ -3,6 +3,7 @@ package com.starluck.service;
 import com.starluck.entity.FakeUser;
 import com.starluck.entity.PushRule;
 import com.starluck.entity.User;
+import com.starluck.vo.MaleUserVO;
 
 import java.util.List;
 
@@ -45,9 +46,9 @@ public interface AdminService {
     /** 分配假用户给客服 */
     void assignFakeToCs(Long fakeId, Long csUserId, String csName);
 
-    /** 获取所有假用户会话（管理员看全部，CS只看自己的） */
-    List<com.starluck.vo.AdminSessionVO> getAdminSessions(Long csUserId);
-
     /** 客服以假用户身份发送消息 */
     void sendAsCs(Long sessionId, String content);
+
+    /** 获取真实男用户列表（含活跃会话信息） */
+    List<MaleUserVO> getMaleUsers(Long csUserId);
 }

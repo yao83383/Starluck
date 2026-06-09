@@ -128,12 +128,13 @@ public class ChatServiceImpl implements ChatService {
         if (session == null) {
             throw new BusinessException("会话不存在");
         }
+        if (!session.getMaleUserId().equals(userId) && !session.getFemaleUserId().equals(userId)) {
+            throw new BusinessException("无权查看此会话");
+        }
 
-        // 将对方发给我的未读消息标记为已读
         Long otherUserId = session.getMaleUserId().equals(userId) ? session.getFemaleUserId() : session.getMaleUserId();
         messageMapper.markAsRead(sessionId, otherUserId);
 
-        // 更新当前用户未读数为0
         if (session.getMaleUserId().equals(userId)) {
             session.setMaleUnread(0);
         } else {

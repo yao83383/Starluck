@@ -1,13 +1,23 @@
 package com.starluck.controller;
 
+import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.starluck.common.BusinessException;
+import com.starluck.config.ChatWebSocketHandler;
 import com.starluck.common.Result;
 import com.starluck.common.SecurityUtil;
+import com.starluck.entity.ChatMessage;
+import com.starluck.entity.ChatSession;
 import com.starluck.entity.FakeUser;
 import com.starluck.entity.PushRule;
 import com.starluck.entity.User;
+import com.starluck.mapper.ChatMessageMapper;
+import com.starluck.mapper.ChatSessionMapper;
 import com.starluck.service.AdminService;
-import com.starluck.vo.AdminSessionVO;
+import com.starluck.vo.ChatMessageVO;
+import com.starluck.vo.MaleUserVO;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,9 +34,14 @@ import java.util.stream.Collectors;
 public class AdminController {
 
     private final AdminService adminService;
+    private final ChatSessionMapper sessionMapper;
+    private final ChatMessageMapper messageMapper;
 
-    public AdminController(AdminService adminService) {
+    public AdminController(AdminService adminService, ChatSessionMapper sessionMapper,
+                           ChatMessageMapper messageMapper) {
         this.adminService = adminService;
+        this.sessionMapper = sessionMapper;
+        this.messageMapper = messageMapper;
     }
 
     @GetMapping("/fake-users")
@@ -116,11 +131,11 @@ public class AdminController {
     }
 
     @GetMapping("/sessions")
-    public Result<List<AdminSessionVO>> getAdminSessions() {
+    public Result<List<MaleUserVO>> getAdminSessions() {
         Long userId = SecurityUtil.getCurrentUserId();
         boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
                 .stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-        return Result.ok(adminService.getAdminSessions(isAdmin ? null : userId));
+        return Result.ok(adminService.getMaleUsers(isAdmin ? null : userId));
     }
 
     @PostMapping("/chat/send")
@@ -132,5 +147,39 @@ public class AdminController {
         }
         adminService.sendAsCs(sessionId, content.trim());
         return Result.okMsg("发送成功");
+    }
+
+    @GetMapping("/chat/messages/{sessionId}")
+    public Result<List<ChatMessageVO>> getAdminChatMessages(@PathVariable Long sessionId) {
+        ChatSession session = sessionMapper.selectById(sessionId);
+        if (session == null) throw new BusinessException("会话不存在");
+
+        List<ChatMessage> messages = messageMapper.selectList(
+                new LambdaQueryWrapper<ChatMessage>()
+                        .eq(ChatMessage::getSessionId, sessionId)
+                        .orderByAsc(ChatMessage::getCreatedAt));
+
+        return Result.ok(messages.stream().map(m -> ChatMessageVO.builder()
+                .id(m.getId()).sessionId(m.getSessionId()).senderId(m.getSenderId())
+                .senderRole(m.getSenderRole()).msgType(m.getMsgType()).content(m.getContent())
+                .isRead(m.getIsRead() != null ? m.getIsRead() : 0)
+                .giftEmoji(m.getGiftEmoji()).giftName(m.getGiftName())
+                .costDiamond(m.getCostDiamond()).msgTime(m.getMsgTime())
+                .build()).collect(Collectors.toList()));
+    }
+
+    @PostMapping("/chat/mark-read/{sessionId}")
+    @Transactional
+    public Result<Void> markRead(@PathVariable Long sessionId) {
+        ChatSession session = sessionMapper.selectById(sessionId);
+        if (session == null) throw new BusinessException("会话不存在");
+        session.setFemaleUnread(0);
+        sessionMapper.updateById(session);
+        messageMapper.markAsRead(sessionId, session.getMaleUserId());
+        Map<String, Object> push = new HashMap<>();
+        push.put("type", "messages_read");
+        push.put("sessionId", sessionId);
+        ChatWebSocketHandler.sendToUser(session.getMaleUserId(), JSONUtil.toJsonStr(push));
+        return Result.ok();
     }
 }
